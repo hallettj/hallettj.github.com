@@ -4,8 +4,17 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
 <head>
    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
    <title>{{ page.title }}</title>
    <meta name="author" content="Jesse Hallett" />
+
+   <!-- OpenID delegation -->
+   <meta http-equiv="X-XRDS-Location" content="http://www.myopenid.com/xrds?username=hallettj.myopenid.com" />
+   <link rel="openid.server" href="http://www.myopenid.com/server" />
+   <link rel="openid.delegate me" href="http://hallettj.myopenid.com/" />
+   <link rel="openid2.local_id" href="http://hallettj.myopenid.com/" />
+   <link rel="openid2.provider" href="http://www.myopenid.com/server" />
+
    <link href="http://feeds.feedburner.com/sitrus" rel="alternate" title="blog.sitr.us" type="application/atom+xml" />
 
    <!-- syntax highlighting CSS -->
