@@ -15,19 +15,19 @@ respectively. The nucleus forms the the core of the syllable; it is
 most often a vowel, or a combination of vowels - but there are many
 exceptions to that. If you examine enough languages you can find
 almost every kind phone used as a syllable nucleus. In the word "far",
-[f] is the syllable onset, [a] is the nucleus, and [r] the coda. If a
+\[f\] is the syllable onset, \[a\] is the nucleus, and \[r\] the coda. If a
 coda is present in a syllable, the nucleus and the coda form a single
 unit called a *rhyme*; otherwise the nucleus makes up the rhyme by
-itself. Looking at "far" again, [ar] forms the rhyme. A syllable does
+itself. Looking at "far" again, \[ar\] forms the rhyme. A syllable does
 not necessarily have to have an onset or a coda - depending on the
 language - but a nucleus is always present.
 
 Even in English, syllable nuclei are not restricted to vowels. For
-example, in the monosyllabic word, "hmm", the syllable nucleus is [ṃ],
+example, in the monosyllabic word, "hmm", the syllable nucleus is \[ṃ\],
 which is a consonant but is more specifically a *nasal*. Another
-nasal, [n], can be seen as a syllable nucleus in the word "isn't",
+nasal, \[n\], can be seen as a syllable nucleus in the word "isn't",
 which is transcribed into the [International Phonetic Alphabet (IPA)][IPA]
-as [ɪzzṇt]. In this case there are two syllables, and [ṇ] forms the
+as \[ɪzzṇt\]. In this case there are two syllables, and \[ṇ\] forms the
 nucleus of the second syllable.
 
 [IPA]: http://en.wikipedia.org/wiki/International_Phonetic_Alphabet
@@ -42,26 +42,26 @@ instead of a dot; but in this case a dot was as close as I could get.
 
 Anyone following closely may notice that it is difficult to decide
 exactly how to divide "isn't" into syllables. It seems like it should
-be either ['ɪz.ṇt], or ['ɪ.zṇt], where the dot (.) represents a
+be either \['ɪz.ṇt\], or \['ɪ.zṇt\], where the dot (.) represents a
 syllable boundary and the apostrophe (') represents the beginning of a
-stressed syllable; but it is tricky to figure out whether the [z] is
+stressed syllable; but it is tricky to figure out whether the \[z\] is
 the coda of the first syllable or the onset of the second
-syllable. That is because in the [z] in "isn't" demonstrates
+syllable. That is because in the \[z\] in "isn't" demonstrates
 *ambisyllabicity*, a common feature in English that I will write about
-in a future article. The short explanation is that [z] is both an
+in a future article. The short explanation is that \[z\] is both an
 onset and a coda, which is why I transcribed the word with two
-[z]'s. Anyway, in both analyses [ṇ] forms the nucleus of the second
-syllable, so we don't need to worry about the placement of [z] for
+\[z\]'s. Anyway, in both analyses \[ṇ\] forms the nucleus of the second
+syllable, so we don't need to worry about the placement of \[z\] for
 now.
 
 There are also arguably cases where a *liquid* forms the nucleus of a
-syllable in English. The liquids in English are [l] and [r]. Consider
+syllable in English. The liquids in English are \[l\] and \[r\]. Consider
 the word "sir" and the second syllable of "apple". If it is the case
 that the liquids in these syllables are the nuclei, then the words
-would be transcribed as [sṛ] and [æppḷ] respectively. However, not
+would be transcribed as \[sṛ\] and \[æppḷ\] respectively. However, not
 everybody agrees with that interpretation, and so these words are
-often analyzed as [sər] and [æppəl]. That would make the syllable
-nuclei [ə], which is a vowel. And by the way, the [p] in "apple" is
+often analyzed as \[sər\] and \[æppəl\]. That would make the syllable
+nuclei \[ə\], which is a vowel. And by the way, the \[p\] in "apple" is
 also ambisyllabic.
 
 The reason vowels are so likely to form syllable nuclei is that they
@@ -71,8 +71,8 @@ phones. Liquids and nasals are right behind vowels in that they are
 more sonorous than any other type of consonant. But it is possible to
 find syllable nuclei in other languages that are considerably less
 sonorant than any of the above. For example, there is at least one
-[Berber language][] that contains syllables like [tḳt], where the
-nucleus of the syllable is [ḳ].
+[Berber language][] that contains syllables like \[tḳt\], where the
+nucleus of the syllable is \[ḳ\].
 
 [Berber language]: http://en.wikipedia.org/wiki/Berber_languages
 
@@ -81,11 +81,11 @@ have strict rules about how many consonants can appear, and what sort
 of order they appear in. English is relatively lax in this respect, so
 we can see syllables with several consonants clustered together in
 both positions. For example, "scrumptious", transcribed as
-['skrʌmp.ʃəs], has three distinct consonant phones in the onset and
+\['skrʌmp.ʃəs\], has three distinct consonant phones in the onset and
 two in the coda of the first syllable. But notice that you would never
-see a word in English like ['rksʌpm.ʃəs], which would probably be
+see a word in English like \['rksʌpm.ʃəs\], which would probably be
 spelled "rksupmtious". Try pronouncing that and see what happens - and
-remember that it's cheating to make the [r] or the [m] into separate
+remember that it's cheating to make the \[r\] or the \[m\] into separate
 syllables!
 
 Consonants in syllable onsets and codas are also governed by
@@ -101,10 +101,10 @@ first syllable, thus making the sonority sequence "wrong".
 
 Every sound in a language has a place somewhere in the sonority
 hierarchy. And every language has its own sonority hierarchy
-ordering. So for example [star] is easy for English speakers to
-pronounce, but you don't see a word like [tsar]: [t] is more sonorous
-than [s] in English. But in Russian it is not uncommon to see a word
-like [tsar].
+ordering. So for example \[star\] is easy for English speakers to
+pronounce, but you don't see a word like \[tsar\]: \[t\] is more sonorous
+than \[s\] in English. But in Russian it is not uncommon to see a word
+like \[tsar\].
 
 Restrictions on what is allowed in a syllable vary from language to
 language. Not all languages allow as many consonants to be clustered

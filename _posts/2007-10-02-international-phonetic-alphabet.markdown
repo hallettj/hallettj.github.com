@@ -54,9 +54,9 @@ about how to spell things, so the IPA adopts some different phonetic
 conventions from different languages. For example, I mentioned earlier
 that the sound represented by "y" in English is spelled "j" in, among
 others languages, Icelandic; and in fact the symbol for that sound in
-IPA is [j]. Here is [the complete IPA chart in its most recent
+IPA is \[j\]. Here is [the complete IPA chart in its most recent
 revision][Full IPA chart]. And by the way: in IPA, the word
-"elucidate" is transcribed [i'lu.sə.deɪt].
+"elucidate" is transcribed \[i'lu.sə.deɪt\].
 
 [Full IPA chart]: http://www.linguiste.org/phonetics/ipa/chart/
 
@@ -65,11 +65,11 @@ articulation* of the sound, an the *manner of articulation*. When you
 voice a consonant you, you press your tongue against the roof of your
 mouth, or in some cases you press your lips together or put the tip of
 your tongue between your teeth. The exact spot on where you press your
-tongue is the place of articulation. For example, when you say [t] you
+tongue is the place of articulation. For example, when you say \[t\] you
 press the tip of your tongue against a spot towards the front of your
-mouth called the alveolar ridge; whereas when you say [k] you press
+mouth called the alveolar ridge; whereas when you say \[k\] you press
 the back of your tongue against your soft palate, which linguists call
-the velum. [t] and [k] have the same manner of articulation - they are
+the velum. \[t\] and \[k\] have the same manner of articulation - they are
 both plosives, which means that they are articulated by completely
 stopping air from flowing out of the mouth for a moment. But they have
 different places of articulation. Early on in a linguist's career he
@@ -82,25 +82,25 @@ English speakers and provides example words to illustrate each sound.
 
 [IPA chart for English]: http://en.wikipedia.org/wiki/IPA_Chart_for_English
 
-Wikipedia provides the transcription for the English "r" as [ɹ]. This
-is the most technically correct transcription, since in IPA [r]
+Wikipedia provides the transcription for the English "r" as \[ɹ\]. This
+is the most technically correct transcription, since in IPA \[r\]
 represents a rolled "r", which is heard in Spanish. In linguistics
-speak, [r] is a trill and [ɹ] is a liquid. However, English doesn't
-have a trill, so people transcribing English often use [r] instead of
-[ɹ] because the former is more familiar - and easier to type. It is
+speak, \[r\] is a trill and \[ɹ\] is a liquid. However, English doesn't
+have a trill, so people transcribing English often use \[r\] instead of
+\[ɹ\] because the former is more familiar - and easier to type. It is
 considered acceptable to make substitutions like that in cases where
 readers are unlikely to be confused by the switch. So when I
-transcribe an English word using [r] instead of [ɹ] I'm not actually
+transcribe an English word using \[r\] instead of \[ɹ\] I'm not actually
 trying to make you practice pronouncing trills.
 
 As an aside, the rolled "r" in French is not the same sound as the
-rolled "r" in Spanish. The French "r" is transcribed [ʀ]. Both sounds
+rolled "r" in Spanish. The French "r" is transcribed \[ʀ\]. Both sounds
 are trills, so they share the same manner of articulation; but they
-have different places of articulation. [ɹ] is alveolar, meaning that
+have different places of articulation. \[ɹ\] is alveolar, meaning that
 to pronounce it the tip of the tongue is positioned on the alveolar
-ridge, in the same spot it is placed when pronouncing [t]. The sound
+ridge, in the same spot it is placed when pronouncing \[t\]. The sound
 is produced by vibrating the tongue against the roof of the mouth,
-which is what makes it a trill. To pronounce [ʀ], the back of the
+which is what makes it a trill. To pronounce \[ʀ\], the back of the
 tongue is placed against the uvula and vibrates against that.
 
 To make the alphabet more flexible, IPA employs a number of
@@ -110,7 +110,7 @@ that differ slightly from the sound usually represented by a bare
 character. Last week I talked about consonants that are used as
 syllable nuclei, which are called syllabic consonants. Syllabicity is
 considered a phonological feature, so it is indicated with a
-diacritic. For example, the syllabic version of [n] is [n̩].
+diacritic. For example, the syllabic version of \[n\] is \[n̩\].
 
 Another example of a diacritic is ʰ, which is used to indicate
 aspiration. Did you know that the letter "p" in English is used to
@@ -126,7 +126,7 @@ is simply /p/.
 
 Even though they are technically different sounds, English speakers
 treat /p/ and /pʰ/ as being the same. So they are written with the
-same letter. And in IPA they are usually both transcribed as [p] for
+same letter. And in IPA they are usually both transcribed as \[p\] for
 simplicity. But on occasion it is important to have the ability to
 distinguish the two. The difference between sounds that are exactly
 the same and sounds that are treated as the same by language speakers
