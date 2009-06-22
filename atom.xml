@@ -4,11 +4,11 @@ layout: nil
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
- <title>{{ site.title }}</title>
- <link href="http://blog.sitr.us/atom.xml" rel="self"/>
- <link href="http://blog.sitr.us/"/>
+ <title>sitr.us</title>
+ <link href="http://sitr.us/atom.xml" rel="self"/>
+ <link href="http://sitr.us/"/>
  <updated>{{ site.time | date_to_xmlschema }}</updated>
- <id>http://blog.sitr.us/</id>
+ <id>http://sitr.us/</id>
  <author>
    <name>Jesse Hallett</name>
    <email>jesse@sitr.us</email>
@@ -17,9 +17,9 @@ layout: nil
  {% for post in site.posts %}
  <entry>
    <title>{{ post.title }}</title>
-   <link href="http://blog.sitr.us{{ post.url }}"/>
+   <link href="http://sitr.us{{ post.url }}"/>
    <updated>{{ post.date | date_to_xmlschema }}</updated>
-   <id>http://blog.sitr.us{{ post.id }}</id>
+   <id>http://sitr.us{{ post.id }}</id>
    <content type="html">{{ post.content | xml_escape }}</content>
  </entry>
  {% endfor %}
