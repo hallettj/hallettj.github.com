@@ -23,10 +23,12 @@ going with Sinatra. I read a [helpful article on gittr.com][] that
 pointed me in the right direction. The article advised me to add these
 lines to my spec files:
 
-    require File.expand_path(File.dirname(__FILE__) + '/your_application')
-    require 'spec'
-    require 'spec/interop/test'
-    require 'sinatra/test/unit'
+{% highlight ruby %}
+require File.expand_path(File.dirname(__FILE__) + '/your_application')
+require 'spec'
+require 'spec/interop/test'
+require 'sinatra/test/unit'
+{% endhighlight %}
 
 The first line loads your application; the second line loads RSpec;
 the third loads an RSpec-Test::Unit compatibility layer; and the
@@ -43,9 +45,11 @@ which conflicts with RSpec.
 Those instructions mostly worked. I could write and run specs. But I
 had trouble with matchers. For example, this example:
 
-    it "should not have a cookie"
-      instance.cookie.should be_nil
-    end
+{% highlight ruby %}
+it "should not have a cookie"
+  instance.cookie.should be_nil
+end
+{% endhighlight %}
 
 Would give an error message like this:
 
@@ -64,21 +68,23 @@ them into Test::Unit::TestCase. So I bypassed 'sinatra/test/unit' by
 copying and adapting some code from it to make the top of my spec file
 look like this:
 
-    require File.expand_path(File.dirname(__FILE__) + '/your_application')
-    require 'spec'
-    require 'spec/interop/test'
-    require 'sinatra/test/methods'
-    
-    include Sinatra::Test::Methods
-    
-    Sinatra::Application.default_options.merge!(
-      :env =&gt; :test,
-      :run =&gt; false,
-      :raise_errors =&gt; true,
-      :logging =&gt; false
-    )
-    
-    Sinatra.application.options = nil
+{% highlight ruby %}
+require File.expand_path(File.dirname(__FILE__) + '/your_application')
+require 'spec'
+require 'spec/interop/test'
+require 'sinatra/test/methods'
+
+include Sinatra::Test::Methods
+
+Sinatra::Application.default_options.merge!(
+  :env => :test,
+  :run => false,
+  :raise_errors => true,
+  :logging => false
+)
+
+Sinatra.application.options = nil
+{% endhighlight %}
 
 Since that is a fair amount of setup, I moved all of it into a
 separate file called spec_helper.rb, which I loaded into my actual
@@ -88,12 +94,14 @@ that is split into multiple files and multiple spec files.
 Anyway, now my specs run just as they should, with Sinatra's helpers
 and everything:
 
-    it "should deliver a cookie" do
-      get_it '/cookie'
-      @response.should be_ok
-      @response.headers['Content-Type'].should == 'application/x-baked-goods'
-      @response.body.should_not be_empty
-    end
+{% highlight ruby %}
+it "should deliver a cookie" do
+  get_it '/cookie'
+  @response.should be_ok
+  @response.headers['Content-Type'].should == 'application/x-baked-goods'
+  @response.body.should_not be_empty
+end
+{% endhighlight %}
 
 The next challenge was to write specs for Sinatra helpers. Although
 Sinatra actions and helpers generally appear in the outermost
@@ -105,28 +113,34 @@ way Rails instantiates a subclass of ActionController::Base to handle a
 controller action. Here is the code you will want in your example
 groups:
 
-    before :all do
-      request = mock("request")
-      response = mock("response", :body= =&gt; nil)
-      route_params = mock("route_params")
-      @event_context = Sinatra::EventContext.new(request, response, route_params)
-    end
+{% highlight ruby %}
+before :all do
+  request = mock("request")
+  response = mock("response", :body= => nil)
+  route_params = mock("route_params")
+  @event_context = Sinatra::EventContext.new(request, response, route_params)
+end
+{% endhighlight %}
 
 A `body=` method has to be defined on the response mock to prevent an
 error. But it doesn't have to actually do anything. With that setup
 code in place, you can do this:
 
-    it "should use a helper to make cookies" do
-      @event_context.bake_a_cookie.should be_an_instance_of(Cookie)
-    end
+{% highlight ruby %}
+it "should use a helper to make cookies" do
+  @event_context.bake_a_cookie.should be_an_instance_of(Cookie)
+end
+{% endhighlight %}
 
 and write something like this in your application:
 
-    helper do
-      def bake_a_cookie
-        Cookie.new(:kind =&gt; :chocolate_chip)
-      end
-    end
+{% highlight ruby %}
+helper do
+  def bake_a_cookie
+    Cookie.new(:kind => :chocolate_chip)
+  end
+end
+{% endhighlight %}
 
 And now you have a reasonably complete speccing setup. There are still
 a couple of issues though. For one thing, the spec helpers are missing
