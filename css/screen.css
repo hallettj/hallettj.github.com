@@ -78,7 +78,7 @@ ul.posts {
 /*
 /*****************************************************************************/
 
-header, footer, nav, article { display: block; }
+header, footer, nav, aside, article { display: block; }
 
 .site {
   font-size: 110%;
@@ -190,10 +190,10 @@ article {
     background-color: #333;
   }
 
-nav.related {
+aside.related {
   margin-top: 2em;
 }
 
-  nav.related h2 {
+  aside.related h2 {
     margin-bottom: 1em;
   }
