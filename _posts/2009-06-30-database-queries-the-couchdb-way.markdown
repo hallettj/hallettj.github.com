@@ -40,9 +40,9 @@ document will be accessible as the indexed values.
 {% highlight js %}
 [
   ...
-  { key: "Smith",  value: { last_name: "Smith",  ... } },
-  { key: "Kelly",  value: { last_name: "Kelly",  ... } },
   { key: "Clarke", value: { last_name: "Clarke", ... } },
+  { key: "Kelly",  value: { last_name: "Kelly",  ... } },
+  { key: "Smith",  value: { last_name: "Smith",  ... } },
   ...
 ]
 {% endhighlight %}
@@ -173,9 +173,9 @@ long and prosper" is below.
 
 {% highlight js %}
 [
+  { key: "and",     value: { text: "Live long and prosper." } },
   { key: "Live",    value: { text: "Live long and prosper." } },
   { key: "long",    value: { text: "Live long and prosper." } },
-  { key: "and",     value: { text: "Live long and prosper." } },
   { key: "prosper", value: { text: "Live long and prosper." } }
 ]
 {% endhighlight %}
@@ -242,19 +242,19 @@ with the text "Hello, world!":
 
 {% highlight js %}
 [
-  { key: "Hello, world!", value: { text: "Hello, world!" } },
+  { key: " world!",       value: { text: "Hello, world!" } },
+  { key: ", world!",      value: { text: "Hello, world!" } },
+  { key: "!",             value: { text: "Hello, world!" } },
+  { key: "d!",            value: { text: "Hello, world!" } },
   { key: "ello, world!",  value: { text: "Hello, world!" } },
+  { key: "Hello, world!", value: { text: "Hello, world!" } },
+  { key: "ld!",           value: { text: "Hello, world!" } },
   { key: "llo, world!",   value: { text: "Hello, world!" } },
   { key: "lo, world!",    value: { text: "Hello, world!" } },
   { key: "o, world!",     value: { text: "Hello, world!" } },
-  { key: ", world!",      value: { text: "Hello, world!" } },
-  { key: " world!",       value: { text: "Hello, world!" } },
-  { key: "world!",        value: { text: "Hello, world!" } },
   { key: "orld!",         value: { text: "Hello, world!" } },
   { key: "rld!",          value: { text: "Hello, world!" } },
-  { key: "ld!",           value: { text: "Hello, world!" } },
-  { key: "d!",            value: { text: "Hello, world!" } },
-  { key: "!",             value: { text: "Hello, world!" } },
+  { key: "world!",        value: { text: "Hello, world!" } }
 ]
 {% endhighlight %}
 
@@ -274,8 +274,13 @@ function find_all_by_substring(db, str) {
 }
 {% endhighlight %}
 
-And just as with the keyword search, if you want to search for documents that
-match a list of substrings then get the matches for one of the substrings from
+CouchDB does not just sort data when responding to queries. In its internal
+representation indexes are always sorted by key.  So a query with a key range
+targets a contiguous block of data from the database.  Because of that CouchDB
+can serve up a key range very efficiently.
+
+Just as with the keyword search, if you want to search for documents that match
+a list of substrings then get the matches for one of the substrings from
 CouchDB and use client code to select results that contain all of the rest of
 the given substrings.
 
@@ -297,6 +302,9 @@ If the text of your documents tends to be very long you can avoid a lot of
 really long keys by limiting the lengths of substring keys in your view. In
 that case make sure to truncate the key parameters in your queries so that they
 are not longer than the index keys.
+
+*Updated 2009-07-05*: Updated examples to demonstrate that CouchDB stores
+indexes sorted by key. Thanks to J. Chris Anderson for pointing that out.
 
 
 Appendix: Helper Function Definitions
