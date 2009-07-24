@@ -35,7 +35,7 @@ The Haskell Platform website does not list a package for Ubuntu yet. So
 Before you run the installer you will want to install the necessary build
 dependencies:
 
-    sudo apt-get install libglut-dev happy alex libedit-dev
+    sudo apt-get install libglut-dev happy alex libedit-dev zlib1g-dev
 
 Please leave a comment if you discover that I have left out any dependencies.
 
@@ -53,3 +53,5 @@ procedure:
 If all of the above worked, you should be good to go. You compile Haskell code
 with `ghc`. You can run an interactive read-eval-print-loop with `ghci`. And
 you can install Haskell libraries with `cabal`.
+
+*Updated 2009-07-23*: Added zlib1g-dev to list of build dependencies.
