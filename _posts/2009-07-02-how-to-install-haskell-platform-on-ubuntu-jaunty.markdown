@@ -39,6 +39,11 @@ dependencies:
 
 Please leave a comment if you discover that I have left out any dependencies.
 
+To perform the final installation step you will also need to have checkinstall
+installed:
+
+    sudo apt-get install checkinstall
+
 Unpack the source installer wherever you like:
 
     tar -xzf haskell-platform-2009.2.0.1.tar.gz
@@ -50,8 +55,12 @@ procedure:
     make
     sudo checkinstall -y
 
+This will build and install a deb package called `haskell-platform`.  If you
+ever want to remove Haskell Platform just uninstall that package.
+
 If all of the above worked, you should be good to go. You compile Haskell code
 with `ghc`. You can run an interactive read-eval-print-loop with `ghci`. And
 you can install Haskell libraries with `cabal`.
 
-*Updated 2009-07-23*: Added zlib1g-dev to list of build dependencies.
+*Updated 2009-07-23*: Added zlib1g-dev to list of build dependencies.  Thanks Jack Siler and Fernand.  
+*Updated 2009-08-01*: Added step for installing checkinstall.  Thanks Paulo.  
