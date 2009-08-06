@@ -216,6 +216,11 @@ views, some client-side processing can make up the difference nicely. From a
 perspective of deploying applications leveraging your users' CPU cycles for
 data processing can really help getting your application to scale.
 
+There is another approach to full text search documented [on the CouchDB
+wiki][full text search].
+
+[full text search]: http://wiki.apache.org/couchdb/Full_text_index_with_view
+
 
 Search by Substring
 --------------------
@@ -304,7 +309,9 @@ that case make sure to truncate the key parameters in your queries so that they
 are not longer than the index keys.
 
 *Updated 2009-07-05*: Updated examples to demonstrate that CouchDB stores
-indexes sorted by key. Thanks to J. Chris Anderson for pointing that out.
+indexes sorted by key. Thanks to J. Chris Anderson for pointing that out.  
+*Updated 2009-08-06*: Added link to full text search implementation on
+CouchDB wiki.
 
 
 Appendix: Helper Function Definitions
