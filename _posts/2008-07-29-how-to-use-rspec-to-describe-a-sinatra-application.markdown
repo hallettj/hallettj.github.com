@@ -3,6 +3,8 @@ layout: post
 title: How to use RSpec to describe a Sinatra application
 ---
 
+This information was written a long time ago and has become pretty outdated.
+
 [Sinatra][] is a fun little web application microframework. Recently I
 started working on an application using Sinatra - and since I am
 working on good programming habits, before I dove into any coding I
@@ -164,3 +166,5 @@ this happens.
 The Sinatra application that led to this article is now open source and is available at [http://github.com/hallettj/restful_captcha][restful_captcha]. If you want to see the RSpec techniques that I used in context, check out the code there.
 
 [restful_captcha]: http://github.com/hallettj/restful_captcha
+
+*Updated 2009-07-09*: This article is pretty outdated.  Added a note to that effect.  
