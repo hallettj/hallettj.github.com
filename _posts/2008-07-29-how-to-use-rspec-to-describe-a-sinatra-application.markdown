@@ -167,4 +167,4 @@ The Sinatra application that led to this article is now open source and is avail
 
 [restful_captcha]: http://github.com/hallettj/restful_captcha
 
-*Updated 2009-07-09*: This article is pretty outdated.  Added a note to that effect.  
+*Updated 2009-08-09*: This article is pretty outdated.  Added a note to that effect.  

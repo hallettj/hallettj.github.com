@@ -155,7 +155,7 @@ function(doc) {
         tokens = doc.text.split(/[^A-Z0-9\-_]+/i).uniq();
         tokens.map(function(token) {
             emit(token, doc);
-        }
+        });
     }
 }
 {% endhighlight %}
@@ -311,7 +311,8 @@ are not longer than the index keys.
 *Updated 2009-07-05*: Updated examples to demonstrate that CouchDB stores
 indexes sorted by key. Thanks to J. Chris Anderson for pointing that out.  
 *Updated 2009-08-06*: Added link to full text search implementation on
-CouchDB wiki.
+CouchDB wiki.  
+*Updated 2009-08-09*: Fixed a typo.  
 
 
 Appendix: Helper Function Definitions
