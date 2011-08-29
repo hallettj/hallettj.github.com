@@ -487,8 +487,6 @@ tags: osb11
 
 *[CORS]: Cross-Origin Resource Sharing
 *[CSRF]: cross-site request forgery
-*[HTTP]: Hypertext Transfer Protocol
-*[HTTPS]: HTTP Secure
 *[JSON]: JavaScript Object Notation
 *[MITM]: man-in-the-middle
 *[URL]: Uniform Resource Locator
