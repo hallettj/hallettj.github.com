@@ -1,6 +1,0 @@
-[submodule "deck.js"]
-	path = deck.js
-	url = https://github.com/imakewebthings/deck.js.git
-[submodule "SyntaxHighlighter"]
-	path = SyntaxHighlighter
-	url = https://github.com/alexgorbatchev/SyntaxHighlighter.git
