@@ -140,7 +140,7 @@ create = (db, document) -&gt;
     id = resp.uuids[0]
     docURL = "/#{db}/#{id}"
 
-    $.putJSON(docURL, document).flatMap -&gt;
+    $.putJSON(docURL, document).flatMap (_) -&gt;
 
       $.getJSON(docURL).map (updatedDoc) -&gt;
         updatedDoc
@@ -153,25 +153,25 @@ $.Deferred.prototype.flatten = -&gt;
   deferred = new $.Deferred()
 
   this.done (deferredPrime) -&gt;
-    deferredPrime.done (value) -&gt;
-      deferred.resolve value
+    deferredPrime.done (values...) -&gt;
+      deferred.resolve values...
 
-    deferredPrime.fail (msg) -&gt;
-      deferred.reject msg
+    deferredPrime.fail (msgs...) -&gt;
+      deferred.reject msgs...
 
-  this.fail (msg) -&gt;
-    deferred.reject msg
+  this.fail (msgs...) -&gt;
+    deferred.reject msgs...
 
   deferred
 
 $.Deferred.prototype.map = (f) -&gt;
   deferred = new $.Deferred()
 
-  this.done (value) -&gt;
-    deferred.resolve (f value)
+  this.done (values...) -&gt;
+    deferred.resolve (f values...)
 
-  this.fail (msg) -&gt;
-    deferred.reject msg
+  this.fail (msgs...) -&gt;
+    deferred.reject msgs...
 
   deferred
 
@@ -320,10 +320,27 @@ Monad = new Protocol
     </pre>
 </section>
 
+<section class="slide" id="monadic-requests-again">
+    <pre class="brush: coffee">
+create = (db, document) -&gt;
+  do
+    resp &lt;- $.getJSON "/_uuids"
+
+    id = resp.uuids[0]
+    docURL = "/#{db}/#{id}"
+
+    _ &lt;- $.putJSON docURL, document
+
+    updatedDoc &lt;- $getJSON docURL
+
+  yield
+    updatedDoc
+    </pre>
+</section>
 
 <section class="slide" id="constructor-chain">
     <pre class="brush: coffee">
-Protocol (signatures) -&gt;
+Protocol = (signatures) -&gt;
   @impls = {}
 
   findImpl = (object) -&gt;
@@ -337,8 +354,8 @@ Protocol (signatures) -&gt;
       getImplementation constructor.prototype
 
   Object.keys(signatures).forEach (name) =&gt;
-    this[name] = (firstArg, args...) -&gt;
-      impl = findImpl args[0]
+    @[name] = (firstArg, args...) -&gt;
+      impl = findImpl firstArg
       func = impl[name]
 
       func firstArg, args...
@@ -347,15 +364,15 @@ Protocol (signatures) -&gt;
 
 <section class="slide" id="protocol-crumb">
     <pre class="brush: coffee">
-Protocol (signatures) -&gt;
+Protocol = (signatures) -&gt;
   @impls = {}
 
   findImpl = (object) -&gt;
     @impls["__protocol_crumb__"]
 
   Object.keys(signatures).forEach (name) =&gt;
-    this[name] = (firstArg, args...) -&gt;
-      impl = findImpl args[0]
+    @[name] = (firstArg, args...) -&gt;
+      impl = findImpl firstArg
       func = impl[name]
 
       func firstArg, args...
@@ -372,9 +389,10 @@ extend = (type, protocol, impl) -&gt;
 <section class="slide" id="alternate-syntax">
     <pre class="brush: coffee">
 _ = undefined
+signature = Protocol.signature
 
 Functor = new Protocol (a) -&gt;
-  map: Protocol.sig _, a
+  map: signature _, a
 
 extend Array, Functor,
   map: (f, array) -&gt; array.map f
@@ -392,5 +410,5 @@ extend Array, Functor,
 <script>
     setTimeout(function() {
         $('.slide > div, .slide > table').addClass('vcenter')
-    }, 100);
+    }, 500);
 </script>
