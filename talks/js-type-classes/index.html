@@ -25,7 +25,7 @@ create = (db, document) -&gt;
 
 <section class="slide" id="create-a-document-with-js">
     <table><tbody><tr>
-    <td style="vertical-align:middle; padding-right: 1.5em"><pre class="brush: coffee">
+    <td style="vertical-align:middle"><pre class="brush: coffee">
 create = (db, document) -&gt;
   deferred = new $.Deferred()
 
@@ -41,7 +41,7 @@ create = (db, document) -&gt;
   deferred
     </pre></td>
 
-    <td style="vertical-align:middle; padding-left: 1.5em"><pre class="brush: js">
+    <td style="vertical-align:middle"><pre class="brush: js">
 function create(db, document) {
     var deferred = new $.Deferred()
 
@@ -65,7 +65,7 @@ function create(db, document) {
 
 <section class="slide" id="promises">
     <table><tbody><tr>
-    <td style="vertical-align:middle; padding-right: 1.5em"><pre class="brush: coffee">
+    <td style="vertical-align:middle"><pre class="brush: coffee">
 asyncFunction = (arg) -&gt;
   deferred = new $.Deferred()
 
@@ -78,7 +78,7 @@ asyncFunction("foo").done (result) -&gt;
   print result
     </pre></td>
 
-    <td style="vertical-align:middle; padding-left: 1.5em"><pre class="brush: coffee">
+    <td style="vertical-align:middle"><pre class="brush: coffee">
 asyncFunction = (arg, callback) -&gt;
   doStuff arg, (result) -&gt;
     callback(result)
@@ -182,7 +182,7 @@ $.Deferred.prototype.flatMap = (f) -&gt;
 
 <section class="slide" id="translated-comprehension-compared">
     <table><tbody><tr>
-    <td style="vertical-align:middle; padding-right: 1.5em"><pre class="brush: coffee">
+    <td style="vertical-align:middle"><pre class="brush: coffee">
 create = (db, document) -&gt;
   $.getJSON("/_uuids").flatMap (resp) -&gt;
     id = resp.uuids[0]
@@ -194,7 +194,7 @@ create = (db, document) -&gt;
         updatedDoc
     </pre></td>
 
-    <td><pre class="brush: coffee">
+    <td style="vertical-align:middle"><pre class="brush: coffee">
 create = (db, document) -&gt;
   deferred = new $.Deferred()
 
