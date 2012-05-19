@@ -399,11 +399,9 @@ wiping the app's data and reinstalling multiple times.  I have also
 tried different books.  And I have confirmed that I am running version 3.5.1.1,
 which is the latest version available in the Play Store right now.
 
-I managed to fix this by following
+I managed to fix the Kindle app by following
 [instructions to fix Machinarium][Machinarium fix], which simply
-involves installing a missing font.  You can download the Droid Sans
-font package from [Font Squirrel][Droid Sans].  Then follow the linked
-instructions for fixing Machinarium.
+involves installing a missing font.
 
 An alternative workaround is to use the [Cloud Reader][].  Note that the
 Cloud Reader will work in [Chrome for Android Beta][], but will refuse
@@ -426,4 +424,7 @@ a missing font in Virtuous Prime.  Specifically the Droid Sans and Droid
 Sans Bold fonts are missing.  There is [a fix][Machinarium fix] reported
 in the XDA Developers forum.
 
-[Machinarium fix]: http://forum.xda-developers.com/showthread.php?p=26146297
+[Machinarium fix]: http://forum.xda-developers.com/showthread.php?p=26109294#post26109294
+
+So with some digging it seems that I did not encounter any problems that
+I could not fix.  Also, having root access to my tablet is excellent.
