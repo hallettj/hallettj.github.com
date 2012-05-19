@@ -354,3 +354,64 @@ be able to recover.  Check out the [recovery guide][] on
 
 [recovery guide]: http://forum.xda-developers.com/showthread.php?t=1514088
 [XDA-Developers]: http://forum.xda-developers.com/
+
+
+## Update 2012-05-19
+
+After about a week of use, the Virtuous Prime ROM is working very well.
+It does everything that the Asus firmware did and more.  But I did run
+into some problems that I wanted to report along with some workarounds.
+
+The Hulu Plus app does not work for me anymore.  When I try to play
+a video I get this message:
+
+> Streaming Unavailable [91]
+>
+> Sorry, we are unable to stream this video. Please check your Internet
+> connection, ensure you have the latest official update for your
+> device, and try again.
+
+The Hulu app did work for me before I unlocked my tablet.  There are
+[reports that unlocking the bootloader is what causes this problem][reports].
+This may not have anything to do with Virtuous Prime directly.
+
+[reports]: http://forum.xda-developers.com/showthread.php?t=1571405
+
+A helpful community member created
+[a modified version of the Hulu Plus app][Hulu Plus apk] that does work.
+From the first post in that thread you can download and install the
+Landscape Mod HuluPlus.apk package.  You will need to enable "Unknown
+Sources" to install the package.  Before you install this version
+I suggest wiping the data of the original Hulu app and uninstalling it.
+
+The home view in the app is distorted; but the queue view works fine.
+This mod is based on a phone version of the original Hulu app rather
+than a tablet version.  Video quality seems a bit low - I don't know
+whether that is due to my connection or to the app.  With those caveats,
+the modified app works great for me.
+
+[Hulu Plus apk]: http://forum.xda-developers.com/showthread.php?t=1449110
+
+Netflix works perfectly.  Hooray for Netflix!
+
+The Amazon Kindle app crashes when I try to open a book.  I have tried
+wiping the app's data and reinstalling multiple times.  I have also
+tried different books.  And I have confirmed that I am running version 3.5.1.1,
+which is the latest version available in the Play Store right now.  So
+far I have not found a way to fix this.
+
+I can still read Kindle books using the [Cloud Reader][].  Note that the
+Cloud Reader will work in [Chrome for Android Beta][], but will refuse
+to run in the default Android browser.  You will not be able to install
+the extension that allows Cloud Reader to work offline since the mobile
+version of Chrome does not support extensions yet.  So you will have to
+be connected to the internet to read.
+
+[Cloud Reader]: https://read.amazon.com
+[Chrome for Android Beta]: https://play.google.com/store/apps/details?id=com.android.chrome
+
+Someone on the XDA Developers forums asked whether the game Machinarium
+would install under Virtuous Prime.  I tested this and found that the
+game will install - but it crashes on startup.  I did not test this game
+before installing Virtuous Prime.  All other games that I have tested
+have worked fine.
