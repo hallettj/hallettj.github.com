@@ -397,15 +397,20 @@ Netflix works perfectly.  Hooray for Netflix!
 The Amazon Kindle app crashes when I try to open a book.  I have tried
 wiping the app's data and reinstalling multiple times.  I have also
 tried different books.  And I have confirmed that I am running version 3.5.1.1,
-which is the latest version available in the Play Store right now.  So
-far I have not found a way to fix this.
+which is the latest version available in the Play Store right now.
 
-I can still read Kindle books using the [Cloud Reader][].  Note that the
+I managed to fix this by following
+[instructions to fix Machinarium][Machinarium fix], which simply
+involves installing a missing font.  You can download the Droid Sans
+font package from [Font Squirrel][Droid Sans].  Then follow the linked
+instructions for fixing Machinarium.
+
+An alternative workaround is to use the [Cloud Reader][].  Note that the
 Cloud Reader will work in [Chrome for Android Beta][], but will refuse
 to run in the default Android browser.  You will not be able to install
 the extension that allows Cloud Reader to work offline since the mobile
 version of Chrome does not support extensions yet.  So you will have to
-be connected to the internet to read.
+be connected to the internet to use the Cloud Reader.
 
 [Cloud Reader]: https://read.amazon.com
 [Chrome for Android Beta]: https://play.google.com/store/apps/details?id=com.android.chrome
@@ -416,8 +421,9 @@ game will install - but it crashes on startup.  I did not test this game
 before installing Virtuous Prime.  All other games that I have tested
 have worked fine.
 
-It looks like the problem with Machinarium may just be that there is
-a missing font in Virtuous Prime.  There is [a fix][Machinarium fix]
-reported in the XDA Developers forum.
+It turns out that the problem with Machinarium is that there is
+a missing font in Virtuous Prime.  Specifically the Droid Sans and Droid
+Sans Bold fonts are missing.  There is [a fix][Machinarium fix] reported
+in the XDA Developers forum.
 
 [Machinarium fix]: http://forum.xda-developers.com/showthread.php?p=26146297
