@@ -410,8 +410,14 @@ be connected to the internet to read.
 [Cloud Reader]: https://read.amazon.com
 [Chrome for Android Beta]: https://play.google.com/store/apps/details?id=com.android.chrome
 
-Someone on the XDA Developers forums asked whether the game Machinarium
+Someone on the XDA Developers forum asked whether the game Machinarium
 would install under Virtuous Prime.  I tested this and found that the
 game will install - but it crashes on startup.  I did not test this game
 before installing Virtuous Prime.  All other games that I have tested
 have worked fine.
+
+It looks like the problem with Machinarium may just be that there is
+a missing font in Virtuous Prime.  There is [a fix][Machinarium fix]
+reported in the XDA Developers forum.
+
+[Machinarium fix]: http://forum.xda-developers.com/showthread.php?p=26146297
