@@ -365,7 +365,7 @@ into some problems that I wanted to report along with some workarounds.
 The Hulu Plus app does not work for me anymore.  When I try to play
 a video I get this message:
 
-> Streaming Unavailable [91]
+> Streaming Unavailable \[91\]
 >
 > Sorry, we are unable to stream this video. Please check your Internet
 > connection, ensure you have the latest official update for your
