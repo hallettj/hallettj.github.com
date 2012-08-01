@@ -368,6 +368,13 @@ I would like to thank [Ryan Munro][] for coming up with the "pipeline" analogy.
 
 [Ryan Munro]: https://github.com/munro
 
+*Update 2012-08-01:* `.pipe()` was added in jQuery 1.6.  And it turns
+out that it behaves like `$.flatMap()` when its callback returns
+a promise.  In jQuery 1.8 `.then()` will be updated to behave exactly
+like `.pipe()`, and `.pipe()` will be deprecated.  So there is actually
+no need to add a custom method - you can just use `.pipe()` or `.then()`
+instead of `$.flatMap()`.
+
 
 ## Promises and Category theory
 
