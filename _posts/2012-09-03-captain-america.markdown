@@ -14,7 +14,7 @@ Captain America lacked character development, felt rushed at times, and
 had an underdeveloped story.
 
 Allow me to elaborate.  Captain America has a promising beginning.
-Scrawny Steve Rogers desparately wants to enlist to fight in World War
+Scrawny Steve Rogers desperately wants to enlist to fight in World War
 II; but the army won't take him due to his tiny size and lengthy list of
 health problems.  The effect that make Rogers appear to be a skinny
 short guy who later turns into a much taller, very buff guy are
@@ -50,7 +50,7 @@ of the gee-women-are-crazy genre it is good.
 It happens that Carter fires that weapon in a room with a lot of
 bystanders standing around.  Thankfully the bullets flatten against the
 shield and fall harmlessly to the ground.  Apparently the shield is
-ricochet-proof due to its convienient property of negating kinetic
+ricochet-proof due to its convenient property of negating kinetic
 energy.  If I understood correctly, that is because the shield is made
 of "vibranium", a "completely vibration-free" metal that is so rare that
 the country's entire supply went into making that one shield.
@@ -74,7 +74,7 @@ name is Hodge.  Though in training Hodge acted like an ass and got
 punched in the face.  One of the other team members is Cap's best friend
 from back home.  So that is kind of an explanation.  There are hints
 later that each of these guys excels at a particular skillset.  One guy
-is seen blowing up a tank single-handledly.  Another guy shoots a sniper
+is seen blowing up a tank single-handedly.  Another guy shoots a sniper
 rifle at one point.  A third guy demonstrates the ability to speak
 several sentences in French and translates a German word.  A fourth guy
 is Asian.  But those revelations are so brief that they only serve as
@@ -134,9 +134,9 @@ him.  From what I saw Cap's qualifications consist only of a montage,
 a botched train heist, and a prison break.
 
 The plan of attack on Red Skull's base made no sense at all.  First, Cap
-gets himself captured during a one-man assult.  But that is just an act - he
+gets himself captured during a one-man assault.  But that is just an act - he
 planned to be captured from the beginning.  Ok, that is a fine way to
-get oneself into an inpenetrable fortress.  Then as Red Skull is
+get oneself into an impenetrable fortress.  Then as Red Skull is
 gloating over Cap's arrogance, the rest of Cap's team zip-lines right
 into Red Skull's office, crashing through a large window, to save Cap
 from imminent execution.  I get that these guys are supposed to be the
