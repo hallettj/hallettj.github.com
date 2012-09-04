@@ -16,12 +16,12 @@ had an underdeveloped story.
 Allow me to elaborate.  Captain America has a promising beginning.
 Scrawny Steve Rogers desperately wants to enlist to fight in World War
 II; but the army won't take him due to his tiny size and lengthy list of
-health problems.  The effect that make Rogers appear to be a skinny
+health problems.  The effect that makes Rogers appear to be a skinny
 short guy who later turns into a much taller, very buff guy are
 particularly impressive.  It would have been seamless except that
 I spent the first 30 minutes of the movie wondering how the filmmakers
 pulled that off.  The development of Steve Rogers and the Army scientist
-who turns him into Captain America are pretty good.  Also there is Tommy
+who turns him into Captain America is pretty good.  Also there is Tommy
 Lee Jones.  You can't have too much of Tommy Lee Jones.
 
 The one piece that is really missing from the introduction is someone
