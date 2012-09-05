@@ -51,6 +51,10 @@ table {
   font: 100%;
 }
 
+code {
+  font-family: "Ubuntu Mono", "Inconsolata", monospace;
+}
+
 /*****************************************************************************/
 /*
 /* Home
