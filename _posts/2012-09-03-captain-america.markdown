@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: tumble
 title: "Movie Review: Captain America"
 type: tumble
 ---
