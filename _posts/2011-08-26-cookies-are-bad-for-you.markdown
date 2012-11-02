@@ -442,7 +442,7 @@ use [PersistJS][] or a similar tool.
 [Flash cookies]: http://en.wikipedia.org/wiki/Flash_cookies
 [userData]: http://msdn.microsoft.com/en-us/library/ms531424(v=vs.85).aspx
 [PersistJS]: http://pablotron.org/software/persist-js/
-[storage summary]: http://diveintohtml5.org/storage.html
+[storage summary]: http://diveintohtml5.info/storage.html
 
 Web applications that rely on cookie authentication can often be
 designed to degrade gracefully, so that if JavaScript is disabled or is
