@@ -56,6 +56,10 @@ fooPromise().then(
 For more information see the
 [jQuery Deferred documentation][jQuery Deferreds].
 
+Note that if you are using a version of jQuery prior to 1.8 you will
+have to use `.pipe()` instead of `.then()`.  That goes for all
+references to `.then()` in this article.
+
 
 ## Sequential operations
 
@@ -72,13 +76,13 @@ functions for downloading a post and a user:
 
 {% highlight js %}
 function getPost(id) {
-    return $.getJSON('/posts/'+ id).pipe(function(data, status, xhr) {
+    return $.getJSON('/posts/'+ id).then(function(data, status, xhr) {
         return data;
     });
 }
 
 function getUser(id) {
-    return $.getJSON('/users/'+ id).pipe(function(data, status, xhr) {
+    return $.getJSON('/users/'+ id).then(function(data, status, xhr) {
         return data;
     });
 }
@@ -88,11 +92,11 @@ In jQuery 1.5 and later all ajax methods return a promise that, on
 a successful request, resolves with the data in the response, the
 response status, and the XHR object representing the request.
 
-The `.pipe()` method produces a new promise that transforms the resolved
-value of its input.  I used `.pipe()` here just because using `$.when()`
+The `.then()` method produces a new promise that transforms the resolved
+value of its input.  I used `.then()` here just because using `$.when()`
 is simpler if each promise resolves to a single value.  We will get back
 to that in parallel operations.  Since only one argument is provided to
-`.pipe()` in these cases the new promises will have the same error
+`.then()` in these cases the new promises will have the same error
 values as the originals if an error occurs.
 
 The result is that `getUser()` returns a promise that should resolve to
@@ -177,7 +181,7 @@ Performing an arbitrary number of actions in parallel is similar:
 function getPosts(ids) {
     var postPromises = ids.map(getPost);
 
-    return $.when.apply($, postPromises).pipe(function(/* posts... */) {
+    return $.when.apply($, postPromises).then(function(/* posts... */) {
         return $.makeArray(arguments);
     });
 }
@@ -187,7 +191,7 @@ This code fetches any number of posts in parallel.  I used `apply` to
 pass the post promises to `$.when()` as though they are each a separate
 argument.  The resulting promise resolves with a separate value for each
 post.  It would be nicer if it resolved with an array of posts as one
-value.  The use of `.pipe()` here takes those post values and transforms
+value.  The use of `.then()` here takes those post values and transforms
 them into an array.
 
 
@@ -253,8 +257,8 @@ returns also resolves with the same values.  On top of that,
 the input promise or the promise returned by the callback fails then the
 promise that `$.flatMap()` returns will fail with the same values.
 
-If you include `$.flatMap()` in your project you can write a function
-like `authorForPost()` a bit more succinctly:
+Using `$.flatMap()` it is possible to write a function like
+`authorForPost()` a bit more succinctly:
 
 {% highlight js %}
 function authorForPost(id) {
@@ -271,13 +275,13 @@ also fail with the appropriate failure values.
 
 Another potential problem is that `authorForPost()` does not give you
 access to any of the information on the posts that it downloads.  You
-can combine `$.flatMap()` and `.pipe()` to create a slightly different
+can combine `$.flatMap()` and `.then()` to create a slightly different
 function that exposes both the post and the author:
 
 {% highlight js %}
 function postWithAuthor(id) {
     return $.flatMap(getPost(id), function(post) {
-        return getUser(post.authorId).pipe(function(author) {
+        return getUser(post.authorId).then(function(author) {
             return $.extend(post, { author: author });
         });
     });
@@ -286,6 +290,22 @@ function postWithAuthor(id) {
 
 The promise that `postWithAuthor()` returns resolves to a post object
 with an added author property containing author information.
+
+It turns out that `.then()` leads a double life.  If the return value of
+its callback is a promise, `.then()` behaves exactly like `$.flatMap()`!
+This is the sort of thing that only a dynamic language like JavaScript
+can do.  So if you want to skip the custom function, you could write
+`postWithAuthor()` like this:
+
+{% highlight js %}
+function postWithAuthor(id) {
+    return getPost(id).then(function(post) {
+        return getUser(post.authorId).then(function(author) {
+            return $.extend(post, { author: author });
+        });
+    });
+}
+{% endhighlight %}
 
 
 ## Other uses for promises
@@ -349,18 +369,19 @@ a callback as an argument.
 
 ## Conclusion
 
-The promise transformations `.pipe()`, `$.when()`, and `$.flatMap()`
+The promise transformations `.then()`, `$.when()`, and `$.flatMap()`
 work together to build promise pipelines.  Using these functions you can
 define arbitrary parallel and sequential operations with nice
 declarative code.  Furthermore, small promise pipelines can be
 encapsulated in helper functions which can be composed to form longer
 pipelines.  This promotes reusability and maintainability in your code.
 
-Use `.pipe()` to transform  individual promises.
+Use `.then()` to transform  individual promises.
 
 Use `$.when()` to synchronize parallel operations.
 
-Use `$.flatMap()` to create chains of sequential operations.
+Use `$.flatMap()` or `.then()` to create chains of sequential
+operations.
 
 Mix and match as desired.
 
@@ -375,12 +396,16 @@ like `.pipe()`, and `.pipe()` will be deprecated.  So there is actually
 no need to add a custom method - you can just use `.pipe()` or `.then()`
 instead of `$.flatMap()`.
 
+*Update 2013-01-30:* jQuery 1.8 has been released, so I replaced
+references to `.pipe()` with `.then()`.  I also included a more
+prominent explanation that `.then()` can do the same thing that
+`$.flatMap()` does.
 
 ## Promises and Category theory
 
 Good news!  If you are able to follow the examples in this post then you
 have a working understanding of Monads.  Specifically, `$.flatMap()` is
-a [monad][] transformation, `.pipe()` with one argument is a [functor][]
+a [monad][] transformation, `.then()` with one argument is a [functor][]
 transformation, and `$.when()` is almost a [monoid][] transformation.
 
 Monads, monoids, and functors are concepts from [category theory][] that
@@ -406,11 +431,11 @@ it teaches you Haskell.
 [LYAH]: http://learnyouahaskell.com/
 
 Those who are already into category theory will note that `$.flatMap()`
-could also be defined in terms of `.pipe()` and a `$.join()` function:
+could also be defined in terms of `.then()` and a `$.join()` function:
 
 {% highlight js %}
 $.flatMap = function(promise, f) {
-    return $.join(promise.pipe(f));
+    return $.join(promise.then(f));
 };
 
 $.join = function(promise) {
@@ -431,3 +456,6 @@ $.join = function(promise) {
     return deferred.promise();
 };
 {% endhighlight %}
+
+Except that this won't actually work because `.then()` will join the
+inner and outer promises before the result is passed to `$.join()`.
