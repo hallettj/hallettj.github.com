@@ -212,6 +212,26 @@ function getShirtColor() {
 </section>
 
 <section class="slide">
+{%highlight js %}
+function getShirtColor() {
+    var withChange = myAvatar.then(function(avatar) {
+        openColorPicker(avatar.shirtColor).then(function(color) {
+
+            var updatedAvatar = $.extend({}, avatar, {
+                shirtColor: color
+            });
+
+            return save(updatedAvatar);
+
+        });
+    });
+
+    myAvatar = orElse(withChange, myAvatar);
+}
+{% endhighlight %}
+</section>
+
+<section class="slide">
 <h2><a href="http://sitr.us/talks/monadic-promises/">sitr.us/talks/monadic-promises/</a></h2>
 <h2><a href="http://sitr.us/2012/07/31/promise-pipelines-in-javascript.html">sitr.us/2012/07/31/promise-pipelines-in-javascript.html</a></h2>
 <h2><a href="http://wiki.commonjs.org/wiki/Promises/A">wiki.commonjs.org/wiki/Promises/A</a></h2>
