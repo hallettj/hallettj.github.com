@@ -34,15 +34,11 @@ fooPromise().then(
 <section class="slide">
 {%highlight js %}
 function getPost(id) {
-    return $.getJSON('/posts/'+ id).then(function(data, status, xhr) {
-        return data;
-    });
+    return $.getJSON('/posts/'+ id);
 }
 
 function getUser(id) {
-    return $.getJSON('/users/'+ id).then(function(data, status, xhr) {
-        return data;
-    });
+    return $.getJSON('/users/'+ id);
 }
 {% endhighlight %}
 </section>
@@ -70,7 +66,8 @@ function authorForPost(id) {
 {%highlight js %}
 function postWithAuthor(id) {
     return getPost(id).then(function(post) {
-        return getUser(post.authorId).then(function(author) {
+        var userId = post.authorId;
+        return getUser(userId).then(function(author) {
             return $.extend(post, { author: author });
         });
     });
@@ -164,7 +161,7 @@ var myAvatar = deferred.promise();
 <section class="slide">
 {%highlight js %}
 function getShirtColor() {
-    myAvatar = $.when(openColorPicker, myAvatar)
+    myAvatar = $.when(openColorPicker(), myAvatar)
     .then(function(color, avatar) {
 
         var updatedAvatar = $.extend({}, avatar, {
@@ -185,7 +182,9 @@ function orElse(promise, fallback) {
 
     promise.then(
         d.resolve,
-        function() { fallback.then(d.resolve, d.reject, d.notify); }
+        function() {
+            fallback.then(d.resolve, d.reject);
+        }
     );
 
     return d.promise();
@@ -196,7 +195,7 @@ function orElse(promise, fallback) {
 <section class="slide">
 {%highlight js %}
 function getShirtColor() {
-    var withChange = $.when(openColorPicker, myAvatar)
+    var withChange = $.when(openColorPicker(), myAvatar)
     .then(function(color, avatar) {
 
         var updatedAvatar = $.extend({}, avatar, {
