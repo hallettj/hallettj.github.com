@@ -201,3 +201,7 @@ article {
     article aside.related header {
       margin-bottom: 1em;
     }
+
+  article aside.translations {
+      color #aaa;
+  }

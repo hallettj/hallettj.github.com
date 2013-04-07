@@ -3,6 +3,11 @@ layout: post
 title: "Promise Pipelines in JavaScript"
 ---
 
+<aside class="translations">This page has been translated into <a
+href="http://www.webhostinghub.com/support/es/misc/las-bases-de">Spanish</a>
+language by Maria Ramos  from <a
+href="http://www.webhostinghub.com/">Webhostinghub.com</a>.</aside>
+
 Promises, also know as deferreds or futures, are a wonderful abstraction
 for manipulating asynchronous actions.  Dojo has had [Deferreds][Dojo Deferreds]
 for some time.  jQuery introduced [its own Deferreds][jQuery Deferreds]
