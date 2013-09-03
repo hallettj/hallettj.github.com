@@ -1,0 +1,38 @@
+{
+    "links": [
+        {
+            "rel": "lrdd",
+            "type": "application/xrd+xml",
+            "template": "https://hallettj-pumpio.nodejitsu.com/api/lrdd?resource={uri}"
+        },
+        {
+            "rel": "lrdd",
+            "type": "application/json",
+            "template": "https://hallettj-pumpio.nodejitsu.com/.well-known/webfinger?resource={uri}"
+        },
+        {
+            "rel": "registration_endpoint",
+            "href": "https://hallettj-pumpio.nodejitsu.com/api/client/register"
+        },
+        {
+            "rel": "http://apinamespace.org/oauth/request_token",
+            "href": "https://hallettj-pumpio.nodejitsu.com/oauth/request_token"
+        },
+        {
+            "rel": "http://apinamespace.org/oauth/authorize",
+            "href": "https://hallettj-pumpio.nodejitsu.com/oauth/authorize"
+        },
+        {
+            "rel": "http://apinamespace.org/oauth/access_token",
+            "href": "https://hallettj-pumpio.nodejitsu.com/oauth/access_token"
+        },
+        {
+            "rel": "dialback",
+            "href": "https://hallettj-pumpio.nodejitsu.com/api/dialback"
+        },
+        {
+            "rel": "http://apinamespace.org/activitypub/whoami",
+            "href": "https://hallettj-pumpio.nodejitsu.com/api/whoami"
+        }
+    ]
+}
