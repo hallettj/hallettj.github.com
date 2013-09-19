@@ -289,8 +289,11 @@ automatically sorted by date:
             return Calendar(with_appt);
         };
 
-        cal.upcoming = function(n) {
-            return mori.take(n, appts);
+        cal.upcoming = function(start, n) {
+            var futureAppts = return mori.filter(function(a) {
+                return a.date >= start;
+            }, appts);
+            return mori.take(n, futureAppts);
         };
 
         return cal;
@@ -301,11 +304,23 @@ automatically sorted by date:
     // *     zero, if a and b are equal
     // * negative, if b is larger
     function compare_appts(a, b) {
-        return a.date - b.date;
+        if (a.date !== b.date) {
+            return a.date - b.date;
+        }
+        else {
+            return (a.title) .localeCompare (b.title);
+        }
     }
 
 Like the underlying set, this calendar implementation is immutable.
 When an appointment is added you get a new calendar value.
+
+The comparison function for comparing appointments sorts appointments by
+date, and uses title as a secondary sort in case there are appointments
+with the same date and time.  The sorted set uses this function to
+determine equality as well as ordering; so if it made comparisons using
+only the date field then the calendar would not accept multiple
+appointments with the same date and time.
 
 Appointments can be added to a calendar and queried in date order:
 
@@ -323,7 +338,8 @@ Appointments can be added to a calendar and queried in date order:
         date:  Date.parse("2013-09-22T15:00-0700")
     });
 
-    var next_appts = my_cal.upcoming(2);
+    var now = new Date();
+    var next_appts = my_cal.upcoming(now, 2);
     mori.map(function(a) { return a.title; }, next_appts);
     // ("Synesthesia Bike Tour" "Code 'n' Splode Monthly Meeting")
 
@@ -355,7 +371,7 @@ step back to a state before the fourth appointment was added:
 
     var my_prev_cal = my_cal.undo();
 
-    var next_appts_ = my_prev_cal.upcoming(2);
+    var next_appts_ = my_prev_cal.upcoming(now, 2);
     mori.map(function(a) { return a.title; }, next_appts_);
     // ("Code 'n' Splode Monthly Meeting" "Portland JavaScript Admirers' Monthly Meeting")
 
@@ -438,3 +454,4 @@ The `hash_map` and `set` implementations in Mori are also implemented as
 trees with 32-way branching.  I'm guessing that the sorted map and set
 structures are implemented as binary trees.
 
+TODO: footnote on evidence of binary implementation
