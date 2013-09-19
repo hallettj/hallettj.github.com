@@ -107,6 +107,65 @@ are available.
 ## Laziness
 
 Mori data structures are lazy.
+TODO: certain structures are lazy; it looks like sets are eager
+
+    var s  = mori.sorted_set(1, 2, 3, 4, 5, 6, 7, 8, 9);
+    var s_ = mori.map(function(e) {
+        console.log('processed:', e);
+        return e;
+    }, s);
+
+    // No output yet.
+
+    mori.take(2, s_);  //> (1 2)
+
+    // Outputs:
+    // > processed: 1
+    // > processed: 2
+
+The results of a lazy evaluation are cached.  If we ask for the same two
+values again the map function will not evaluate a second time:
+
+    mori.take(2, s_);  //> (1 2)
+
+    // No console output.
+
+    mori.take(4, s_);  //> (1 2 3 4)
+
+    // Outputs:
+    // > processed: 3
+    // > processed: 4
+
+How about a structure that is mapped more than once?
+
+    var s_1 = mori.map(function(e) {
+        console.log('first pass:', e);
+        return e;
+    }, s);
+    var s_2 = mori.map(function(e) {
+        console.log('first pass:', e);
+        return e;
+    }, s_1);
+
+    mori.take(2, s_2);  //> (1 2)
+
+    // Outputs:
+    // > first pass: 1
+    // > second pass: 1
+    // > first pass: 2
+    // > second pass: 2
+
+If applying `map` to a collection twice resulted in two iterations we
+would expect to see:
+
+    // > first pass: 1
+    // > first pass: 2
+    // > second pass: 1
+    // > second pass: 2
+
+The fact that the first pass and second pass are interleaved suggests
+that Mori collects transformations and applies all transformations to
+a value at once.
 
 
 ## Examples
