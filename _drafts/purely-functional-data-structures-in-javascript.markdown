@@ -47,9 +47,9 @@ structures, like PersistentVector, which supports efficient random
 random-access operations.
 
 [ClojureScript][] is an alternative Clojure compiler that produces
-JavaScript code instead of JVM bytecode.  From what I understand it does
-some bootstrapping so that the Clojure standard library can generally be
-compiled straight to JavaScript.
+JavaScript code instead of JVM bytecode.  The team behind ClojureScript
+has ported Clojure collections to ClojureScript implementations - which
+are therefore within reach of JavaScript code.
 
 [Mori]: http://swannodette.github.io/mori/
 [Clojure]: http://clojure.org/
