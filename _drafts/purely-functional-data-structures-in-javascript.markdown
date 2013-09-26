@@ -3,8 +3,8 @@ layout: post
 title: "Purely functional data structures in JavaScript"
 ---
 
-I have a long-standing desire for a JavaScript library that with a good
-implementation of some functional data structures.  Recently I found
+I have a long-standing desire for a JavaScript library that with good
+implementations of some functional data structures.  Recently I found
 [Mori][], and I think that it may be just the library that I have been
 looking for.  Mori packages data structures from the [Clojure][]
 standard library for use in JavaScript code.
@@ -19,8 +19,8 @@ has to be allocated for the changed portions of the data structure.
 
 A simple example is a linked list.  A linked list is an object,
 specifically a list node, with a value and a pointer to the next list
-node, which points to the next list node.  Eventually you get to the end
-of the list where there is a node that points to the empty list.
+node, which points to the next list node.  (Eventually you get to the end
+of the list where there is a node that points to the empty list.)
 Prepending an element to the front of such a list is a constant-time
 operation: you just create a new list element with a pointer to the
 start of the existing list.  When lists are immutable there is no need
@@ -102,70 +102,6 @@ are available.
 
 `mori.hash(obj)`, see what happens
 
-
-
-## Laziness
-
-Mori data structures are lazy.
-TODO: certain structures are lazy; it looks like sets are eager
-
-    var s  = mori.sorted_set(1, 2, 3, 4, 5, 6, 7, 8, 9);
-    var s_ = mori.map(function(e) {
-        console.log('processed:', e);
-        return e;
-    }, s);
-
-    // No output yet.
-
-    mori.take(2, s_);  //> (1 2)
-
-    // Outputs:
-    // > processed: 1
-    // > processed: 2
-
-The results of a lazy evaluation are cached.  If we ask for the same two
-values again the map function will not evaluate a second time:
-
-    mori.take(2, s_);  //> (1 2)
-
-    // No console output.
-
-    mori.take(4, s_);  //> (1 2 3 4)
-
-    // Outputs:
-    // > processed: 3
-    // > processed: 4
-
-How about a structure that is mapped more than once?
-
-    var s_1 = mori.map(function(e) {
-        console.log('first pass:', e);
-        return e;
-    }, s);
-    var s_2 = mori.map(function(e) {
-        console.log('first pass:', e);
-        return e;
-    }, s_1);
-
-    mori.take(2, s_2);  //> (1 2)
-
-    // Outputs:
-    // > first pass: 1
-    // > second pass: 1
-    // > first pass: 2
-    // > second pass: 2
-
-If applying `map` to a collection twice resulted in two iterations we
-would expect to see:
-
-    // > first pass: 1
-    // > first pass: 2
-    // > second pass: 1
-    // > second pass: 2
-
-The fact that the first pass and second pass are interleaved suggests
-that Mori collects transformations and applies all transformations to
-a value at once.
 
 
 ## Examples
@@ -455,3 +391,148 @@ trees with 32-way branching.  I'm guessing that the sorted map and set
 structures are implemented as binary trees.
 
 TODO: footnote on evidence of binary implementation
+
+
+## Laziness
+
+Many of the functions provided by Mori return what is called a lazy
+sequence.  Being a sequence this is like a list and can be transformed
+using functions like `map`, `filter`, and `reduce`.  What makes a
+sequence lazy is that it is not actually computed right away.
+Evaluation is deferred until some non-lazy function accesses one or more
+elements of the transformed sequence.  At that point Mori computes and
+memoizes transformations.
+
+    // Sets, maps, vectors, and lists are actually not lazy.  But ranges
+    // are.
+    var s = mori.sorted_set_by(function(a, b) {
+        console.log('comparing', a, b);
+        return a - b;
+    }, 5, 4, 3, 2, 1);
+
+    // Outputs about n * ln_2(n) lines:
+    // > comparing 4 5
+    // > comparing 3 5
+    // > comparing 3 4
+    // > comparing 2 4
+    // > comparing 2 3
+    // > comparing 1 4
+    // > comparing 1 3
+    // > comparing 1 2
+
+    // `map` returns a lazy sequence of transformed values.
+    var seq = mori.map(function(e) {
+        console.log('processed:', e);
+        return 0 - e;
+    }, s);
+
+    // No output yet.
+
+    // Getting the string representation of a collection or applying a
+    // non-lazy function like `reduce` forces evaluation.
+    console.log(seq);
+
+    // Outputs:
+    // > processed: 1
+    // > processed: 2
+    // > processed: 3
+    // > processed: 4
+    // > processed: 5
+    // > (-1 -2 -3 -4 -5)
+
+The results of a lazy evaluation are cached.  If the same sequence is
+forced again the map function will not be called a second time:
+
+    console.log(seq);
+
+    // Outputs:
+    // > (-1 -2 -3 -4 -5)
+
+Mori runs just enough deferred computation to get whatever result is
+needed.  It is often not necessary to compute an entire lazy sequence:
+
+    var seq_ = mori.map(function(e) {
+        console.log('processed:', e);
+        return e * 2;
+    }, s);
+
+    // `take` returns a lazy sequence of the first n members of a
+    // collection.
+    var seq__ = mori.take(2, seq_);
+
+    console.log(seq__);
+
+    // Outputs:
+    // > processed: 1
+    // > processed: 2
+    // > (2 4)
+
+In the above case there is an intermediate lazy sequence that
+theoretically contains five values, the results of doubling values in
+the original set.  But only the first two values in that sequence are
+needed.  The other three are never computed.
+
+Laziness means that it is possible to create infinite sequences without
+needing unlimited memory or time:
+
+    // With no arguments, `range` returns a lazy sequence of all whole
+    // numbers from zero up.
+    var non_neg_ints = mori.range();
+
+    // Dropping the first element, zero, results in a sequence of all of
+    // the natural numbers.
+    var nats = mori.drop(1, non_neg_ints);
+
+    // Let's take just the powers of 2.
+    var ln_2   = function(n) { return Math.log(n) / Math.LN2; };
+    var pows_2 = mori.filter(function(n) { return ln_2(n) % 1 === 0; }, nats);
+
+    // What are the first 10 powers of 2?
+    console.log(
+        mori.take(10, pows_2)
+    );
+
+    // Outputs:
+    // > (1 2 4 8 16 32 64 128 256 512)
+
+    // What is the 100th power of 2?
+    console.log(
+        mori.nth(pows_2, 100)
+    );
+
+In procedural code running a sequence through multiple operations that
+apply to every element would result in multiple iterations of the entire
+sequence.  Because Mori operates lazily it can potentially collect
+transformations for each element and apply them in a single pass:
+
+    var seq_1 = mori.map(function(e) {
+        console.log('first pass:', e);
+        return e;
+    }, s);
+    var seq_2 = mori.map(function(e) {
+        console.log('second pass:', e);
+        return e;
+    }, seq_1);
+
+    console.log(
+        mori.take(2, seq_2);
+    );
+
+    // Outputs:
+    // > first pass: 1
+    // > second pass: 1
+    // > first pass: 2
+    // > second pass: 2
+    // > (1 2)
+
+If applying `map` to a collection twice resulted in two iterations we
+would expect to see:
+
+    // > first pass: 1
+    // > first pass: 2
+    // > second pass: 1
+    // > second pass: 2
+
+The fact that the first pass and second pass are interleaved suggests
+that Mori collects transformations and applies all transformations to
+a value at once.
