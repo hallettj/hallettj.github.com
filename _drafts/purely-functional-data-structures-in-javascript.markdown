@@ -62,7 +62,7 @@ to make the Clojure data structures easier to use in JavaScript - mostly
 that involves conversion between JavaScript arrays and Clojure
 structures.  Mori also includes a few helpers to make functional
 programming easier, like identity, constant, and sum functions.  These
-are the data structures provided in the latest version of Mori, v0.2.3:
+are the data structures provided in the latest version of Mori, v0.2.4:
 
 - [`list`][list] (linked list)
 - [`vector`][vector]
@@ -91,7 +91,7 @@ updated via copying.
 
 The documentation for Mori is pretty good.  But it does neglect to
 mention some of the available structures and methods; and there is an
-innacuracy or two.  Since most of the stuff provided by Mori comes from
+inaccuracy or two.  Since most of the stuff provided by Mori comes from
 Clojure, if you cannot find information that you need in the Mori docs
 you can also look at the Clojure docs.  I provided links to the Clojure
 documentation for each data structure where more detailed descriptions
@@ -280,7 +280,7 @@ Appointments can be added to a calendar and queried in date order:
     // ("Synesthesia Bike Tour" "Code 'n' Splode Monthly Meeting")
 
 Looks good!  Now let's add an undo feature.  In case the user changes
-her mind about the last appoinment that was added, the undo feature
+her mind about the last appointment that was added, the undo feature
 should recreate the previous state without that appointment.  The
 implementation of `Calendar` is the same as before except that the
 constructor takes an additional optional argument, the `add` method
@@ -484,8 +484,9 @@ needing unlimited memory or time:
     var nats = mori.drop(1, non_neg_ints);
 
     // Let's take just the powers of 2.
-    var ln_2   = function(n) { return Math.log(n) / Math.LN2; };
-    var pows_2 = mori.filter(function(n) { return ln_2(n) % 1 === 0; }, nats);
+    var log_2    = function(n) { return Math.log(n) / Math.LN2; };
+    var is_pow_2 = function(n) { return log_2(n) % 1 === 0; };
+    var pows_2   = mori.filter(is_pow_2, nats);
 
     // What are the first 10 powers of 2?
     console.log(
@@ -495,10 +496,34 @@ needing unlimited memory or time:
     // Outputs:
     // > (1 2 4 8 16 32 64 128 256 512)
 
-    // What is the 100th power of 2?
+    // What is the 20th power of 2?
     console.log(
-        mori.nth(pows_2, 100)
+        mori.nth(pows_2, 20)
     );
+
+    // Outputs:
+    // > 1048576
+
+If you try this out in a REPL be aware that when an expression is
+entered a JavaScript REPL will usually try to print the value of that
+expression, which has the effect of forcing evaluation of lazy
+sequences.  If you enter a lazy sequence you will end up in an infinite
+loop:
+
+    non_neg_ints = mori.range();
+
+    // Loops for a long time, then runs out of memory.
+
+The solution to this is to be careful to assign infinite sequences in
+`var` statements.  That prevents the REPL from trying to print the
+sequence:
+
+    var non_neg_ints = mori.range();
+
+    // Prints 'undefined', all is well.
+
+
+### Efficiency
 
 In procedural code running a sequence through multiple operations that
 apply to every element would result in multiple iterations of the entire
@@ -535,4 +560,89 @@ would expect to see:
 
 The fact that the first pass and second pass are interleaved suggests
 that Mori collects transformations and applies all transformations to
-a value at once.
+a value at once.  This is the advantage of lazy evaluation: it
+encourages writing code in a way that makes most logical sense rather
+than thinking about performance.  You can write what are logically many
+iterations over a collection and the library will rearrange computations
+to minimize the actual work that is done.
+
+### Apples to apples
+
+The transformations that are available in Mori - `map`, `filter`, etc. - return
+lazy sequences no matter what the type of the input collection is.  This
+is advantageous because the other collection implementations are not
+lazy.  But what if you want to do something like create a new set based
+on an existing set?  The answer is that you feed a lazy sequence into
+a new empty collection using the appropriate constructor or the `into`
+function:
+
+    var s_1 = mori.set([5, 4, 3, 2, 1]);
+    var seq = mori.map(function(e) { return Math.pow(e, 2); }, s_1);
+
+    var s_2 = mori.set(seq);
+    console.log(s_2);
+
+    // Outputs:
+    // > #{25 16 9 4 1}
+
+    var empty_s = mori.sorted_set_by(function(a, b) { return a - b; });
+    var s_3     = mori.into(empty_s, seq);
+    console.log(s_3);
+
+    // Outputs:
+    // > #{1 4 9 16 25}
+
+Applying `map` to the first set is lazy, but building the second set
+with `into` is not.  So a good practice is to avoid building non-lazy
+collection until the last possible moment.
+
+### Don't hold onto your head
+
+If you try to use the infinite sequence above to compute a large power
+of 2 you will see that your JavaScript process runs out of memory and
+crashes.  The program computes all of the sequence elements up to
+the number that you want and holds them in memory.  But it is possible
+to use an infinite sequence to compute a large value using constant
+memory: what you have to do is to avoid keeping a reference to the
+beginning of the sequence so that elements that have already been
+traversed can be garbage-collected while later elements are being
+computed.
+
+    function get_nats() {
+        return mori.drop(1, mori.range());
+    }
+
+    function get_pows_2() {
+        return mori.filter(is_pow_2, get_nats());
+    }
+
+    function zip_with_index(seq) {
+        return mori.map(function(e, idx) {
+            return mori.vector(e, idx);
+        }, seq, mori.range());
+    }
+
+    // function headless_nth(seq, n) {
+    //     var i = n;
+    //     //seq = zip_with_index(seq);
+    //     while (i > 0) {
+    //         seq = mori.rest(seq);
+    //     }
+    //     return mori.first(seq);
+    // }
+
+    function headless_nth_async(seq, n, fn) {
+        if (n === 0) {
+            fn(mori.first(seq));
+        }
+        else {
+            setTimeout(
+                headless_nth_async.bind(null, mori.rest(seq), n - 1, fn),
+                0
+            );
+        }
+    }
+
+    headless_nth_async(get_pows_2, 100, function(result) {
+        console.log(result);
+    }
