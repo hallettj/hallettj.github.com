@@ -522,6 +522,14 @@ sequence:
 
     // Prints 'undefined', all is well.
 
+TODO: change example to Fibonacci sequence
+
+A lazy sequence might also contain lines from a large file or chunks of
+data flowing into a network server.  At the time of this writing I was
+not able to write a program that traversed a long sequence in constant
+space.  But I have verified that this is possible in JavaScript.  I hope
+to find a solution and to post an update later.
+
 
 ### Efficiency
 
