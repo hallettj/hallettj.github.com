@@ -654,3 +654,32 @@ computed.
     headless_nth_async(get_pows_2, 100, function(result) {
         console.log(result);
     }
+
+Fibonacci sequence:
+
+    var fibs = mori.map(
+        function(x, y) {
+            return x + y;
+        },
+        mori.mapcat(function() {
+            return mori.cons(0, mori.cons(0, fibs));
+        }, mori.repeat(0)),
+        mori.mapcat(function() {
+            return mori.cons(1, fibs);
+        }, mori.repeat(0))
+    );
+
+    console.log(
+        mori.take(10, fibs)
+    );
+
+    // Outputs:
+    // > (1 1 2 3 5 8 13 21 34 55)
+
+    // What is the 100th number in the Fibonacci sequence?
+    console.log(
+        mori.nth(fibs, 100)
+    );
+
+    // Outputs:
+    // > 573147844013817200000
