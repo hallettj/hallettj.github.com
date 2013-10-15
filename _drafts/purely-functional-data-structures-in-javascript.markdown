@@ -28,7 +28,7 @@ to actually copy the original list.  Removing an element from the front
 of a list is also a constant-time operation: you just return a pointer
 to the second element of the list.
 
-[linked list]: TODO
+[linked list]: https://en.wikipedia.org/wiki/Linked_list
 
 Lists are just one example.  There are functional implementations of
 maps, sets, and other types of structures.
@@ -102,24 +102,85 @@ All of these data structures are immutable and can be efficiently
 updated via copying and structural sharing.
 
 The documentation for Mori is pretty good.  But it does skip over some
-of the available data structures and methods.  Since most of the stuff
+of the available data structures and functions.  Since most of the stuff
 provided by Mori comes from Clojure, if you cannot find information that
 you need in the Mori docs you can also look at the Clojure docs.
 I provided links to the Clojure documentation for each data structure
 where more detailed descriptions are available.
 
 
-## Hashes and equality
-
-`mori.hash(obj)`, see what happens
-
-TODO:
-
-
 ## Examples
 
 Let's take a look at the particular advantages of some of these
 structures.
+
+### `vector`
+
+A vector is an ordered, finite sequence that supports efficient
+random-access lookups and updates.  Vectors are created using the
+[`vector`][vector mori] function from the `'mori'` module.  Any
+arguments given to the function become elements of a new vector.  In
+[Node.js][] you can import Mori and create a vector like this:
+
+{% highlight js %}
+var mori = require('mori');
+var v = mori.vector(1, 2, 3);
+
+assert(mori.count(v) === 3);  // `count` gives the length of the vector
+assert(mori.first(v) === 1);
+{% endhighlight %}
+
+Mori also works with [AMD][] implementations, such as [RequireJS][], for
+use in browser code:
+
+{% highlight js %}
+define(['mori'], function(mori) {
+    var v = mori.vector(1, 2, 3);
+});
+{% endhighlight %}
+
+[Node.js]: http://nodejs.org/
+[AMD]: https://github.com/amdjs/amdjs-api/wiki/AMD
+[Require.js]: http://requirejs.org/
+
+Clojure is not an object-oriented language.  The convention in Clojure
+is that instead of putting methods on objects / values, one defines
+functions that take values as arguments.  Those functions are organized
+into modules to group related functions together.  This approach makes
+a lot of sense when values are mostly immutable; and it avoids name
+collisions that sometimes come up in object-oriented code, since names
+are scoped by module instead of by object.[^polymorphism]
+
+[^polymorphism]: You might be wondering how Clojure handles
+polymorphism, since the convention is to use functions instead of
+methods.  Clojure has a feature called [protocols][] that permit
+multiple implementations for functions depending on the type of a
+given argument.  Elsewhere in the functional world, [Haskell][] and
+[Scala][] provide a similar feature, called [type classes][].
+
+[protocols]: http://clojure.org/protocols
+[Haskell]: http://www.haskell.org/haskellwiki/Haskell
+[Scala]: http://www.scala-lang.org/
+[type classes]: http://learnyouahaskell.com/types-and-typeclasses
+
+Since Mori is an adaptation of Clojure code, it uses the same
+convention.  Data structures created with Mori do not have any methods.
+Instead all functionality is provided by functions exported by the
+`'mori'` module.  That is why the code here uses expressions like
+`mori.count(v)` instead of `v.count()`.
+
+Existing vectors can be modified:
+
+{% highlight js %}
+var v1 = mori.vector(1, 2, 3);
+var v2 = mori.conj(v1, 4);
+
+assert(String(v2) === '[1 2 3 4]');
+assert(String(v1) === '[1 2 3]');  // The original vector is unchanged.
+{% endhighlight %}
+
+TODO: conj
+
 
 ### `hash_map`
 
@@ -224,7 +285,6 @@ a feature that I often miss.
 As with maps, most objects are compared by reference identity except for
 Mori data structures which are compared by value.  Primitives are also
 compared by value.
-
 
 ### `sorted_set_by`
 
@@ -331,7 +391,7 @@ function Calendar(appts, prev_cal) {
 }
 {% endhighlight %}
 
-Assuming the same set of appointments, we can use the undo method to
+Assuming the same set of appointments, we can use the `undo` method to
 step back to a state before the fourth appointment was added:
 
 {% highlight js %}
@@ -381,6 +441,13 @@ function makeCalendar() {
 Not that I have anything against the Synesthesia Bike Tour!  It's just
 that when demonstrating an undo feature, something has to take one for
 the team.
+
+
+## Hashes and equality
+
+`mori.hash(obj)`, see what happens
+
+TODO:
 
 
 ## List versus Vector
@@ -688,6 +755,7 @@ than thinking about performance.  You can write what are logically many
 iterations over a collection and the library will rearrange computations
 to minimize the actual work that is done.
 
+
 ### Apples to apples
 
 The transformations that are available in Mori - `map`, `filter`, etc. - return
@@ -719,6 +787,7 @@ console.log(s_3);
 Applying `map` to the first set is lazy, but building the second set
 with `into` is not.  So a good practice is to avoid building non-lazy
 collection until the last possible moment.
+
 
 ### Don't hold onto your head
 
