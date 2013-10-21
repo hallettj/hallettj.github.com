@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Purely functional data structures in JavaScript"
+title: "Functional data structures in JavaScript with Mori"
 ---
 
 I have a long-standing desire for a JavaScript library that provides
@@ -11,11 +11,12 @@ standard library for use in JavaScript code.
 
 A functional data structure (also called a persistent data structure)
 has two important qualities: it is immutable and it can be updated by
-creating a copy with modifications.  Creating copies should be nearly as
-cheap as modifying a comparable mutable data structure in place.  This
-is usually achieved with structural sharing: pointers to unchanged
-portions of a structure are shared between copies so that memory need
-only be allocated for changed portions of the data structure.
+creating a copy with modifications (copy-on-write).  Creating copies
+should be nearly as cheap as modifying a comparable mutable data
+structure in place.  This is usually achieved with structural sharing:
+pointers to unchanged portions of a structure are shared between copies
+so that memory need only be allocated for changed portions of the data
+structure.
 
 A simple example is a [linked list][].  A linked list is an object,
 specifically a list node, with a value and a pointer to the next list
@@ -67,7 +68,7 @@ Mori also includes a few helpers to make functional programming easier,
 like `identity`, `constant`, and `sum` functions.  These are the data
 structures provided in the latest version of Mori, v0.2.4:
 
-| structure       | Mori                         | Clojure                               |
+| constructor     | Mori                         | Clojure                               |
 | --------------- | ---------------------------- | ------------------------------------- |
 | `list`          | [Mori docs][list mori]       | [Clojure docs][list clojure]          |
 | `vector`        | [Mori docs][vector mori]     | [Clojure docs][vector clojure]        |
@@ -130,7 +131,7 @@ assert(mori.count(v) === 3);  // `count` gives the length of the vector
 assert(mori.first(v) === 1);
 {% endhighlight %}
 
-Mori also works with [AMD][] implementations, such as [RequireJS][], for
+Mori also works with [AMD][] implementations (such as [RequireJS][]) for
 use in browser code:
 
 {% highlight js %}
@@ -143,8 +144,8 @@ define(['mori'], function(mori) {
 [AMD]: https://github.com/amdjs/amdjs-api/wiki/AMD
 [Require.js]: http://requirejs.org/
 
-Clojure is not an object-oriented language.  The convention in Clojure
-is that instead of putting methods on objects / values, one defines
+Idiomatic Clojure is not object-oriented.  The convention in Clojure is
+that instead of putting methods on objects / values, one defines
 functions that take values as arguments.  Those functions are organized
 into modules to group related functions together.  This approach makes
 a lot of sense when values are mostly immutable; and it avoids name
@@ -154,9 +155,10 @@ are scoped by module instead of by object.[^polymorphism]
 [^polymorphism]: You might be wondering how Clojure handles
 polymorphism, since the convention is to use functions instead of
 methods.  Clojure has a feature called [protocols][] that permit
-multiple implementations for functions depending on the type of a
-given argument.  Elsewhere in the functional world, [Haskell][] and
-[Scala][] provide a similar feature, called [type classes][].
+multiple implementations for functions depending on the type of a given
+argument.  Elsewhere in the functional world, [Haskell][] and
+[Scala][] provide a similar, yet more powerful feature, called [type
+classes][].
 
 [protocols]: http://clojure.org/protocols
 [Haskell]: http://www.haskell.org/haskellwiki/Haskell
@@ -179,18 +181,65 @@ assert(String(v2) === '[1 2 3 4]');
 assert(String(v1) === '[1 2 3]');  // The original vector is unchanged.
 {% endhighlight %}
 
-TODO: conj
+`conj` is an idiom that is particular to Clojure.  It inserts one or
+more values into a collection.  It behaves differently with different
+collection types, using whatever insert strategy is most efficient for
+the given collection.[^conj]
+
+[^conj]: When `conj` is used on a list it prepends elements (like
+`cons`) because prepending is much cheaper than inserting at other
+possible positions.  Given a vector `conj` appends values; appending is
+often desired, and appending to a vector is just as efficient as
+inserting at any other position.  `conj` works on sets and maps too - but
+in those cases the idea of insertion position is not really meaningful.
+
+Mori provides a number of higher-order methods.  Here is an example that
+computes the sum of the even values in a collection:
+
+{% highlight js %}
+function even_sum(coll) {
+    var evens = mori.filter(mori.is_even, coll);
+    var sum   = mori.reduce(mori.sum, 0, evens);
+    return sum;
+}
+
+assert(even_sum(v2) === 6);
+{% endhighlight %}
+
+Or, borrowing from an example in the Mori documentation, one might
+compute a sum for even values and a separate sum for odd values:
+
+{% highlight js %}
+function even_odd_sum(coll) {
+    var groups = mori.group_by(function(n) {
+        return mori.is_even(n) ? 'even' : 'odd';
+    }, coll);
+    var evens = mori.get(groups, 'even');
+    var odds  = mori.get(groups, 'odd');
+    return mori.array_map(
+        'even', mori.reduce(mori.sum, 0, evens),
+        'odd',  mori.reduce(mori.sum, 0, odds)
+    );
+}
+
+assert(mori.get(even_odd_sum(v2), 'even') === 6);
+assert(mori.get(even_odd_sum(v2), 'odd') === 4);
+{% endhighlight %}
+
+The example above returns a map created with [`array_map`][array_map clojure],
+which is a map implementation that works well with a small number of
+keys.
 
 
 ### `hash_map`
 
 All JavaScript objects are maps.  But those can only use strings as
-keys[^maps in es6].  The `hash_map` provided by Mori can use any values as keys.
+keys.[^maps in es6]  The `hash_map` provided by Mori can use any values as keys.
 
-[^maps in es6]: It does look like ECMAScript 6 will add
-[a Map implementation][ES6 Map] and a [WeakMap][] to the language spec,
-both of which will take arbitrary objects as keys.  But those will not
-be immutable!
+[^maps in es6]: It does look like ECMAScript 6 will add [a Map
+implementation][ES6 Map] and a [WeakMap][] to the language spec, both of
+which will take arbitrary objects as keys (only non-primitives in the
+WeakMap case).  But those will not be immutable!
 
 [ES6 Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map
 [WeakMap]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap
@@ -209,7 +258,6 @@ If you use plain JavaScript objects as keys they will be compared by
 reference identity.  If you use Mori data structures as keys they will
 be compared by value use equality comparisons provided by ClojureScript.
 
-
 Mori maps are immutable; so there is never a need to create defensive
 copies.  An update operation produces a new map.
 
@@ -223,6 +271,10 @@ assert(mori.get(m2, 'foo') === 1);
 assert(mori.get(m2, 'bar') === 2);
 assert(mori.get(m3, 'foo') === null);
 {% endhighlight %}
+
+All of this also applies to `array_map`, `sorted_map`, and
+`sorted_map_by`.  See (TODO) below for information about the differences
+between the map implementations.
 
 There is a common pattern in JavaScript of passing options objects to
 constructors to avoid having functions that take zillions of arguments.
@@ -268,11 +320,27 @@ The function `mori.into(coll, from)` adds all of the members of `from`
 into a copy of `coll`.  Both `from` and `coll` can by any Mori
 collection.
 
-The gain from using Mori in this situation is not huge, since you end up
-creating a new object with Mori or with the standard defensive copy
-approach.  Mori is able to create copies faster using less memory - which
-matters when working with large maps but probably won't make any
-difference with options objects.  I find this idea appealing anyway.
+That does still involve copying the input `options` object into a new
+Mori map.  It is also possible to provide a Mori sequence as input to
+start with - `js_to_clj` will accept either a plain JavaScript object or
+a Mori collection:
+
+{% highlight js %}
+var feat_ = new MyFeature(mori.hash_map(
+    'position',       'above',
+    'destroyOnClose': true
+));
+{% endhighlight %}
+
+The gain from using Mori in this situation is slight in practice, since
+the objects and maps involved are small.
+
+In situations with larger data structures, or where data is copied many
+times in a loop, Mori's ability to create copies faster using less
+memory could make a difference.  In my opinion applying immutability
+consistently - even where there are no significant performance gains
+- can simplify things.
+
 
 ### `set`
 
@@ -443,11 +511,69 @@ that when demonstrating an undo feature, something has to take one for
 the team.
 
 
-## Hashes and equality
+## Apples to apples
 
-`mori.hash(obj)`, see what happens
+The transformations that are available in Mori - `map`, `filter`, etc. - return
+lazy sequences no matter what the type of the input collection is.  (See
+below for an explanation of what laziness is).  This is advantageous
+because the other collection implementations are not lazy.  But what if
+you want to do something like create a new set based on an existing set?
+The answer is that you feed a lazy sequence into a new empty collection
+using the appropriate constructor or the `into` function:
 
-TODO:
+{% highlight js %}
+var s_1 = mori.set([5, 4, 3, 2, 1]);
+var seq = mori.map(function(e) { return Math.pow(e, 2); }, s_1);
+
+var s_2 = mori.set(seq);
+console.log(s_2);
+
+// Outputs:
+// > #{25 16 9 4 1}
+
+var empty_s = mori.sorted_set_by(function(a, b) { return a - b; });
+var s_3     = mori.into(empty_s, seq);
+console.log(s_3);
+
+// Outputs:
+// > #{1 4 9 16 25}
+{% endhighlight %}
+
+You might want to write transformations that are polymorphic - that can
+operate on any type of collection and that return a collection of the
+same type.  To do that use `mori.empty(coll)` to get an empty version of
+a given collection.  This makes it possible to build a new collection
+without having to know which constructor was used to create the
+original.
+
+Here is a function that removes `null` values from any Mori collection
+and that returns a collection of the same type:
+
+{% highlight js %}
+function nub(coll) {
+    return mori.into(mori.empty(coll), mori.filter(function(elem) {
+        return elem !== null;
+    }, coll));
+}
+{% endhighlight %}
+
+Applying `map` to the first set is lazy - but building the second set
+with `into` is not.  So a good practice is to avoid building non-lazy
+collection until the last possible moment.
+
+
+## Mori pairs well with Bacon
+
+In a previous post,
+[Functional Reactive Programming in JavaScript][FRP],
+I wrote about functional reactive programming (FRP) using [Bacon.js][]
+or [RxJS][].  A typical assumption in FRP code is that values contained
+in events and properties will never be updated in place.  The immutable
+data structures that Mori provides are a perfect fit.
+
+[FRP]: /2013/05/22/functional-reactive-programming-in-javascript.html
+[Bacon.js]: https://github.com/raimohanska/bacon.js
+[RxJS]: https://github.com/Reactive-Extensions/RxJS
 
 
 ## List versus Vector
@@ -495,6 +621,41 @@ structures are implemented as binary trees.
 TODO: footnote on evidence of binary implementation
 
 
+## Different map and set implementations
+
+`mori.hash(obj)`, see what happens
+
+also, `mori.equals(a, b)`
+
+TODO: combine this with discussion of different map types
+
+The differences are that `hash_map` uses a hash
+function for lookups and has O(log_32 n) lookup time; the sorted
+variants use comparison functions for lookups and have O(log_2 n) lookup
+time; and `array_map` is just an array of key-value pairs, so it uses
+only an equality function for lookups and has O(n) lookup times.
+
+| constructor     | insert time | lookup time | how values are checked                           |
+| --------------  | ----------: | ----------: | ------------------------------------------------ |
+| `hash_map`      | log_32 n    | log_32 n    | `mori.hash(key)`, `mori.equals(key, target_key)` |
+| `array_map`     | 1, log_32 n | n           | `mori.equals(key, target_key)`                   |
+| `sorted_map`    | log_2 n     | log_2 n     | `compare(key, target_key)`                       |
+| `sorted_map_by` | log_2 n     | log_2 n     | user-supplied comparison function                |
+| `set`           | log_32 n    | log_32 n    | `mori.hash(val)`, `mori.equals(val, target_val)` |
+| `sorted_set`    | log_2 n     | log_2 n     | `compare(val, target_val)`                       |
+| `sorted_set_by` | log_2 n     | log_2 n     | user-supplied comparison function                |
+
+`compare` is part of ClojureScript, but is not exported by Mori.
+
+sorted structures do not perform `equals` check; hashed structures do
+
+`array_map` preserves order given in constructor
+inserting into a sufficiently large `array_map` produces a `hash_map`
+
+TODO: definitive sources for running times; information in:
+http://www.infoq.com/articles/in-depth-look-clojure-collections
+
+
 ## Laziness
 
 Many of the functions provided by Mori return what is called a lazy
@@ -513,7 +674,7 @@ var s = mori.sorted_set_by(function(a, b) {
     return a - b;
 }, 5, 4, 3, 2, 1);
 
-// Outputs about n * ln_2(n) lines:
+// Outputs approximately n * log_2(n) lines:
 // > comparing 4 5
 // > comparing 3 5
 // > comparing 3 4
@@ -754,39 +915,6 @@ encourages writing code in a way that makes most logical sense rather
 than thinking about performance.  You can write what are logically many
 iterations over a collection and the library will rearrange computations
 to minimize the actual work that is done.
-
-
-### Apples to apples
-
-The transformations that are available in Mori - `map`, `filter`, etc. - return
-lazy sequences no matter what the type of the input collection is.  This
-is advantageous because the other collection implementations are not
-lazy.  But what if you want to do something like create a new set based
-on an existing set?  The answer is that you feed a lazy sequence into
-a new empty collection using the appropriate constructor or the `into`
-function:
-
-{% highlight js %}
-var s_1 = mori.set([5, 4, 3, 2, 1]);
-var seq = mori.map(function(e) { return Math.pow(e, 2); }, s_1);
-
-var s_2 = mori.set(seq);
-console.log(s_2);
-
-// Outputs:
-// > #{25 16 9 4 1}
-
-var empty_s = mori.sorted_set_by(function(a, b) { return a - b; });
-var s_3     = mori.into(empty_s, seq);
-console.log(s_3);
-
-// Outputs:
-// > #{1 4 9 16 25}
-{% endhighlight %}
-
-Applying `map` to the first set is lazy, but building the second set
-with `into` is not.  So a good practice is to avoid building non-lazy
-collection until the last possible moment.
 
 
 ### Don't hold onto your head
