@@ -342,7 +342,7 @@ consistently - even where there are no significant performance gains
 - can simplify things.
 
 
-### `set`
+### `sorted_set_by`
 
 JavaScript does not have its own set implementation.  (Though it looks
 like [one will be introduced][ES6 Set] in ECMAScript 6.)  Sets are
@@ -354,8 +354,6 @@ As with maps, most objects are compared by reference identity except for
 Mori data structures which are compared by value.  Primitives are also
 compared by value.
 
-### `sorted_set_by`
-
 A sorted set is a heavenly blend of a sequence and a set.  Any duplicate
 values that are added are ignored, and there is a specific ordering of
 elements.  Unlike a list or a vector, ordering is not based on
@@ -364,8 +362,8 @@ insertion, but is determined by comparisons between elements.
 One possible use for a sorted set is to implement a priority queue.
 Consider an example of a calendar application.  `sorted_set_by` takes
 a comparison function that is used to to maintain an ordering of added
-values.  With the appropriate comparison appointments are added and are
-automatically sorted by date:
+values.  With the appropriate comparison function, appointments are
+added and are automatically sorted by date:
 
 {% highlight js %}
 function Calendar(appts) {
@@ -406,9 +404,9 @@ When an appointment is added you get a new calendar value.
 
 The comparison function for comparing appointments sorts appointments by
 date, and uses title as a secondary sort in case there are appointments
-with the same date and time.  The sorted set uses this function to
-determine equality as well as ordering; so if it made comparisons using
-only the date field then the calendar would not accept multiple
+with the same date and time.  The sorted set uses the comparison
+function to determine equality as well as ordering; so if there were no
+secondary sort criteria then the calendar would not accept multiple
 appointments with the same date and time.
 
 Appointments can be added to a calendar and queried in date order:
