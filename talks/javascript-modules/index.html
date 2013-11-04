@@ -1,178 +1,161 @@
----
-layout: deckjs-pygments
-title: "JavaScript modules and lazy loading"
-description: "A comparison of some different module strategies"
-author: Jesse Hallett
----
-
 <section class="slide">
-{%highlight js %}
-// fileA.js
-B.stuff.doStuff();
+<div class="highlight"><pre><code class="js"><span class="c1">// fileA.js</span>
+<span class="nx">B</span><span class="p">.</span><span class="nx">stuff</span><span class="p">.</span><span class="nx">doStuff</span><span class="p">();</span>
 
 
-// fileB.js
-var B = B || {};
-B.stuff = B.stuff || {};
-B.stuff.doStuff = function() {
-    console.log('stuff!');
-};
-{% endhighlight %}
+<span class="c1">// fileB.js</span>
+<span class="kd">var</span> <span class="nx">B</span> <span class="o">=</span> <span class="nx">B</span> <span class="o">||</span> <span class="p">{};</span>
+<span class="nx">B</span><span class="p">.</span><span class="nx">stuff</span> <span class="o">=</span> <span class="nx">B</span><span class="p">.</span><span class="nx">stuff</span> <span class="o">||</span> <span class="p">{};</span>
+<span class="nx">B</span><span class="p">.</span><span class="nx">stuff</span><span class="p">.</span><span class="nx">doStuff</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;stuff!&#39;</span><span class="p">);</span>
+<span class="p">};</span>
+</code></pre></div>
 </section>
 
 <section class="slide">
-{%highlight js %}
-// fileA.js
-var b = require('./fileB.js');
+<div class="highlight"><pre><code class="js"><span class="c1">// fileA.js</span>
+<span class="kd">var</span> <span class="nx">b</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./fileB.js&#39;</span><span class="p">);</span>
 
-b.doStuff();
+<span class="nx">b</span><span class="p">.</span><span class="nx">doStuff</span><span class="p">();</span>
 
 
-// fileB.js
-exports.doStuff = function() {
-    console.log('stuff!');
-};
-{% endhighlight %}
+<span class="c1">// fileB.js</span>
+<span class="nx">exports</span><span class="p">.</span><span class="nx">doStuff</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;stuff!&#39;</span><span class="p">);</span>
+<span class="p">};</span>
+</code></pre></div>
 </section>
 
 <section class="slide">
-{%highlight js %}
-// fileA.js
-define('fileA', ['fileB'], function(b) {
-    b.doStuff();
-});
+<div class="highlight"><pre><code class="js"><span class="c1">// fileA.js</span>
+<span class="nx">define</span><span class="p">(</span><span class="s1">&#39;fileA&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;fileB&#39;</span><span class="p">],</span> <span class="kd">function</span><span class="p">(</span><span class="nx">b</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">b</span><span class="p">.</span><span class="nx">doStuff</span><span class="p">();</span>
+<span class="p">});</span>
 
 
-// fileB.js
-define('fileB', function() {
-    return {
-        doStuff: function() {
-            console.log('stuff!');
-        }
-    }
-});
-{% endhighlight %}
+<span class="c1">// fileB.js</span>
+<span class="nx">define</span><span class="p">(</span><span class="s1">&#39;fileB&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="nx">doStuff</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+            <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;stuff!&#39;</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+</code></pre></div>
 </section>
 
 <section class="slide">
-{%highlight js %}
-// fileA.js
-define(['fileB'], function(b) {
-    b.doStuff();
-});
+<div class="highlight"><pre><code class="js"><span class="c1">// fileA.js</span>
+<span class="nx">define</span><span class="p">([</span><span class="s1">&#39;fileB&#39;</span><span class="p">],</span> <span class="kd">function</span><span class="p">(</span><span class="nx">b</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">b</span><span class="p">.</span><span class="nx">doStuff</span><span class="p">();</span>
+<span class="p">});</span>
 
 
-// fileB.js
-define(function() {
-    return {
-        doStuff: function() {
-            console.log('stuff!');
-        }
-    }
-});
-{% endhighlight %}
+<span class="c1">// fileB.js</span>
+<span class="nx">define</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="nx">doStuff</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+            <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;stuff!&#39;</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+</code></pre></div>
 </section>
 
 <section class="slide">
-{%highlight js %}
-define('moduleName', ['depA', 'depB'], function(depA, depB) {
-    return {
-        doStuff: function() {
-            depA.doStuff();
-            depB.doStuff();
-        }
-    };
-});
+<div class="highlight"><pre><code class="js"><span class="nx">define</span><span class="p">(</span><span class="s1">&#39;moduleName&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;depA&#39;</span><span class="p">,</span> <span class="s1">&#39;depB&#39;</span><span class="p">],</span> <span class="kd">function</span><span class="p">(</span><span class="nx">depA</span><span class="p">,</span> <span class="nx">depB</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="nx">doStuff</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+            <span class="nx">depA</span><span class="p">.</span><span class="nx">doStuff</span><span class="p">();</span>
+            <span class="nx">depB</span><span class="p">.</span><span class="nx">doStuff</span><span class="p">();</span>
+        <span class="p">}</span>
+    <span class="p">};</span>
+<span class="p">});</span>
 
-require(['moduleName', 'jquery'], function(module, $) {
-    $(document).ready(function() {
-        module.doStuff();
-    });
-});
-{% endhighlight %}
+<span class="nx">require</span><span class="p">([</span><span class="s1">&#39;moduleName&#39;</span><span class="p">,</span> <span class="s1">&#39;jquery&#39;</span><span class="p">],</span> <span class="kd">function</span><span class="p">(</span><span class="nx">module</span><span class="p">,</span> <span class="nx">$</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">$</span><span class="p">(</span><span class="nb">document</span><span class="p">).</span><span class="nx">ready</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nx">module</span><span class="p">.</span><span class="nx">doStuff</span><span class="p">();</span>
+    <span class="p">});</span>
+<span class="p">});</span>
+</code></pre></div>
 </section>
 
 <section class="slide">
-{%highlight js %}
-// fileA.js
-require(['fileB'], function(b) {
-    b.doStuff();
-});
+<div class="highlight"><pre><code class="js"><span class="c1">// fileA.js</span>
+<span class="nx">require</span><span class="p">([</span><span class="s1">&#39;fileB&#39;</span><span class="p">],</span> <span class="kd">function</span><span class="p">(</span><span class="nx">b</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">b</span><span class="p">.</span><span class="nx">doStuff</span><span class="p">();</span>
+<span class="p">});</span>
 
-$.getScript('/fileB.js');
+<span class="nx">$</span><span class="p">.</span><span class="nx">getScript</span><span class="p">(</span><span class="s1">&#39;/fileB.js&#39;</span><span class="p">);</span>
 
 
-// fileB.js
-define('fileB', function() {
-    return {
-        doStuff: function() {
-            console.log('stuff!');
-        }
-    }
-});
-{% endhighlight %}
+<span class="c1">// fileB.js</span>
+<span class="nx">define</span><span class="p">(</span><span class="s1">&#39;fileB&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="nx">doStuff</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+            <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;stuff!&#39;</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+</code></pre></div>
 </section>
 
 <section class="slide">
-{%highlight js %}
-// fileA.js
-require(['fileB'], function(b) {
-    b.doStuff();
-});
+<div class="highlight"><pre><code class="js"><span class="c1">// fileA.js</span>
+<span class="nx">require</span><span class="p">([</span><span class="s1">&#39;fileB&#39;</span><span class="p">],</span> <span class="kd">function</span><span class="p">(</span><span class="nx">b</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">b</span><span class="p">.</span><span class="nx">doStuff</span><span class="p">();</span>
+<span class="p">});</span>
 
-$.getScript('/fileB.js');
+<span class="nx">$</span><span class="p">.</span><span class="nx">getScript</span><span class="p">(</span><span class="s1">&#39;/fileB.js&#39;</span><span class="p">);</span>
 
 
-// fileB.js
-define('fileB', {
-    doStuff: function() {
-        console.log('stuff!');
-    }
-});
-{% endhighlight %}
+<span class="c1">// fileB.js</span>
+<span class="nx">define</span><span class="p">(</span><span class="s1">&#39;fileB&#39;</span><span class="p">,</span> <span class="p">{</span>
+    <span class="nx">doStuff</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;stuff!&#39;</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+</code></pre></div>
 </section>
 
 <section class="slide">
-{%highlight js %}
-// main.js
-$('#navbar').on('click', '.register', function(event) {
-    event.preventDefault();
-    showLoading();
-    require(['registration'], function(registration) {
-        hideLoading();
-        registration.showModal();
-    });
-});
+<div class="highlight"><pre><code class="js"><span class="c1">// main.js</span>
+<span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#navbar&#39;</span><span class="p">).</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;click&#39;</span><span class="p">,</span> <span class="s1">&#39;.register&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">event</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span>
+    <span class="nx">showLoading</span><span class="p">();</span>
+    <span class="nx">require</span><span class="p">([</span><span class="s1">&#39;registration&#39;</span><span class="p">],</span> <span class="kd">function</span><span class="p">(</span><span class="nx">registration</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">hideLoading</span><span class="p">();</span>
+        <span class="nx">registration</span><span class="p">.</span><span class="nx">showModal</span><span class="p">();</span>
+    <span class="p">});</span>
+<span class="p">});</span>
 
-// registration.js
-define(['jquery'], function($) {
-    /* lots of code */
-    return {
-        showModal: function() { /* ... */ };
-    }
-});
-{% endhighlight %}
+<span class="c1">// registration.js</span>
+<span class="nx">define</span><span class="p">([</span><span class="s1">&#39;jquery&#39;</span><span class="p">],</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$</span><span class="p">)</span> <span class="p">{</span>
+    <span class="cm">/* lots of code */</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="nx">showModal</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="cm">/* ... */</span> <span class="p">};</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+</code></pre></div>
 </section>
 
 <section class="slide">
-{%highlight html %}
-<!--This sets the baseUrl to the "scripts" directory-->
-<script data-main="scripts/main.js" src="scripts/require.js"></script>
-{% endhighlight %}
+<div class="highlight"><pre><code class="html"><span class="c">&lt;!--This sets the baseUrl to the &quot;scripts&quot; directory--&gt;</span>
+<span class="nt">&lt;script </span><span class="na">data-main=</span><span class="s">&quot;scripts/main.js&quot;</span> <span class="na">src=</span><span class="s">&quot;scripts/require.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
+</code></pre></div>
 
-{%highlight js %}
-// /scripts/main.js
-require(['fileA', 'fileB'], function(a, b) {
-    a.doStuff();
-    b.doStuff();
-});
+<div class="highlight"><pre><code class="js"><span class="c1">// /scripts/main.js</span>
+<span class="nx">require</span><span class="p">([</span><span class="s1">&#39;fileA&#39;</span><span class="p">,</span> <span class="s1">&#39;fileB&#39;</span><span class="p">],</span> <span class="kd">function</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">a</span><span class="p">.</span><span class="nx">doStuff</span><span class="p">();</span>
+    <span class="nx">b</span><span class="p">.</span><span class="nx">doStuff</span><span class="p">();</span>
+<span class="p">});</span>
 
-// /scripts/fileA.js
-define({ /* ... */ });
+<span class="c1">// /scripts/fileA.js</span>
+<span class="nx">define</span><span class="p">({</span> <span class="cm">/* ... */</span> <span class="p">});</span>
 
-// /scripts/fileB.js
-define({ /* ... */ });
-{% endhighlight %}
+<span class="c1">// /scripts/fileB.js</span>
+<span class="nx">define</span><span class="p">({</span> <span class="cm">/* ... */</span> <span class="p">});</span>
+</code></pre></div>
 </section>
 
 <section class="slide">

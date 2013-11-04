@@ -1,111 +1,97 @@
----
-layout: deckjs-pygments
-title: "Promises and monadic concurrency"
-description: "pdxjs presentation 2013-02-27"
-author: "Jesse Hallett"
----
-
 <section class="slide">
-{%highlight js %}
-function fooPromise() {
-    var deferred = $.Deferred();
+<div class="highlight"><pre><code class="js"><span class="kd">function</span> <span class="nx">fooPromise</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">deferred</span> <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">Deferred</span><span class="p">();</span>
 
-    setTimeout(function() {
-        deferred.resolve("foo");
-    }, 1000);
+    <span class="nx">setTimeout</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nx">deferred</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="s2">&quot;foo&quot;</span><span class="p">);</span>
+    <span class="p">},</span> <span class="mi">1000</span><span class="p">);</span>
 
-    return deferred.promise();
-}
-{% endhighlight %}
+    <span class="k">return</span> <span class="nx">deferred</span><span class="p">.</span><span class="nx">promise</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div>
 </section>
 
 <section class="slide">
-{%highlight js %}
-fooPromise().then(
-    function(value) {
-        // prints "foo" after 1 second
-        console.log(value);
-    },
-    function() { console.log("something went wrong"); }
-);
-{% endhighlight %}
+<div class="highlight"><pre><code class="js"><span class="nx">fooPromise</span><span class="p">().</span><span class="nx">then</span><span class="p">(</span>
+    <span class="kd">function</span><span class="p">(</span><span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// prints &quot;foo&quot; after 1 second</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">value</span><span class="p">);</span>
+    <span class="p">},</span>
+    <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;something went wrong&quot;</span><span class="p">);</span> <span class="p">}</span>
+<span class="p">);</span>
+</code></pre></div>
 </section>
 
 <section class="slide">
-{%highlight js %}
-function getPost(id) {
-    return $.getJSON('/posts/'+ id);
-}
+<div class="highlight"><pre><code class="js"><span class="kd">function</span> <span class="nx">getPost</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">$</span><span class="p">.</span><span class="nx">getJSON</span><span class="p">(</span><span class="s1">&#39;/posts/&#39;</span><span class="o">+</span> <span class="nx">id</span><span class="p">);</span>
+<span class="p">}</span>
 
-function getUser(id) {
-    return $.getJSON('/users/'+ id);
-}
-{% endhighlight %}
+<span class="kd">function</span> <span class="nx">getUser</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">$</span><span class="p">.</span><span class="nx">getJSON</span><span class="p">(</span><span class="s1">&#39;/users/&#39;</span><span class="o">+</span> <span class="nx">id</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
 </section>
 
 <section class="slide">
-{%highlight js %}
-function authorForPost(id) {
-    var postPromise = getPost(id),
-        deferred = $.Deferred();
+<div class="highlight"><pre><code class="js"><span class="kd">function</span> <span class="nx">authorForPost</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">postPromise</span> <span class="o">=</span> <span class="nx">getPost</span><span class="p">(</span><span class="nx">id</span><span class="p">),</span>
+        <span class="nx">deferred</span> <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">Deferred</span><span class="p">();</span>
 
-    postPromise.then(function(post) {
-        var authorPromise = getUser(post.authorId);
+    <span class="nx">postPromise</span><span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">post</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">authorPromise</span> <span class="o">=</span> <span class="nx">getUser</span><span class="p">(</span><span class="nx">post</span><span class="p">.</span><span class="nx">authorId</span><span class="p">);</span>
 
-        authorPromise.then(function(author) {
-            deferred.resolve(author);
-        });
-    });
+        <span class="nx">authorPromise</span><span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">author</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">deferred</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">author</span><span class="p">);</span>
+        <span class="p">});</span>
+    <span class="p">});</span>
 
-    return deferred.promise();
-}
-{% endhighlight %}
+    <span class="k">return</span> <span class="nx">deferred</span><span class="p">.</span><span class="nx">promise</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div>
 </section>
 
 <section class="slide">
-{%highlight js %}
-function authorForPost(id) {
-    var postPromise = getPost(id),
-        deferred = $.Deferred();
+<div class="highlight"><pre><code class="js"><span class="kd">function</span> <span class="nx">authorForPost</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">postPromise</span> <span class="o">=</span> <span class="nx">getPost</span><span class="p">(</span><span class="nx">id</span><span class="p">),</span>
+        <span class="nx">deferred</span> <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">Deferred</span><span class="p">();</span>
 
-    postPromise.then(function(post) {
-        return getUser(post.authorId);
-    }).then(function(author) {
-        deferred.resolve(author);
-    });
+    <span class="nx">postPromise</span><span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">post</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">getUser</span><span class="p">(</span><span class="nx">post</span><span class="p">.</span><span class="nx">authorId</span><span class="p">);</span>
+    <span class="p">}).</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">author</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">deferred</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">author</span><span class="p">);</span>
+    <span class="p">});</span>
 
-    return deferred.promise();
-}
-{% endhighlight %}
+    <span class="k">return</span> <span class="nx">deferred</span><span class="p">.</span><span class="nx">promise</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div>
 </section>
 
 <section class="slide">
-{%highlight js %}
-function postWithAuthor(id) {
-    return getPost(id).then(function(post) {
-        var userId = post.authorId;
-        return getUser(userId).then(function(author) {
-            return $.extend(post, { author: author });
-        });
-    });
-}
-{% endhighlight %}
+<div class="highlight"><pre><code class="js"><span class="kd">function</span> <span class="nx">postWithAuthor</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">getPost</span><span class="p">(</span><span class="nx">id</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">post</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">userId</span> <span class="o">=</span> <span class="nx">post</span><span class="p">.</span><span class="nx">authorId</span><span class="p">;</span>
+        <span class="k">return</span> <span class="nx">getUser</span><span class="p">(</span><span class="nx">userId</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">author</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">post</span><span class="p">,</span> <span class="p">{</span> <span class="nx">author</span><span class="o">:</span> <span class="nx">author</span> <span class="p">});</span>
+        <span class="p">});</span>
+    <span class="p">});</span>
+<span class="p">}</span>
+</code></pre></div>
 </section>
 
 <section class="slide">
-{%highlight js %}
-function getTwoUsers(idA, idB) {
-    var userPromiseA = getUser(idA),
-        userPromiseB = getUser(idB);
+<div class="highlight"><pre><code class="js"><span class="kd">function</span> <span class="nx">getTwoUsers</span><span class="p">(</span><span class="nx">idA</span><span class="p">,</span> <span class="nx">idB</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">userPromiseA</span> <span class="o">=</span> <span class="nx">getUser</span><span class="p">(</span><span class="nx">idA</span><span class="p">),</span>
+        <span class="nx">userPromiseB</span> <span class="o">=</span> <span class="nx">getUser</span><span class="p">(</span><span class="nx">idB</span><span class="p">);</span>
 
-    return $.when(userPromiseA, userPromiseB);
-}
+    <span class="k">return</span> <span class="nx">$</span><span class="p">.</span><span class="nx">when</span><span class="p">(</span><span class="nx">userPromiseA</span><span class="p">,</span> <span class="nx">userPromiseB</span><span class="p">);</span>
+<span class="p">}</span>
 
-getTwoUsers(1002, 1008).then(function(userA, userB) {
-    $(render(userA)).appendTo('#users');
-    $(render(userB)).appendTo('#users');
-});
-{% endhighlight %}
+<span class="nx">getTwoUsers</span><span class="p">(</span><span class="mi">1002</span><span class="p">,</span> <span class="mi">1008</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">userA</span><span class="p">,</span> <span class="nx">userB</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">$</span><span class="p">(</span><span class="nx">render</span><span class="p">(</span><span class="nx">userA</span><span class="p">)).</span><span class="nx">appendTo</span><span class="p">(</span><span class="s1">&#39;#users&#39;</span><span class="p">);</span>
+    <span class="nx">$</span><span class="p">(</span><span class="nx">render</span><span class="p">(</span><span class="nx">userB</span><span class="p">)).</span><span class="nx">appendTo</span><span class="p">(</span><span class="s1">&#39;#users&#39;</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre></div>
 </section>
 
 <section class="slide">
@@ -113,139 +99,131 @@ getTwoUsers(1002, 1008).then(function(userA, userB) {
 </section>
 
 <section class="slide">
-{%highlight js %}
-var myAvatar = {
-    name:       '[enter name here]',
-    height:     170,
-    hatStyle:   'conductor/skater',
-    shirtColor: 'rgb(12, 12, 250)'
-};
+<div class="highlight"><pre><code class="js"><span class="kd">var</span> <span class="nx">myAvatar</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="nx">name</span><span class="o">:</span>       <span class="s1">&#39;[enter name here]&#39;</span><span class="p">,</span>
+    <span class="nx">height</span><span class="o">:</span>     <span class="mi">170</span><span class="p">,</span>
+    <span class="nx">hatStyle</span><span class="o">:</span>   <span class="s1">&#39;conductor/skater&#39;</span><span class="p">,</span>
+    <span class="nx">shirtColor</span><span class="o">:</span> <span class="s1">&#39;rgb(12, 12, 250)&#39;</span>
+<span class="p">};</span>
 
-function update() {
-    drawAvatar({
-        name:       myAvatar.name,
-        height:     myAvatar.height,
-        hatStyle:   myAvatar.hatStyle,
-        shirtColor: myAvatar.shirtColor
-    });
-}
-{% endhighlight %}
+<span class="kd">function</span> <span class="nx">update</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">drawAvatar</span><span class="p">({</span>
+        <span class="nx">name</span><span class="o">:</span>       <span class="nx">myAvatar</span><span class="p">.</span><span class="nx">name</span><span class="p">,</span>
+        <span class="nx">height</span><span class="o">:</span>     <span class="nx">myAvatar</span><span class="p">.</span><span class="nx">height</span><span class="p">,</span>
+        <span class="nx">hatStyle</span><span class="o">:</span>   <span class="nx">myAvatar</span><span class="p">.</span><span class="nx">hatStyle</span><span class="p">,</span>
+        <span class="nx">shirtColor</span><span class="o">:</span> <span class="nx">myAvatar</span><span class="p">.</span><span class="nx">shirtColor</span>
+    <span class="p">});</span>
+<span class="p">}</span>
+</code></pre></div>
 </section>
 
 <section class="slide">
-{%highlight js %}
-function getShirtColor() {
-    openColorPicker().then(function(color) {
-        myAvatar.shirtColor = color;
-        update();
-    });
-}
-{% endhighlight %}
+<div class="highlight"><pre><code class="js"><span class="kd">function</span> <span class="nx">getShirtColor</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">openColorPicker</span><span class="p">().</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">color</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">myAvatar</span><span class="p">.</span><span class="nx">shirtColor</span> <span class="o">=</span> <span class="nx">color</span><span class="p">;</span>
+        <span class="nx">update</span><span class="p">();</span>
+    <span class="p">});</span>
+<span class="p">}</span>
+</code></pre></div>
 </section>
 
 <section class="slide">
-{%highlight js %}
-function getShirtColor() {
-    openColorPicker().then(function(color) {
+<div class="highlight"><pre><code class="js"><span class="kd">function</span> <span class="nx">getShirtColor</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">openColorPicker</span><span class="p">().</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">color</span><span class="p">)</span> <span class="p">{</span>
 
-        myAvatar.shirtColor = color;
+        <span class="nx">myAvatar</span><span class="p">.</span><span class="nx">shirtColor</span> <span class="o">=</span> <span class="nx">color</span><span class="p">;</span>
 
-        save(myAvatar).then(function(savedAvatar) {
-            myAvatar = savedAvatar;
-            update();
-        });
+        <span class="nx">save</span><span class="p">(</span><span class="nx">myAvatar</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">savedAvatar</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">myAvatar</span> <span class="o">=</span> <span class="nx">savedAvatar</span><span class="p">;</span>
+            <span class="nx">update</span><span class="p">();</span>
+        <span class="p">});</span>
 
-    });
-}
-{% endhighlight %}
+    <span class="p">});</span>
+<span class="p">}</span>
+</code></pre></div>
 </section>
 
 <section class="slide">
-{%highlight js %}
-var deferred = $.Deferred();
+<div class="highlight"><pre><code class="js"><span class="kd">var</span> <span class="nx">deferred</span> <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">Deferred</span><span class="p">();</span>
 
-deferred.resolve({
-    name:       '[enter name here]',
-    height:     170,
-    hatStyle:   'conductor/skater',
-    shirtColor: 'rgb(12, 12, 250)'
-});
+<span class="nx">deferred</span><span class="p">.</span><span class="nx">resolve</span><span class="p">({</span>
+    <span class="nx">name</span><span class="o">:</span>       <span class="s1">&#39;[enter name here]&#39;</span><span class="p">,</span>
+    <span class="nx">height</span><span class="o">:</span>     <span class="mi">170</span><span class="p">,</span>
+    <span class="nx">hatStyle</span><span class="o">:</span>   <span class="s1">&#39;conductor/skater&#39;</span><span class="p">,</span>
+    <span class="nx">shirtColor</span><span class="o">:</span> <span class="s1">&#39;rgb(12, 12, 250)&#39;</span>
+<span class="p">});</span>
 
-var myAvatar = deferred.promise();
-{% endhighlight %}
+<span class="kd">var</span> <span class="nx">myAvatar</span> <span class="o">=</span> <span class="nx">deferred</span><span class="p">.</span><span class="nx">promise</span><span class="p">();</span>
+</code></pre></div>
 </section>
 
 <section class="slide">
-{%highlight js %}
-function getShirtColor() {
-    myAvatar = $.when(openColorPicker(), myAvatar)
-    .then(function(color, avatar) {
+<div class="highlight"><pre><code class="js"><span class="kd">function</span> <span class="nx">getShirtColor</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">myAvatar</span> <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">when</span><span class="p">(</span><span class="nx">openColorPicker</span><span class="p">(),</span> <span class="nx">myAvatar</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">color</span><span class="p">,</span> <span class="nx">avatar</span><span class="p">)</span> <span class="p">{</span>
 
-        var updatedAvatar = $.extend({}, avatar, {
-            shirtColor: color
-        });
+        <span class="kd">var</span> <span class="nx">updatedAvatar</span> <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">({},</span> <span class="nx">avatar</span><span class="p">,</span> <span class="p">{</span>
+            <span class="nx">shirtColor</span><span class="o">:</span> <span class="nx">color</span>
+        <span class="p">});</span>
 
-        return save(updatedAvatar);
+        <span class="k">return</span> <span class="nx">save</span><span class="p">(</span><span class="nx">updatedAvatar</span><span class="p">);</span>
 
-    });
-}
-{% endhighlight %}
+    <span class="p">});</span>
+<span class="p">}</span>
+</code></pre></div>
 </section>
 
 <section class="slide">
-{%highlight js %}
-function orElse(promise, fallback) {
-    var d = $.Deferred();
+<div class="highlight"><pre><code class="js"><span class="kd">function</span> <span class="nx">orElse</span><span class="p">(</span><span class="nx">promise</span><span class="p">,</span> <span class="nx">fallback</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">d</span> <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">Deferred</span><span class="p">();</span>
 
-    promise.then(
-        d.resolve,
-        function() {
-            fallback.then(d.resolve, d.reject);
-        }
-    );
+    <span class="nx">promise</span><span class="p">.</span><span class="nx">then</span><span class="p">(</span>
+        <span class="nx">d</span><span class="p">.</span><span class="nx">resolve</span><span class="p">,</span>
+        <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+            <span class="nx">fallback</span><span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">d</span><span class="p">.</span><span class="nx">resolve</span><span class="p">,</span> <span class="nx">d</span><span class="p">.</span><span class="nx">reject</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">);</span>
 
-    return d.promise();
-}
-{% endhighlight %}
+    <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">promise</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div>
 </section>
 
 <section class="slide">
-{%highlight js %}
-function getShirtColor() {
-    var withChange = $.when(openColorPicker(), myAvatar)
-    .then(function(color, avatar) {
+<div class="highlight"><pre><code class="js"><span class="kd">function</span> <span class="nx">getShirtColor</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">withChange</span> <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">when</span><span class="p">(</span><span class="nx">openColorPicker</span><span class="p">(),</span> <span class="nx">myAvatar</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">color</span><span class="p">,</span> <span class="nx">avatar</span><span class="p">)</span> <span class="p">{</span>
 
-        var updatedAvatar = $.extend({}, avatar, {
-            shirtColor: color
-        });
+        <span class="kd">var</span> <span class="nx">updatedAvatar</span> <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">({},</span> <span class="nx">avatar</span><span class="p">,</span> <span class="p">{</span>
+            <span class="nx">shirtColor</span><span class="o">:</span> <span class="nx">color</span>
+        <span class="p">});</span>
 
-        return save(updatedAvatar);
+        <span class="k">return</span> <span class="nx">save</span><span class="p">(</span><span class="nx">updatedAvatar</span><span class="p">);</span>
 
-    });
+    <span class="p">});</span>
 
-    myAvatar = orElse(withChange, myAvatar);
-}
-{% endhighlight %}
+    <span class="nx">myAvatar</span> <span class="o">=</span> <span class="nx">orElse</span><span class="p">(</span><span class="nx">withChange</span><span class="p">,</span> <span class="nx">myAvatar</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
 </section>
 
 <section class="slide">
-{%highlight js %}
-function getShirtColor() {
-    var withChange = myAvatar.then(function(avatar) {
-        openColorPicker(avatar.shirtColor).then(function(color) {
+<div class="highlight"><pre><code class="js"><span class="kd">function</span> <span class="nx">getShirtColor</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">withChange</span> <span class="o">=</span> <span class="nx">myAvatar</span><span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">avatar</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">openColorPicker</span><span class="p">(</span><span class="nx">avatar</span><span class="p">.</span><span class="nx">shirtColor</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">color</span><span class="p">)</span> <span class="p">{</span>
 
-            var updatedAvatar = $.extend({}, avatar, {
-                shirtColor: color
-            });
+            <span class="kd">var</span> <span class="nx">updatedAvatar</span> <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">({},</span> <span class="nx">avatar</span><span class="p">,</span> <span class="p">{</span>
+                <span class="nx">shirtColor</span><span class="o">:</span> <span class="nx">color</span>
+            <span class="p">});</span>
 
-            return save(updatedAvatar);
+            <span class="k">return</span> <span class="nx">save</span><span class="p">(</span><span class="nx">updatedAvatar</span><span class="p">);</span>
 
-        });
-    });
+        <span class="p">});</span>
+    <span class="p">});</span>
 
-    myAvatar = orElse(withChange, myAvatar);
-}
-{% endhighlight %}
+    <span class="nx">myAvatar</span> <span class="o">=</span> <span class="nx">orElse</span><span class="p">(</span><span class="nx">withChange</span><span class="p">,</span> <span class="nx">myAvatar</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
 </section>
 
 <section class="slide">
