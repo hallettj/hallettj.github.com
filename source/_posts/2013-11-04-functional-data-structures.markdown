@@ -760,15 +760,15 @@ lookups and have O(log_2 n) lookup times; and `array_map` is just an
 array of key-value pairs, so it uses only an equality function for
 lookups and has O(n) lookup times.
 
-constructor     | insert time | lookup time | how keys/values are checked
---------------- | ----------: | ----------: | ---------------------------
-`hash_map`      | log_32 n    | log_32 n    | `hash(key) === hash(target_key) && equals(key, target_key)`
-`array_map`     | 1           | n           | `equals(key, target_key)`
-`sorted_map`    | log_2 n     | log_2 n     | `compare(key, target_key)`
-`sorted_map_by` | log_2 n     | log_2 n     | like `sorted_map` with a user-supplied comparison function
-`set`           | log_32 n    | log_32 n    | `hash(val) === hash(target_val) && equals(val, target_val)`
-`sorted_set`    | log_2 n     | log_2 n     | `compare(val, target_val)`
-`sorted_set_by` | log_2 n     | log_2 n     | like `sorted_set` with a user-supplied comparison function
+constructor     | insert time   | lookup time   | how keys/values are checked
+--------------- | ------------: | ------------: | ---------------------------
+`hash_map`      | log_32&nbsp;n | log_32&nbsp;n | `hash(key) === hash(target_key) && equals(key, target_key)`
+`array_map`     | 1             | n             | `equals(key, target_key)`
+`sorted_map`    | log_2&nbsp;n  | log_2&nbsp;n  | `compare(key, target_key)`
+`sorted_map_by` | log_2&nbsp;n  | log_2&nbsp;n  | like `sorted_map` with a user-supplied comparison function
+`set`           | log_32&nbsp;n | log_32&nbsp;n | `hash(val) === hash(target_val) && equals(val, target_val)`
+`sorted_set`    | log_2&nbsp;n  | log_2&nbsp;n  | `compare(val, target_val)`
+`sorted_set_by` | log_2&nbsp;n  | log_2&nbsp;n  | like `sorted_set` with a user-supplied comparison function
 
 `hash` and `equals` are provided by Mori.  `compare` is part of
 ClojureScript, but is not exported by Mori.
