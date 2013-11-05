@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "How Mobile Safari emulates mouse events"
+comments: true
 ---
 
 When you are adapting web apps to touchscreen devices particular
@@ -37,6 +38,8 @@ to fire as soon as the user presses her finger to the screen - but it
 does not.  When the user taps on another clickable element the browser
 fires a `mouseout` event on the first element in addition to firing the
 aforementioned events on the new element.
+
+<!-- more -->
 
 So how do we get to the behavior where one tap emulates `mouseover` and
 a second tap emulates `click`?  It turns out that after any `mouseover`

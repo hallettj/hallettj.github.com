@@ -20,6 +20,8 @@ to distribute firmware updates in a timely fashion.  But if you are reading
 this then you probably already know why you want to install a custom ROM
 - so let's get on to the next step.
 
+<!-- more -->
+
 This guide specifically covers installing [Virtuous Prime][], which is
 based on the official Asus firmware.  If you like the features that Asus
 provides, like the ability to switch between performance profiles and to

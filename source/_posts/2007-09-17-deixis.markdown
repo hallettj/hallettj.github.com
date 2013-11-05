@@ -1,6 +1,7 @@
 ---
 layout: post
 title: Deixis
+comments: true
 ---
 
 When someone says to you, "here" or "now", you probably know what he
@@ -31,6 +32,8 @@ the context represented by deixis in understood by participants of the
 discourse to change too.
 
 [Personal pronouns]: http://en.wikipedia.org/wiki/Personal_pronoun
+
+<!-- more -->
 
 Location and time are a little more complicated. Whenever someone
 speaks - or writes, or is quoted, etc. - there is an implicit deictic

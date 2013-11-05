@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Cookies are bad for you: Improving web application security"
+comments: true
 ---
 
 Most web applications today use browser cookies to keep a user logged in
@@ -41,6 +42,8 @@ Plain cookie authentication is vulnerable to all three.
 
 [MITM]: http://en.wikipedia.org/wiki/Man-in-the-middle_attack
 [XSS]: http://en.wikipedia.org/wiki/Cross-site_scripting
+
+<!-- more -->
 
 <img alt="session hijacking" src="/talks/cookies/svg/session_hijacking.svg" style="width: 100%" />
 

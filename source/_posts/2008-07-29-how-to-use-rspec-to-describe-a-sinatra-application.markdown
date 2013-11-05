@@ -39,6 +39,8 @@ Test::Unit.
 
 [helpful article on gittr.com]: http://www.gittr.com/index.php/archive/sinatra-rspec-integration-without-a-patch-with-examples/
 
+<!-- more -->
+
 Contrary to Sinatra's instructions for writing tests, you
 want to avoid loading 'sinatra/test/spec', which defines Sinatra's
 helper methods for test/spec, because that would load test/spec itself

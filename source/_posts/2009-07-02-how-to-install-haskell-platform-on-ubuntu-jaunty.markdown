@@ -32,6 +32,8 @@ The Haskell Platform website does not list a package for Ubuntu yet. So
 
 [source installer]: http://hackage.haskell.org/platform/
 
+<!-- more -->
+
 Before you run the installer you will want to install the necessary build
 dependencies:
 

@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Promise Pipelines in JavaScript"
+comments: true
 ---
 
 <aside class="translations">This page has been translated into <a
@@ -47,6 +48,8 @@ function fooPromise() {
 
 Callbacks can be added to a deferred or a promise using the `.then()`
 method.  The first callback is called on success, the second on failure:
+
+<!-- more -->
 
 {% highlight js %}
 fooPromise().then(

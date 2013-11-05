@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Monkey patching document.write()"
+comments: true
 ---
 
 This is one of the crazier workarounds that I have implemented.  I was
@@ -43,6 +44,8 @@ The new implementation checks the value of `jQuery.isReady` and
 delegates to the original `document.write()` implementation if the page
 is not finished rendering yet.  Otherwise it does nothing other than to
 output a warning message.
+
+<!-- more -->
 
 Disabling `document.write()` means that the problematic widget will not
 be fully functional if it is redrawn after page load.  It happens that

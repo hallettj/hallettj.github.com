@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Functional Reactive Programming in JavaScript"
+comments: true
 ---
 
 I had a great time at [NodePDX][] last week.  There were many talks
@@ -39,6 +40,8 @@ given input.  The stream is transformed into a stream of strings matching
 the value of the input when each event occurs.  Then that stream is
 filtered so that subscribers to `inputs` will only receive events if the
 value of the input has a length greater than two.
+
+<!-- more -->
 
 Streams can be assigned to variables, shared, and used as inputs to
 create more specific streams.  In the example above `inputs` is used to

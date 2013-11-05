@@ -42,6 +42,7 @@ Some of the downsides:
 * CouchDB is a young project and its API is undergoing rapid changes.
 * Documentation can be sparse - especially when very new features are involved.  
 
+<!-- more -->
 
 ## Ruby Interfaces to CouchDB ##
 

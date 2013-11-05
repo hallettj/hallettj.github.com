@@ -52,6 +52,8 @@ before emitting a key/value pair. There may be documents in the database that
 are not user records. By performing that check the view excludes any
 non-user-record documents from the resulting index.
 
+<!-- more -->
+
 If you include the [couch.js][] library in a web page you can create
 client-side queries to pull data from CouchDB over HTTP.  The function below
 will fetch all of the user records from your database by returning the `value`

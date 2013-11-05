@@ -1,6 +1,7 @@
 ---
 layout: post
 title: International Phonetic Alphabet
+comments: true
 ---
 
 In [last week's post][Anatomy of a Syllable] I provided phonetic
@@ -33,6 +34,8 @@ ambiguous, as is the spelling of almost any language. That is already
 demonstrated by the need to add a note to distinguish "y" the
 consonant from "y" the vowel or any of the other vowel sounds
 represented by "y".
+
+<!-- more -->
 
 To solve all these problems, a group of linguistics developed the
 International Phonetic Alphabet in the late nineteenth century. The

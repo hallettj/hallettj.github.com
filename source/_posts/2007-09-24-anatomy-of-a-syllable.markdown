@@ -1,6 +1,7 @@
 ---
 layout: post
 title: Anatomy of a Syllable
+comments: true
 ---
 
 The syllable is a constant feature in every spoken language in the
@@ -32,6 +33,7 @@ nucleus of the second syllable.
 
 [IPA]: http://en.wikipedia.org/wiki/International_Phonetic_Alphabet
 
+<!-- more -->
 
 The small dot underneath the characters ṇ and ṃ indicates that the
 sound represented is a *syllabic consonant*, which is any consonant
