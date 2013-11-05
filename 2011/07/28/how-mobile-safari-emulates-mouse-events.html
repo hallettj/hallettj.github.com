@@ -9,7 +9,9 @@
   <meta name="author" content="Jesse Hallett">
 
   
-  <meta name="description" content="When you are adapting web apps to touchscreen devices particular challenges come up around events like mouseover and mouseout. Touchscreen devices &hellip;">
+  <meta name="description" content="When you are adapting web apps to touchscreen devices particular
+challenges come up around events like mouseover and mouseout.
+Touchscreen devices &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -28,7 +30,6 @@
   <link rel="canonical" href="http://sitr.us/2011/07/28/how-mobile-safari-emulates-mouse-events.html">
   <link href="/favicon.ico" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
   <link href="http://feeds.feedburner.com/hallettj" rel="alternate" title="sitr.us" type="application/atom+xml">
   <script src="/javascripts/modernizr-2.0.js"></script>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
@@ -111,26 +112,78 @@
   </header>
 
 
-<div class="entry-content"><p>When you are adapting web apps to touchscreen devices particular challenges come up around events like <code>mouseover</code> and <code>mouseout</code>. Touchscreen devices like the iPad do not have a cursor, so the user cannot exactly move the mouse over an HTML element. However, Mobile Safari, the web browser that comes with the iPhone and iPad, has a fallback for websites that require hovering or cursor movement.</p>
+<div class="entry-content"><p>When you are adapting web apps to touchscreen devices particular
+challenges come up around events like <code>mouseover</code> and <code>mouseout</code>.
+Touchscreen devices like the iPad do not have a cursor, so the user
+cannot exactly move the mouse over an HTML element.  However, Mobile
+Safari, the web browser that comes with the iPhone and iPad, has
+a fallback for websites that require hovering or cursor movement.</p>
 
-<p>Usually when you tap on an element on a link or other clickable element Mobile Safari translates that into a regular <code>click</code> event. The browser also produces some touch events that do not exist in a lot of browsers. But from the perspective of a web page that was not designed with a touchscreen in mind, what you get is a plain <code>click</code>. More specifically, the browser fires <code>mousedown</code>, <code>mouseup</code>, and <code>click</code> in that order. But if a clickable element also does something on <code>mouseover</code> then tapping on that element will trigger a <code>mouseover</code> event instead of a <code>click</code>. Tapping on the same element again will produce a <code>click</code> event. A random example of a page that exhibits this behavior is <a href='http://opensourcebridge.org/events/2011/schedule'>the schedule page</a> from the <a href='http://opensourcebridge.org/'>Open Source Bridge</a> website. Try tapping on session titles and see what happens.</p>
+<p>Usually when you tap on an element on a link or other clickable element
+Mobile Safari translates that into a regular <code>click</code> event.  The browser
+also produces some touch events that do not exist in a lot of browsers.
+But from the perspective of a web page that was not designed with
+a touchscreen in mind, what you get is a plain <code>click</code>.  More
+specifically, the browser fires <code>mousedown</code>, <code>mouseup</code>, and <code>click</code> in
+that order.  But if a clickable element also does something on
+<code>mouseover</code> then tapping on that element will trigger a <code>mouseover</code> event
+instead of a <code>click</code>.  Tapping on the same element again will produce
+a <code>click</code> event.  A random example of a page that exhibits this behavior
+is <a href="http://opensourcebridge.org/events/2011/schedule">the schedule page</a> from the <a href="http://opensourcebridge.org/">Open Source Bridge</a>
+website.  Try tapping on session titles and see what happens.</p>
 
-<p>Mobile Safari will only produce mouse events when the user taps on a clickable element, like a link. You can make an element clickable by adding an onClick event handler to it, even if that handler does nothing. On tap Mobile Safari fires the events <code>mouseover</code>, <code>mousemove</code>, <code>mousedown</code>, <code>mouseup</code>, and <code>click</code> in that order - with some caveats which are explained below. Those events all fire together after the user lifts her finger. You might expect the <code>mousedown</code> event to fire as soon as the user presses her finger to the screen - but it does not. When the user taps on another clickable element the browser fires a <code>mouseout</code> event on the first element in addition to firing the aforementioned events on the new element.</p>
+<p>Mobile Safari will only produce mouse events when the user taps on
+a clickable element, like a link.  You can make an element clickable by
+adding an onClick event handler to it, even if that handler does
+nothing.  On tap Mobile Safari fires the events <code>mouseover</code>,
+<code>mousemove</code>, <code>mousedown</code>, <code>mouseup</code>, and <code>click</code> in that order - with
+some caveats which are explained below.  Those events all fire together
+after the user lifts her finger.  You might expect the <code>mousedown</code> event
+to fire as soon as the user presses her finger to the screen - but it
+does not.  When the user taps on another clickable element the browser
+fires a <code>mouseout</code> event on the first element in addition to firing the
+aforementioned events on the new element.</p>
 
-<p>So how do we get to the behavior where one tap emulates <code>mouseover</code> and a second tap emulates <code>click</code>? It turns out that after any <code>mouseover</code> event handlers run Safari checks the DOM for changes and if the content has changed it skips the <code>mousedown</code>, <code>mouseup</code>, and <code>click</code> events. So these events do not fire. When the user taps on the same element again the <code>mouseover</code> event does not fire again, so the browser goes ahead with the other events.</p>
+<!-- more -->
 
-<p>The <code>mousemove</code> event behaves in a similar way: if the DOM has changed after any <code>mousemove</code> handlers are finished running then Mobile Safari skips the remaining events.</p>
-<figure>
+<p>So how do we get to the behavior where one tap emulates <code>mouseover</code> and
+a second tap emulates <code>click</code>?  It turns out that after any <code>mouseover</code>
+event handlers run Safari checks the DOM for changes and if the content
+has changed it skips the <code>mousedown</code>, <code>mouseup</code>, and <code>click</code> events.  So
+these events do not fire.  When the user taps on the same element again
+the <code>mouseover</code> event does not fire again, so the browser goes ahead
+with the other events.</p>
+
+<p>The <code>mousemove</code> event behaves in a similar way: if the DOM has changed
+after any <code>mousemove</code> handlers are finished running then Mobile Safari
+skips the remaining events.</p>
+
+<div class="bogus-wrapper"><notextile><figure>
   <figcaption>
-    Diagram from <a href='http://developer.apple.com/library/safari/#documentation/AppleApplications/Reference/SafariWebContent/HandlingEvents/HandlingEvents.html'>Apple&#8217;s
+    Diagram from <a href="http://developer.apple.com/library/safari/#documentation/AppleApplications/Reference/SafariWebContent/HandlingEvents/HandlingEvents.html">Apple&#8217;s
     documentation</a> demonstrating how the browser determines which
     mouse events to fire.
   </figcaption>
-  <img alt='mouse event firing diagram' src='/images/events_1_finger.jpg' />
-</figure>
-<p>Safari does not accept just any change to a DOM element as a &#8220;content change&#8221; though. Through testing I discovered that adding a regular element to the DOM or showing a previously hidden element in a <code>mouseover</code> handler would prevent the <code>click</code> event from firing. But removing an element, hiding an element, or changing the content of a text node do not prevent the <code>click</code> event. I also tried adding class names to elements - which Safari also did not treat as a &#8220;content change&#8221;. As far as I can tell only adding or showing an element will cause the <code>mousedown</code>, <code>mouseup</code>, and <code>click</code> events to be skipped.</p>
+  <img src="/images/events_1_finger.jpg" alt="mouse event firing diagram" />
+</figure></notextile></div>
 
-<p>I created some fiddles on <a href='http://jsfiddle.net/'>jsfiddle.net</a> to test Mobile Safari behavior. For your investigative pleasure I have <a href='http://jsfiddle.net/hallettj/pgpLA/'>an example of a <code>mouseover</code> handler that adds elements to the DOM</a>, <a href='http://jsfiddle.net/hallettj/4wjgk/'>another that shows a hidden element</a>, and <a href='http://jsfiddle.net/hallettj/m5EXk/'>a third that makes no changes to the DOM at all</a>.</p></div>
+<p>Safari does not accept just any change to a DOM element as a “content
+change” though.  Through testing I discovered that adding a regular
+element to the DOM or showing a previously hidden element in
+a <code>mouseover</code> handler would prevent the <code>click</code> event from firing.  But
+removing an element, hiding an element, or changing the content of
+a text node do not prevent the <code>click</code> event.  I also tried adding class
+names to elements - which Safari also did not treat as a “content
+change”.  As far as I can tell only adding or showing an element will
+cause the <code>mousedown</code>, <code>mouseup</code>, and <code>click</code> events to be skipped.</p>
+
+<p>I created some fiddles on <a href="http://jsfiddle.net/">jsfiddle.net</a> to test Mobile Safari
+behavior.  For your investigative pleasure I have
+<a href="http://jsfiddle.net/hallettj/pgpLA/">an example of a <code>mouseover</code> handler that adds elements to the DOM</a>,
+<a href="http://jsfiddle.net/hallettj/4wjgk/">another that shows a hidden element</a>,
+and <a href="http://jsfiddle.net/hallettj/m5EXk/">a third that makes no changes to the DOM at all</a>.</p>
+
+</div>
 
 
   <footer>
@@ -177,6 +230,12 @@
     </p>
   </footer>
 </article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
 
 </div>
 
@@ -259,7 +318,10 @@
       var disqus_shortname = 'hallettj';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://sitr.us/2011/07/28/how-mobile-safari-emulates-mouse-events.html';
+        var disqus_url = 'http://sitr.us/2011/07/28/how-mobile-safari-emulates-mouse-events.html';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;

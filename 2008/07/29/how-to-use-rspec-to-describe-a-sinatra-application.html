@@ -28,7 +28,6 @@
   <link rel="canonical" href="http://sitr.us/2008/07/29/how-to-use-rspec-to-describe-a-sinatra-application.html">
   <link href="/favicon.ico" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
   <link href="http://feeds.feedburner.com/hallettj" rel="alternate" title="sitr.us" type="application/atom+xml">
   <script src="/javascripts/modernizr-2.0.js"></script>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
@@ -113,87 +112,157 @@
 
 <div class="entry-content"><p>This information was written a long time ago and has become pretty outdated.</p>
 
-<p><a href='http://sinatrarb.com/'>Sinatra</a> is a fun little web application microframework. Recently I started working on an application using Sinatra - and since I am working on good programming habits, before I dove into any coding I sat down to work out how to write specs for a Sinatra application.</p>
+<p><a href="http://sinatrarb.com/">Sinatra</a> is a fun little web application microframework. Recently I
+started working on an application using Sinatra - and since I am
+working on good programming habits, before I dove into any coding I
+sat down to work out how to write specs for a Sinatra application.</p>
 
-<p>Sinatra comes bundled with support for <a href='http://chneukirchen.org/repos/testspec/README'>test/spec</a>: a spec framework that builds on top of Rail&#8217;s own Test::Unit to provide support for writing specs. Which is a really neat idea. But I have been using <a href='http://rspec.info/'>RSpec</a> for my other work, and I wanted to continue doing so.</p>
+<p>Sinatra comes bundled with support for <a href="http://chneukirchen.org/repos/testspec/README">test/spec</a>: a spec framework
+that builds on top of Rail’s own Test::Unit to provide support for
+writing specs. Which is a really neat idea. But I have been using
+<a href="http://rspec.info/">RSpec</a> for my other work, and I wanted to continue doing so.</p>
 
-<p>It turns out that RSpec takes a little bit of manual work to get going with Sinatra. I read a <a href='http://www.gittr.com/index.php/archive/sinatra-rspec-integration-without-a-patch-with-examples/'>helpful article on gittr.com</a> that pointed me in the right direction. The article advised me to add these lines to my spec files:</p>
-<div class='highlight'><pre><code class='ruby'><span class='nb'>require</span> <span class='no'>File</span><span class='o'>.</span><span class='n'>expand_path</span><span class='p'>(</span><span class='no'>File</span><span class='o'>.</span><span class='n'>dirname</span><span class='p'>(</span><span class='bp'>__FILE__</span><span class='p'>)</span> <span class='o'>+</span> <span class='s1'>&#39;/your_application&#39;</span><span class='p'>)</span>
-<span class='nb'>require</span> <span class='s1'>&#39;spec&#39;</span>
-<span class='nb'>require</span> <span class='s1'>&#39;spec/interop/test&#39;</span>
-<span class='nb'>require</span> <span class='s1'>&#39;sinatra/test/unit&#39;</span>
+<p>It turns out that RSpec takes a little bit of manual work to get
+going with Sinatra. I read a <a href="http://www.gittr.com/index.php/archive/sinatra-rspec-integration-without-a-patch-with-examples/">helpful article on gittr.com</a> that
+pointed me in the right direction. The article advised me to add these
+lines to my spec files:</p>
+
+<div class="highlight"><pre><code class="ruby"><span class="nb">require</span> <span class="no">File</span><span class="o">.</span><span class="n">expand_path</span><span class="p">(</span><span class="no">File</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">__FILE__</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;/your_application&#39;</span><span class="p">)</span>
+<span class="nb">require</span> <span class="s1">&#39;spec&#39;</span>
+<span class="nb">require</span> <span class="s1">&#39;spec/interop/test&#39;</span>
+<span class="nb">require</span> <span class="s1">&#39;sinatra/test/unit&#39;</span>
 </code></pre></div>
-<p>The first line loads your application; the second line loads RSpec; the third loads an RSpec-Test::Unit compatibility layer; and the fourth loads Sinatra&#8217;s test helpers, which are written for Test::Unit.</p>
 
-<p>Contrary to Sinatra&#8217;s instructions for writing tests, you want to avoid loading &#8216;sinatra/test/spec&#8217;, which defines Sinatra&#8217;s helper methods for test/spec, because that would load test/spec itself which conflicts with RSpec.</p>
+<p>The first line loads your application; the second line loads RSpec;
+the third loads an RSpec-Test::Unit compatibility layer; and the
+fourth loads Sinatra’s test helpers, which are written for
+Test::Unit.</p>
 
-<p>Those instructions mostly worked. I could write and run specs. But I had trouble with matchers. For example, this example:</p>
-<div class='highlight'><pre><code class='ruby'><span class='n'>it</span> <span class='s2'>&quot;should not have a cookie&quot;</span>
-  <span class='n'>instance</span><span class='o'>.</span><span class='n'>cookie</span><span class='o'>.</span><span class='n'>should</span> <span class='n'>be_nil</span>
-<span class='k'>end</span>
+<!-- more -->
+
+<p>Contrary to Sinatra’s instructions for writing tests, you
+want to avoid loading ‘sinatra/test/spec’, which defines Sinatra’s
+helper methods for test/spec, because that would load test/spec itself
+which conflicts with RSpec.</p>
+
+<p>Those instructions mostly worked. I could write and run specs. But I
+had trouble with matchers. For example, this example:</p>
+
+<div class="highlight"><pre><code class="ruby"><span class="n">it</span> <span class="s2">&quot;should not have a cookie&quot;</span>
+  <span class="n">instance</span><span class="o">.</span><span class="n">cookie</span><span class="o">.</span><span class="n">should</span> <span class="n">be_nil</span>
+<span class="k">end</span>
 </code></pre></div>
+
 <p>Would give an error message like this:</p>
 
-<pre><code>undefined method `be_nil&#39; for nil:NilClass</code></pre>
+<pre><code>undefined method `be_nil' for nil:NilClass
+</code></pre>
 
-<p>Which I&#8217;m sure you can imagine is pretty annoying.</p>
+<p>Which I’m sure you can imagine is pretty annoying.</p>
 
-<p>It was easy enough to identify &#8216;sinatra/test/unit&#8217; as the root of the problem. When I removed that line RSpec&#8217;s matchers worked fine; but then I didn&#8217;t get Sinatra&#8217;s test helpers, which make spec-writing much easier. So that wasn&#8217;t a great solution either.</p>
+<p>It was easy enough to identify ‘sinatra/test/unit’ as the root of the
+problem. When I removed that line RSpec’s matchers worked fine; but
+then I didn’t get Sinatra’s test helpers, which make spec-writing much
+easier. So that wasn’t a great solution either.</p>
 
-<p>Examining Sinatra&#8217;s code, I found that all &#8216;sinatra/test/unit&#8217; does is to load &#8216;sinatra/test/methods&#8217; - the actual helper methods - and mixes them into Test::Unit::TestCase. So I bypassed &#8216;sinatra/test/unit&#8217; by copying and adapting some code from it to make the top of my spec file look like this:</p>
-<div class='highlight'><pre><code class='ruby'><span class='nb'>require</span> <span class='no'>File</span><span class='o'>.</span><span class='n'>expand_path</span><span class='p'>(</span><span class='no'>File</span><span class='o'>.</span><span class='n'>dirname</span><span class='p'>(</span><span class='bp'>__FILE__</span><span class='p'>)</span> <span class='o'>+</span> <span class='s1'>&#39;/your_application&#39;</span><span class='p'>)</span>
-<span class='nb'>require</span> <span class='s1'>&#39;spec&#39;</span>
-<span class='nb'>require</span> <span class='s1'>&#39;spec/interop/test&#39;</span>
-<span class='nb'>require</span> <span class='s1'>&#39;sinatra/test/methods&#39;</span>
+<p>Examining Sinatra’s code, I found that all ‘sinatra/test/unit’ does is
+to load ‘sinatra/test/methods’ - the actual helper methods - and mixes
+them into Test::Unit::TestCase. So I bypassed ‘sinatra/test/unit’ by
+copying and adapting some code from it to make the top of my spec file
+look like this:</p>
 
-<span class='kp'>include</span> <span class='ss'>Sinatra</span><span class='p'>:</span><span class='ss'>:Test</span><span class='o'>::</span><span class='no'>Methods</span>
+<div class="highlight"><pre><code class="ruby"><span class="nb">require</span> <span class="no">File</span><span class="o">.</span><span class="n">expand_path</span><span class="p">(</span><span class="no">File</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">__FILE__</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;/your_application&#39;</span><span class="p">)</span>
+<span class="nb">require</span> <span class="s1">&#39;spec&#39;</span>
+<span class="nb">require</span> <span class="s1">&#39;spec/interop/test&#39;</span>
+<span class="nb">require</span> <span class="s1">&#39;sinatra/test/methods&#39;</span>
 
-<span class='ss'>Sinatra</span><span class='p'>:</span><span class='ss'>:Application</span><span class='o'>.</span><span class='n'>default_options</span><span class='o'>.</span><span class='n'>merge!</span><span class='p'>(</span>
-  <span class='ss'>:env</span> <span class='o'>=&gt;</span> <span class='ss'>:test</span><span class='p'>,</span>
-  <span class='ss'>:run</span> <span class='o'>=&gt;</span> <span class='kp'>false</span><span class='p'>,</span>
-  <span class='ss'>:raise_errors</span> <span class='o'>=&gt;</span> <span class='kp'>true</span><span class='p'>,</span>
-  <span class='ss'>:logging</span> <span class='o'>=&gt;</span> <span class='kp'>false</span>
-<span class='p'>)</span>
+<span class="kp">include</span> <span class="ss">Sinatra</span><span class="p">:</span><span class="ss">:Test</span><span class="o">::</span><span class="no">Methods</span>
 
-<span class='no'>Sinatra</span><span class='o'>.</span><span class='n'>application</span><span class='o'>.</span><span class='n'>options</span> <span class='o'>=</span> <span class='kp'>nil</span>
+<span class="ss">Sinatra</span><span class="p">:</span><span class="ss">:Application</span><span class="o">.</span><span class="n">default_options</span><span class="o">.</span><span class="n">merge!</span><span class="p">(</span>
+  <span class="ss">:env</span> <span class="o">=&gt;</span> <span class="ss">:test</span><span class="p">,</span>
+  <span class="ss">:run</span> <span class="o">=&gt;</span> <span class="kp">false</span><span class="p">,</span>
+  <span class="ss">:raise_errors</span> <span class="o">=&gt;</span> <span class="kp">true</span><span class="p">,</span>
+  <span class="ss">:logging</span> <span class="o">=&gt;</span> <span class="kp">false</span>
+<span class="p">)</span>
+
+<span class="no">Sinatra</span><span class="o">.</span><span class="n">application</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="kp">nil</span>
 </code></pre></div>
-<p>Since that is a fair amount of setup, I moved all of it into a separate file called spec_helper.rb, which I loaded into my actual spec files. Because I am weird enough to write a Sinatra application that is split into multiple files and multiple spec files.</p>
 
-<p>Anyway, now my specs run just as they should, with Sinatra&#8217;s helpers and everything:</p>
-<div class='highlight'><pre><code class='ruby'><span class='n'>it</span> <span class='s2'>&quot;should deliver a cookie&quot;</span> <span class='k'>do</span>
-  <span class='n'>get_it</span> <span class='s1'>&#39;/cookie&#39;</span>
-  <span class='vi'>@response</span><span class='o'>.</span><span class='n'>should</span> <span class='n'>be_ok</span>
-  <span class='vi'>@response</span><span class='o'>.</span><span class='n'>headers</span><span class='o'>[</span><span class='s1'>&#39;Content-Type&#39;</span><span class='o'>].</span><span class='n'>should</span> <span class='o'>==</span> <span class='s1'>&#39;application/x-baked-goods&#39;</span>
-  <span class='vi'>@response</span><span class='o'>.</span><span class='n'>body</span><span class='o'>.</span><span class='n'>should_not</span> <span class='n'>be_empty</span>
-<span class='k'>end</span>
+<p>Since that is a fair amount of setup, I moved all of it into a
+separate file called spec_helper.rb, which I loaded into my actual
+spec files. Because I am weird enough to write a Sinatra application
+that is split into multiple files and multiple spec files.</p>
+
+<p>Anyway, now my specs run just as they should, with Sinatra’s helpers
+and everything:</p>
+
+<div class="highlight"><pre><code class="ruby"><span class="n">it</span> <span class="s2">&quot;should deliver a cookie&quot;</span> <span class="k">do</span>
+  <span class="n">get_it</span> <span class="s1">&#39;/cookie&#39;</span>
+  <span class="vi">@response</span><span class="o">.</span><span class="n">should</span> <span class="n">be_ok</span>
+  <span class="vi">@response</span><span class="o">.</span><span class="n">headers</span><span class="o">[</span><span class="s1">&#39;Content-Type&#39;</span><span class="o">].</span><span class="n">should</span> <span class="o">==</span> <span class="s1">&#39;application/x-baked-goods&#39;</span>
+  <span class="vi">@response</span><span class="o">.</span><span class="n">body</span><span class="o">.</span><span class="n">should_not</span> <span class="n">be_empty</span>
+<span class="k">end</span>
 </code></pre></div>
-<p>The next challenge was to write specs for Sinatra helpers. Although Sinatra actions and helpers generally appear in the outermost namespace, the DSL methods that define them actually bind the helpers to Sinatra::EventContext. You can&#8217;t invoke helper methods directly from an example context; you have to create an instance of Sinatra::EventContext and send the method call to that - much the same way Rails instantiates a subclass of ActionController::Base to handle a controller action. Here is the code you will want in your example groups:</p>
-<div class='highlight'><pre><code class='ruby'><span class='n'>before</span> <span class='ss'>:all</span> <span class='k'>do</span>
-  <span class='n'>request</span> <span class='o'>=</span> <span class='n'>mock</span><span class='p'>(</span><span class='s2'>&quot;request&quot;</span><span class='p'>)</span>
-  <span class='n'>response</span> <span class='o'>=</span> <span class='n'>mock</span><span class='p'>(</span><span class='s2'>&quot;response&quot;</span><span class='p'>,</span> <span class='ss'>:body</span><span class='o'>=</span> <span class='o'>=&gt;</span> <span class='kp'>nil</span><span class='p'>)</span>
-  <span class='n'>route_params</span> <span class='o'>=</span> <span class='n'>mock</span><span class='p'>(</span><span class='s2'>&quot;route_params&quot;</span><span class='p'>)</span>
-  <span class='vi'>@event_context</span> <span class='o'>=</span> <span class='ss'>Sinatra</span><span class='p'>:</span><span class='ss'>:EventContext</span><span class='o'>.</span><span class='n'>new</span><span class='p'>(</span><span class='n'>request</span><span class='p'>,</span> <span class='n'>response</span><span class='p'>,</span> <span class='n'>route_params</span><span class='p'>)</span>
-<span class='k'>end</span>
+
+<p>The next challenge was to write specs for Sinatra helpers. Although
+Sinatra actions and helpers generally appear in the outermost
+namespace, the DSL methods that define them actually bind the helpers
+to Sinatra::EventContext. You can’t invoke helper methods directly
+from an example context; you have to create an instance of
+Sinatra::EventContext and send the method call to that - much the same
+way Rails instantiates a subclass of ActionController::Base to handle a
+controller action. Here is the code you will want in your example
+groups:</p>
+
+<div class="highlight"><pre><code class="ruby"><span class="n">before</span> <span class="ss">:all</span> <span class="k">do</span>
+  <span class="n">request</span> <span class="o">=</span> <span class="n">mock</span><span class="p">(</span><span class="s2">&quot;request&quot;</span><span class="p">)</span>
+  <span class="n">response</span> <span class="o">=</span> <span class="n">mock</span><span class="p">(</span><span class="s2">&quot;response&quot;</span><span class="p">,</span> <span class="ss">:body</span><span class="o">=</span> <span class="o">=&gt;</span> <span class="kp">nil</span><span class="p">)</span>
+  <span class="n">route_params</span> <span class="o">=</span> <span class="n">mock</span><span class="p">(</span><span class="s2">&quot;route_params&quot;</span><span class="p">)</span>
+  <span class="vi">@event_context</span> <span class="o">=</span> <span class="ss">Sinatra</span><span class="p">:</span><span class="ss">:EventContext</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">route_params</span><span class="p">)</span>
+<span class="k">end</span>
 </code></pre></div>
-<p>A <code>body=</code> method has to be defined on the response mock to prevent an error. But it doesn&#8217;t have to actually do anything. With that setup code in place, you can do this:</p>
-<div class='highlight'><pre><code class='ruby'><span class='n'>it</span> <span class='s2'>&quot;should use a helper to make cookies&quot;</span> <span class='k'>do</span>
-  <span class='vi'>@event_context</span><span class='o'>.</span><span class='n'>bake_a_cookie</span><span class='o'>.</span><span class='n'>should</span> <span class='n'>be_an_instance_of</span><span class='p'>(</span><span class='no'>Cookie</span><span class='p'>)</span>
-<span class='k'>end</span>
+
+<p>A <code>body=</code> method has to be defined on the response mock to prevent an
+error. But it doesn’t have to actually do anything. With that setup
+code in place, you can do this:</p>
+
+<div class="highlight"><pre><code class="ruby"><span class="n">it</span> <span class="s2">&quot;should use a helper to make cookies&quot;</span> <span class="k">do</span>
+  <span class="vi">@event_context</span><span class="o">.</span><span class="n">bake_a_cookie</span><span class="o">.</span><span class="n">should</span> <span class="n">be_an_instance_of</span><span class="p">(</span><span class="no">Cookie</span><span class="p">)</span>
+<span class="k">end</span>
 </code></pre></div>
+
 <p>and write something like this in your application:</p>
-<div class='highlight'><pre><code class='ruby'><span class='n'>helper</span> <span class='k'>do</span>
-  <span class='k'>def</span> <span class='nf'>bake_a_cookie</span>
-    <span class='no'>Cookie</span><span class='o'>.</span><span class='n'>new</span><span class='p'>(</span><span class='ss'>:kind</span> <span class='o'>=&gt;</span> <span class='ss'>:chocolate_chip</span><span class='p'>)</span>
-  <span class='k'>end</span>
-<span class='k'>end</span>
+
+<div class="highlight"><pre><code class="ruby"><span class="n">helper</span> <span class="k">do</span>
+  <span class="k">def</span> <span class="nf">bake_a_cookie</span>
+    <span class="no">Cookie</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">:kind</span> <span class="o">=&gt;</span> <span class="ss">:chocolate_chip</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
 </code></pre></div>
-<p>And now you have a reasonably complete speccing setup. There are still a couple of issues though. For one thing, the spec helpers are missing a much needed <code>assigns[]</code> method. As it stands there is no good way to pry apart the behavior of an action if there is no convenient method call to stub. You can only define the parameters that are passed to it, and read response. On the upside, this does help to enforce good behavior-driven development.</p>
 
-<p>The other issue is more of an annoyance than a serious problem. It seems that somewhere in all of this there are one or two <code>method_missing</code> definitions that bounce calls back and forth. If call a method that is not defined, you generally won&#8217;t get an &#8220;undefined method&#8221; error, you will get a &#8220;stack level too deep&#8221; error instead. This is particularly unhelpful because it does not tell you what class received the undefined method, or which method is undefined. So a little extra manual stack tracing is required when this happens.</p>
+<p>And now you have a reasonably complete speccing setup. There are still
+a couple of issues though. For one thing, the spec helpers are missing
+a much needed <code>assigns[]</code> method. As it stands there is no good way to
+pry apart the behavior of an action if there is no convenient method
+call to stub. You can only define the parameters that are passed to
+it, and read response. On the upside, this does help to enforce good
+behavior-driven development.</p>
 
-<p><em>Update</em> 10/11/08: The Sinatra application that led to this article is now open source and is available at <a href='http://github.com/hallettj/restful_captcha'>http://github.com/hallettj/restful_captcha</a>. If you want to see the RSpec techniques that I used in context, check out the code there.</p>
+<p>The other issue is more of an annoyance than a serious problem. It
+seems that somewhere in all of this there are one or two
+<code>method_missing</code> definitions that bounce calls back and forth. If call
+a method that is not defined, you generally won’t get an “undefined
+method” error, you will get a “stack level too deep” error
+instead. This is particularly unhelpful because it does not tell you
+what class received the undefined method, or which method is
+undefined. So a little extra manual stack tracing is required when
+this happens.</p>
 
-<p><em>Updated 2009-08-09</em>: This article is pretty outdated. Added a note to that effect.</p></div>
+<p><em>Update</em> 10/11/08:
+The Sinatra application that led to this article is now open source and is available at <a href="http://github.com/hallettj/restful_captcha">http://github.com/hallettj/restful_captcha</a>. If you want to see the RSpec techniques that I used in context, check out the code there.</p>
+
+<p><em>Updated 2009-08-09</em>: This article is pretty outdated.  Added a note to that effect.  </p>
+</div>
 
 
   <footer>

@@ -9,7 +9,7 @@
   <meta name="author" content="Jesse Hallett">
 
   
-  <meta name="description" content="I had a great time at NodePDX last week. There were many talks packed into a short span of time and I saw many exciting ideas presented. One topic &hellip;">
+  <meta name="description" content="This information was written a long time ago and has become pretty outdated. Sinatra is a fun little web application microframework. Recently I &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -28,7 +28,6 @@
   <link rel="canonical" href="http://sitr.us/blog/page/2/index.html">
   <link href="/favicon.ico" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
   <link href="http://feeds.feedburner.com/hallettj" rel="alternate" title="sitr.us" type="application/atom+xml">
   <script src="/javascripts/modernizr-2.0.js"></script>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
@@ -91,7 +90,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/2013/05/22/functional-reactive-programming-in-javascript.html">Functional Reactive Programming in JavaScript</a></h1>
+      <h1 class="entry-title"><a href="/2008/07/29/how-to-use-rspec-to-describe-a-sinatra-application.html">How to use RSpec to describe a Sinatra application</a></h1>
     
     
       <p class="meta">
@@ -107,90 +106,249 @@
   
 
 
-<time datetime="2013-05-22T00:00:00-07:00" pubdate data-updated="true">2013-05-22</time>
+<time datetime="2008-07-29T00:00:00-07:00" pubdate data-updated="true">2008-07-29</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>I had a great time at <a href='http://nodepdx.org/'>NodePDX</a> last week. There were many talks packed into a short span of time and I saw many exciting ideas presented. One topic that seemed particularly useful to me was <a href='http://lanyrd.com/2013/nodepdx/schbpc/'>Chris Meiklejohn&#8217;s talk on Functional Reactive Programming (FRP)</a>.</p>
+  <div class="entry-content"><p>This information was written a long time ago and has become pretty outdated.</p>
 
-<p>I have talked and written about how useful promises are. See <a href='http://sitr.us/2012/07/31/promise-pipelines-in-javascript.html'>Promise Pipelines in JavaScript</a>. Promises are useful when you want to represent the outcome of an action or a value that will be available at some future time. FRP is similar except that it deals with streams of reoccurring events and dynamic values.</p>
+<p><a href="http://sinatrarb.com/">Sinatra</a> is a fun little web application microframework. Recently I
+started working on an application using Sinatra - and since I am
+working on good programming habits, before I dove into any coding I
+sat down to work out how to write specs for a Sinatra application.</p>
 
-<p>Here is an example of using FRP to subscribe to changes to a text input. This creates an event stream that could be used for a typeahead search feature:</p>
-<div class='highlight'><pre><code class='js'><span class='kd'>var</span> <span class='nx'>inputs</span> <span class='o'>=</span> <span class='nx'>$</span><span class='p'>(</span><span class='s1'>&#39;#search&#39;</span><span class='p'>)</span>
-    <span class='p'>.</span><span class='nx'>asEventStream</span><span class='p'>(</span><span class='s1'>&#39;keyup change&#39;</span><span class='p'>)</span>
-    <span class='p'>.</span><span class='nx'>map</span><span class='p'>(</span><span class='kd'>function</span><span class='p'>(</span><span class='nx'>event</span><span class='p'>)</span> <span class='p'>{</span> <span class='k'>return</span> <span class='nx'>event</span><span class='p'>.</span><span class='nx'>target</span><span class='p'>.</span><span class='nx'>value</span><span class='p'>;</span> <span class='p'>})</span>
-    <span class='p'>.</span><span class='nx'>filter</span><span class='p'>(</span><span class='kd'>function</span><span class='p'>(</span><span class='nx'>value</span><span class='p'>)</span> <span class='p'>{</span> <span class='k'>return</span> <span class='nx'>value</span><span class='p'>.</span><span class='nx'>length</span> <span class='o'>&gt;</span> <span class='mi'>2</span><span class='p'>;</span> <span class='p'>});</span>
+<p>Sinatra comes bundled with support for <a href="http://chneukirchen.org/repos/testspec/README">test/spec</a>: a spec framework
+that builds on top of Rail’s own Test::Unit to provide support for
+writing specs. Which is a really neat idea. But I have been using
+<a href="http://rspec.info/">RSpec</a> for my other work, and I wanted to continue doing so.</p>
 
-<span class='kd'>var</span> <span class='nx'>throttled</span> <span class='o'>=</span> <span class='nx'>inputs</span><span class='p'>.</span><span class='nx'>throttle</span><span class='p'>(</span><span class='mi'>500</span> <span class='cm'>/* ms */</span><span class='p'>);</span>
+<p>It turns out that RSpec takes a little bit of manual work to get
+going with Sinatra. I read a <a href="http://www.gittr.com/index.php/archive/sinatra-rspec-integration-without-a-patch-with-examples/">helpful article on gittr.com</a> that
+pointed me in the right direction. The article advised me to add these
+lines to my spec files:</p>
 
-<span class='kd'>var</span> <span class='nx'>distinct</span> <span class='o'>=</span> <span class='nx'>throttled</span><span class='p'>.</span><span class='nx'>skipDuplicates</span><span class='p'>();</span>
+<div class="highlight"><pre><code class="ruby"><span class="nb">require</span> <span class="no">File</span><span class="o">.</span><span class="n">expand_path</span><span class="p">(</span><span class="no">File</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">__FILE__</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;/your_application&#39;</span><span class="p">)</span>
+<span class="nb">require</span> <span class="s1">&#39;spec&#39;</span>
+<span class="nb">require</span> <span class="s1">&#39;spec/interop/test&#39;</span>
+<span class="nb">require</span> <span class="s1">&#39;sinatra/test/unit&#39;</span>
 </code></pre></div>
-<p>This creates an event stream from all <code>keyup</code> and <code>change</code> events on the given input. The stream is transformed into a stream of strings matching the value of the input when each event occurs. Then that stream is filtered so that subscribers to <code>inputs</code> will only receive events if the value of the input has a length greater than two.</p>
 
-<p>Streams can be assigned to variables, shared, and used as inputs to create more specific streams. In the example above <code>inputs</code> is used to create two more streams: one that limits the stream so that events are emitted at most every 500 ms and another that takes the throttled stream and drops duplicate values that appear consecutively. So when the final stream, <code>distinct</code>, is consumed later it is guaranteed that events 1) will be non-empty strings with length greater than two, 2) will not occur too frequently, and 3) will not include duplicates.</p>
+<p>The first line loads your application; the second line loads RSpec;
+the third loads an RSpec-Test::Unit compatibility layer; and the
+fourth loads Sinatra’s test helpers, which are written for
+Test::Unit.</p>
 
-<p>That stream can be fed through a service via ajax calls to show a live list of results:</p>
-<div class='highlight'><pre><code class='js'><span class='kd'>function</span> <span class='nx'>searchWikipedia</span><span class='p'>(</span><span class='nx'>term</span><span class='p'>)</span> <span class='p'>{</span>
-    <span class='kd'>var</span> <span class='nx'>url</span> <span class='o'>=</span> <span class='s1'>&#39;//en.wikipedia.org/w/api.php?callback=?&#39;</span><span class='p'>;</span>
-    <span class='k'>return</span> <span class='nx'>$</span><span class='p'>.</span><span class='nx'>getJSON</span><span class='p'>(</span><span class='nx'>url</span><span class='p'>,</span> <span class='p'>{</span>
-        <span class='nx'>action</span><span class='o'>:</span> <span class='s1'>&#39;opensearch&#39;</span><span class='p'>,</span>
-        <span class='nx'>format</span><span class='o'>:</span> <span class='s1'>&#39;json&#39;</span><span class='p'>,</span>
-        <span class='nx'>search</span><span class='o'>:</span> <span class='nx'>term</span>
-    <span class='p'>})</span>
-    <span class='p'>.</span><span class='nx'>then</span><span class='p'>(</span><span class='kd'>function</span><span class='p'>(</span><span class='nx'>data</span><span class='p'>)</span> <span class='p'>{</span>
-        <span class='k'>return</span> <span class='p'>{</span> <span class='nx'>query</span><span class='o'>:</span> <span class='nx'>data</span><span class='p'>[</span><span class='mi'>0</span><span class='p'>],</span> <span class='nx'>results</span><span class='o'>:</span> <span class='nx'>data</span><span class='p'>[</span><span class='mi'>1</span><span class='p'>]</span> <span class='p'>};</span>
-    <span class='p'>});</span>
-<span class='p'>}</span>
-
-<span class='kd'>var</span> <span class='nx'>suggestions</span> <span class='o'>=</span> <span class='nx'>distinct</span><span class='p'>.</span><span class='nx'>flatMapLatest</span><span class='p'>(</span><span class='kd'>function</span><span class='p'>(</span><span class='nx'>value</span><span class='p'>)</span> <span class='p'>{</span>
-    <span class='k'>return</span> <span class='nx'>Bacon</span><span class='p'>.</span><span class='nx'>fromPromise</span><span class='p'>(</span><span class='nx'>searchWikipedia</span><span class='p'>(</span><span class='nx'>value</span><span class='p'>));</span>
-<span class='p'>});</span>
-
-<span class='nx'>suggestions</span><span class='p'>.</span><span class='nx'>onValue</span><span class='p'>(</span><span class='kd'>function</span><span class='p'>(</span><span class='nx'>data</span><span class='p'>)</span> <span class='p'>{</span>
-    <span class='kd'>var</span> <span class='nx'>$results</span> <span class='o'>=</span> <span class='nx'>$</span><span class='p'>(</span><span class='s1'>&#39;#results&#39;</span><span class='p'>).</span><span class='nx'>empty</span><span class='p'>();</span>
-    <span class='nx'>data</span><span class='p'>.</span><span class='nx'>results</span><span class='p'>.</span><span class='nx'>forEach</span><span class='p'>(</span><span class='kd'>function</span><span class='p'>(</span><span class='nx'>s</span><span class='p'>)</span> <span class='p'>{</span>
-        <span class='nx'>$</span><span class='p'>(</span><span class='s1'>&#39;&lt;li&gt;&#39;</span><span class='p'>).</span><span class='nx'>text</span><span class='p'>(</span><span class='nx'>s</span><span class='p'>).</span><span class='nx'>appendTo</span><span class='p'>(</span><span class='nx'>$results</span><span class='p'>);</span>
-    <span class='p'>});</span>
-<span class='p'>});</span>
-</code></pre></div>
-<p>Here <code>suggestions</code> is a new stream that has been transformed from strings to search results using the <code>searchWikipedia</code> function. All of jQuery&#8217;s ajax methods return promises and <code>Bacon.fromPromise()</code> turns a promise into an event stream.</p>
-
-<p>The <code>flatMapLatest</code> transformer builds a new stream from an existing stream and a stream factory - and it only emits events from the last stream created. This means that if the user types slowly and a lot of ajax requests are made responses to all but the last request will be disregarded.</p>
-
-<p>The <code>suggestions</code> stream is ultimately used by calling its <code>onValue</code> method. That adds a subscriber that runs code for every event that makes it all the way through the stream. The result is a list of search results that is updated live as the user types.</p>
-
-<p>There are some other tricks available. It is possible to bind data from an event stream to a DOM element:</p>
-<div class='highlight'><pre><code class='js'><span class='kd'>var</span> <span class='nx'>query</span> <span class='o'>=</span> <span class='nx'>suggestions</span><span class='p'>.</span><span class='nx'>map</span><span class='p'>(</span><span class='kd'>function</span><span class='p'>(</span><span class='nx'>data</span><span class='p'>)</span> <span class='p'>{</span>
-    <span class='k'>return</span> <span class='nx'>data</span><span class='p'>.</span><span class='nx'>query</span><span class='p'>;</span>
-<span class='p'>}).</span><span class='nx'>toProperty</span><span class='p'>(</span><span class='s1'>&#39;--&#39;</span><span class='p'>);</span>
-
-<span class='nx'>query</span><span class='p'>.</span><span class='nx'>assign</span><span class='p'>(</span><span class='nx'>$</span><span class='p'>(</span><span class='s1'>&#39;#query&#39;</span><span class='p'>),</span> <span class='s1'>&#39;text&#39;</span><span class='p'>);</span>
-</code></pre></div>
-<p>This creates a new stream that is pared down to just the query used to produce each set of results. Whenever a result set is rendered the corresponding query will also be output as the text content of the <code>&#39;#query&#39;</code> element. The new stream is converted to a property to make this work. A property is a value that varies over time. The main practical distinction between a property and an event stream is that a property always has a value. In other words a property is <em>continuous</em> while an event stream is <em>discrete</em>. This example provides <code>&#39;--&#39;</code> as the initial value for the new property.</p>
-
-<p>Notice that property binding as shown here is more general than some data binding frameworks in that the destination is not limited to DOM elements and the source is not limited to model instances. This example passes values to the <code>text</code> method of the given jQuery object. It is possible to push data to any method on any object.</p>
-
-<p>Streams can be combined, split, piped, and generally manipulated in all kinds of ways. Properties can be bound, sampled, combined, transformed, or whatever.</p>
-
-<p>I put this code up on JSFiddle so you can try it out and play with it: <a href='http://jsfiddle.net/hallettj/SqrNT/'>http://jsfiddle.net/hallettj/SqrNT/</a></p>
-
-<p>There are several FRP implementations out there. Two that seem to be prominent are <a href='https://github.com/raimohanska/bacon.js'>Bacon.js</a> and <a href='https://github.com/Reactive-Extensions/RxJS'>RxJS</a>. The examples above are code from the RxJS documentation that I rewrote with Bacon. That gave me an opportunity to learn a bit about both libraries and to see how they approach the same problem. The original RxJS code is <a href='https://github.com/Reactive-Extensions/RxJS#why-rxjs'>here</a>.</p>
-
-<p>With FRP it is possible to describe complicated processes in a clean, declarative way. FRP is also a natural way to avoid certain classes of race conditions. When I wrote the initial version of the sample code above it worked perfectly on the first try. In my view that is a sign of a very well-designed library.</p>
-
-<p>If you are interested in further reading I suggest the <a href='http://nullzzz.blogspot.fi/2012/11/baconjs-tutorial-part-i-hacking-with.html'>series of tutorials</a> from the author of Bacon. And there is a great deal of information on the RxJS and Bacon Github pages, including documentation and more examples.</p></div>
+</div>
   
+  
+    <footer>
+      <a rel="full-article" href="/2008/07/29/how-to-use-rspec-to-describe-a-sinatra-application.html">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2007/10/02/international-phonetic-alphabet.html">International Phonetic Alphabet</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2007-10-02T00:00:00-07:00" pubdate data-updated="true">2007-10-02</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>In <a href="http://sitr.us/ling/2007/09/24/anatomy-of-a-syllable/">last week’s post</a> I provided phonetic
+transcriptions of some example words using the International Phonetic
+Alphabet, or IPA for short. I thought it would be helpful to follow
+that up with some information about what the IPA is, and how to read
+it. And as a bonus, after learning about IPA transcription you will be
+able to better read pronunciation guides on Wikipedia.</p>
+
+<p>You have probably seen many phonetic transcriptions before -
+especially as pronunciation guides in dictionaries. In dictionaries it
+is common to see a transcription convention that uses English spelling
+conventions to represent sounds. For example, the word “elucidate”
+might be transcribed as (ee-LOO-suh-date). That system is handy
+because it is immediately familiar to anyone who has experience
+reading stuff in English. But it has drawbacks too. There are a few
+main problems that are especially important for linguists; there are
+lots of linguists all over the world who are used to languages with
+entirely different spelling conventions. For example, the sound in
+English that is represented as “y” - the consonant, not the vowel - is
+written in Icelandic as “j”. There are also a lot of languages with
+sounds that just don’t exist in English. Linguists need to be able to
+transcribe those sounds; but since they don’t exist in English there
+is no spelling convention to represent them. In fact there is no one
+language with enough spelling conventions to represent every sound in
+every language in the world. And finally, English spelling is
+ambiguous, as is the spelling of almost any language. That is already
+demonstrated by the need to add a note to distinguish “y” the
+consonant from “y” the vowel or any of the other vowel sounds
+represented by “y”.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/2007/10/02/international-phonetic-alphabet.html">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2007/09/24/anatomy-of-a-syllable.html">Anatomy of a Syllable</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2007-09-24T00:00:00-07:00" pubdate data-updated="true">2007-09-24</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>The syllable is a constant feature in every spoken language in the
+world. Each language has its own rules about what kinds of syllables
+are allowed, and what kinds aren’t - but the general structure is the
+same everywhere.</p>
+
+<p>A syllable has as many as three parts: <em>onset</em>, <em>nucleus</em>, and
+<em>coda</em>. The onset and the coda are consonants, or consonant clusters,
+that appear at the beginning and the end of the syllable
+respectively. The nucleus forms the the core of the syllable; it is
+most often a vowel, or a combination of vowels - but there are many
+exceptions to that. If you examine enough languages you can find
+almost every kind phone used as a syllable nucleus. In the word “far”,
+[f] is the syllable onset, [a] is the nucleus, and [r] the coda. If a
+coda is present in a syllable, the nucleus and the coda form a single
+unit called a <em>rhyme</em>; otherwise the nucleus makes up the rhyme by
+itself. Looking at “far” again, [ar] forms the rhyme. A syllable does
+not necessarily have to have an onset or a coda - depending on the
+language - but a nucleus is always present.</p>
+
+<p>Even in English, syllable nuclei are not restricted to vowels. For
+example, in the monosyllabic word, “hmm”, the syllable nucleus is [ṃ],
+which is a consonant but is more specifically a <em>nasal</em>. Another
+nasal, [n], can be seen as a syllable nucleus in the word “isn’t”,
+which is transcribed into the <a href="http://en.wikipedia.org/wiki/International_Phonetic_Alphabet">International Phonetic Alphabet (IPA)</a>
+as [ɪzzṇt]. In this case there are two syllables, and [ṇ] forms the
+nucleus of the second syllable.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/2007/09/24/anatomy-of-a-syllable.html">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2007/09/17/deixis.html">Deixis</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2007-09-17T00:00:00-07:00" pubdate data-updated="true">2007-09-17</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>When someone says to you, “here” or “now”, you probably know what he
+means. “Here” might the room that you are both sitting in. “Now” would
+be the span of time you spent sitting together. But if either word
+were uttered under different circumstances, it could mean something
+very different. For example, if I called you from the Andes and I used
+the word, “here”, it would mean a mountainside somewhere - possibly
+thousands of miles away from the aforementioned room. The same word
+can mean both the room and the mountainside because of <a href="http://en.wikipedia.org/wiki/Deixis">deixis</a>.</p>
+
+<p>Deixis is a form of <a href="http://en.wikipedia.org/wiki/Exophora">exophora</a>, which is an utterance that is given
+meaning by the context it is uttered in. Specifically, deixis
+represents the speech event itself: deictic expressions reference the
+speaker, the speaker’s utterances, the speaker’s location, and the
+time at which the speech event occurs. There are different types of
+deictic expressions that refer to each particular aspect.</p>
+
+<p><a href="http://en.wikipedia.org/wiki/Personal_pronoun">Personal pronouns</a>, such as “I”, “you”, “he”, and “she”, are deictic
+expressions. “I” refers simply to the speaker. The other pronouns are
+defined by the relation the referenced person has to the speaker in
+the discourse. As the role of speaker switches from person to person,
+the context represented by deixis in understood by participants of the
+discourse to change too.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/2007/09/17/deixis.html">Read on &rarr;</a>
+    </footer>
   
 
 
     </article>
   
   <div class="pagination">
-    
-      <a class="prev" href="/blog/page/3/">&larr; Older</a>
     
     <a href="/blog/archives">Blog Archives</a>
     

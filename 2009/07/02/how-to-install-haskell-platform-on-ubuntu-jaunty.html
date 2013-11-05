@@ -9,7 +9,8 @@
   <meta name="author" content="Jesse Hallett">
 
   
-  <meta name="description" content="Just for kicks I thought I would take another shot at some Haskell programming. To get all of the common libraries and the automated package &hellip;">
+  <meta name="description" content="Just for kicks I thought I would take another shot at some Haskell programming.
+To get all of the common libraries and the automated package &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -28,7 +29,6 @@
   <link rel="canonical" href="http://sitr.us/2009/07/02/how-to-install-haskell-platform-on-ubuntu-jaunty.html">
   <link href="/favicon.ico" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
   <link href="http://feeds.feedburner.com/hallettj" rel="alternate" title="sitr.us" type="application/atom+xml">
   <script src="/javascripts/modernizr-2.0.js"></script>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
@@ -111,51 +111,73 @@
   </header>
 
 
-<div class="entry-content"><p>Just for kicks I thought I would take another shot at some Haskell programming. To get all of the common libraries and the automated package installer, cabal, I set up the <a href='http://hackage.haskell.org/platform/'>Haskell Platform</a>. Here is how I did it.</p>
+<div class="entry-content"><p>Just for kicks I thought I would take another shot at some Haskell programming.
+To get all of the common libraries and the automated package installer, cabal,
+I set up the <a href="http://hackage.haskell.org/platform/">Haskell Platform</a>. Here is how I did it.</p>
 
-<p>Ubuntu Jaunty includes a package for the Haskell compiler, ghc, at version 6.8. The Haskell Platform installer will roll its eyes at you if you try to proceed with this version of ghc. So the first step is to install ghc 6.10.</p>
+<p>Ubuntu Jaunty includes a package for the Haskell compiler, ghc, at version 6.8.
+The Haskell Platform installer will roll its eyes at you if you try to proceed
+with this version of ghc. So the first step is to install ghc 6.10.</p>
 
 <p>Paste these lines into <code>/etc/apt/sources.list.d/haskell.list</code>:</p>
 
 <pre><code>deb http://ppa.launchpad.net/someone561/ppa/ubuntu jaunty main
-deb-src http://ppa.launchpad.net/someone561/ppa/ubuntu jaunty main</code></pre>
+deb-src http://ppa.launchpad.net/someone561/ppa/ubuntu jaunty main
+</code></pre>
 
 <p>To get the key to verify packages from that PPA, run this optional command:</p>
 
-<pre><code>sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E51D9310</code></pre>
+<pre><code>sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E51D9310
+</code></pre>
 
 <p>Then update your package list and install Haskell:</p>
 
 <pre><code>sudo apt-get update
-sudo apt-get install ghc6 ghc6-prof ghc6-doc haddock</code></pre>
+sudo apt-get install ghc6 ghc6-prof ghc6-doc haddock
+</code></pre>
 
-<p>The Haskell Platform website does not list a package for Ubuntu yet. So <a href='http://hackage.haskell.org/platform/'>download the source installer</a>.</p>
+<p>The Haskell Platform website does not list a package for Ubuntu yet. So
+<a href="http://hackage.haskell.org/platform/">download the source installer</a>.</p>
 
-<p>Before you run the installer you will want to install the necessary build dependencies:</p>
+<!-- more -->
 
-<pre><code>sudo apt-get install libglut-dev happy alex libedit-dev zlib1g-dev</code></pre>
+<p>Before you run the installer you will want to install the necessary build
+dependencies:</p>
+
+<pre><code>sudo apt-get install libglut-dev happy alex libedit-dev zlib1g-dev
+</code></pre>
 
 <p>Please leave a comment if you discover that I have left out any dependencies.</p>
 
-<p>To perform the final installation step you will also need to have checkinstall installed:</p>
+<p>To perform the final installation step you will also need to have checkinstall
+installed:</p>
 
-<pre><code>sudo apt-get install checkinstall</code></pre>
+<pre><code>sudo apt-get install checkinstall
+</code></pre>
 
 <p>Unpack the source installer wherever you like:</p>
 
-<pre><code>tar -xzf haskell-platform-2009.2.0.1.tar.gz</code></pre>
+<pre><code>tar -xzf haskell-platform-2009.2.0.1.tar.gz
+</code></pre>
 
-<p>Finally <code>cd</code> into the installer directory and run the generic installation procedure:</p>
+<p>Finally <code>cd</code> into the installer directory and run the generic installation
+procedure:</p>
 
 <pre><code>./configure
 make
-sudo checkinstall -y</code></pre>
+sudo checkinstall -y
+</code></pre>
 
-<p>This will build and install a deb package called <code>haskell-platform</code>. If you ever want to remove Haskell Platform just uninstall that package.</p>
+<p>This will build and install a deb package called <code>haskell-platform</code>.  If you
+ever want to remove Haskell Platform just uninstall that package.</p>
 
-<p>If all of the above worked, you should be good to go. You compile Haskell code with <code>ghc</code>. You can run an interactive read-eval-print-loop with <code>ghci</code>. And you can install Haskell libraries with <code>cabal</code>.</p>
+<p>If all of the above worked, you should be good to go. You compile Haskell code
+with <code>ghc</code>. You can run an interactive read-eval-print-loop with <code>ghci</code>. And
+you can install Haskell libraries with <code>cabal</code>.</p>
 
-<p><em>Updated 2009-07-23</em>: Added zlib1g-dev to list of build dependencies. Thanks Jack Siler and Fernand.<br /><em>Updated 2009-08-01</em>: Added step for installing checkinstall. Thanks Paulo.</p></div>
+<p><em>Updated 2009-07-23</em>: Added zlib1g-dev to list of build dependencies.  Thanks Jack Siler and Fernand.<br />
+<em>Updated 2009-08-01</em>: Added step for installing checkinstall.  Thanks Paulo.  </p>
+</div>
 
 
   <footer>
