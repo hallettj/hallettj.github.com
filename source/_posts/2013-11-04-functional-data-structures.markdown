@@ -11,6 +11,11 @@ good implementations of functional data structures.  Recently I found
 looking for.  Mori packages data structures from the [Clojure][]
 standard library for use in JavaScript code.
 
+* Table of Contents
+{:toc}
+
+## Functional data structures
+
 A functional data structure (also called a persistent data structure)
 has two important qualities: it is immutable and it can be updated by
 creating a copy with modifications (copy-on-write).  Creating copies
@@ -47,6 +52,10 @@ code that uses mutable data structures.
 [values and change]: http://clojure.org/state
 [Are We There Yet]: http://www.infoq.com/presentations/Are-We-There-Yet-Rich-Hickey
 
+<!-- more -->
+
+## Clojure, ClojureScript, and Mori
+
 [Clojure][] is a functional language that compiles to JVM bytecode.  It
 is a Lisp dialect.  Among Clojure's innovations are implementations of
 a number of functional data structures, old and new.  For example, other
@@ -72,18 +81,18 @@ Mori also includes a few helpers to make functional programming easier,
 like `identity`, `constant`, and `sum` functions.  These are the data
 structures provided in the latest version of Mori, v0.2.4:
 
-| constructor     | Mori                         | Clojure                               |
-| --------------- | ---------------------------- | ------------------------------------- |
-| `list`          | [Mori docs][list mori]       | [Clojure docs][list clojure]          |
-| `vector`        | [Mori docs][vector mori]     | [Clojure docs][vector clojure]        |
-| `range`         | [Mori docs][range mori]      | [Clojure docs][range clojure]         |
-| `hash_map`      | [Mori docs][hash_map mori]   | [Clojure docs][hash_map clojure]      |
-| `array_map`     |                              | [Clojure docs][array_map clojure]     |
-| `sorted_map`    |                              | [Clojure docs][sorted_map clojure]    |
-| `sorted_map_by` |                              | [Clojure docs][sorted_map_by clojure] |
-| `set`           | [Mori docs][set mori]        | [Clojure docs][set clojure]           |
-| `sorted_set`    | [Mori docs][sorted_set mori] | [Clojure docs][sorted_set clojure]    |
-| `sorted_set_by` |                              | [Clojure docs][sorted_set_by clojure] |
+constructor     | Mori                         | Clojure
+--------------- | ---------------------------- | -------------------------------------
+`list`          | [Mori docs][list mori]       | [Clojure docs][list clojure]
+`vector`        | [Mori docs][vector mori]     | [Clojure docs][vector clojure]
+`range`         | [Mori docs][range mori]      | [Clojure docs][range clojure]
+`hash_map`      | [Mori docs][hash_map mori]   | [Clojure docs][hash_map clojure]
+`array_map`     |                              | [Clojure docs][array_map clojure]
+`sorted_map`    |                              | [Clojure docs][sorted_map clojure]
+`sorted_map_by` |                              | [Clojure docs][sorted_map_by clojure]
+`set`           | [Mori docs][set mori]        | [Clojure docs][set clojure]
+`sorted_set`    | [Mori docs][sorted_set mori] | [Clojure docs][sorted_set clojure]
+`sorted_set_by` |                              | [Clojure docs][sorted_set_by clojure]
 
 [list mori]: http://swannodette.github.io/mori/#list
 [vector mori]: http://swannodette.github.io/mori/#vector
