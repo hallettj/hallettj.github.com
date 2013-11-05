@@ -165,13 +165,7 @@ a lot of sense when values are mostly immutable; and it avoids name
 collisions that sometimes come up in object-oriented code, since names
 are scoped by module instead of by object.[^polymorphism]
 
-[^polymorphism]: You might be wondering how Clojure handles
-polymorphism, since the convention is to use functions instead of
-methods.  Clojure has a feature called [protocols][] that permit
-multiple implementations for functions depending on the type of a given
-argument.  Elsewhere in the functional world, [Haskell][] and
-[Scala][] provide a similar, yet more powerful feature, called [type
-classes][].
+[^polymorphism]: You might be wondering how Clojure handles polymorphism, since the convention is to use functions instead of methods.  Clojure has a feature called [protocols][] that permit multiple implementations for functions depending on the type of a given argument.  Elsewhere in the functional world, [Haskell][] and [Scala][] provide a similar, yet more powerful feature, called [type classes][].
 
 [protocols]: http://clojure.org/protocols
 [Haskell]: http://www.haskell.org/haskellwiki/Haskell
@@ -199,13 +193,7 @@ more values into a collection.  It behaves differently with different
 collection types, using whatever insert strategy is most efficient for
 the given collection.[^conj]
 
-[^conj]: When `conj` is used on a list it prepends elements (like
-`cons`) because prepending is much cheaper than inserting at other
-possible positions.  Given a vector `conj` appends values.  Appending is
-often desired, and appending to a vector is just as efficient as
-inserting at any other position.  `conj` works on sets and maps too
-- but in those cases the idea of insertion position is not usually
-meaningful.
+[^conj]: When `conj` is used on a list it prepends elements (like `cons`) because prepending is much cheaper than inserting at other possible positions.  Given a vector `conj` appends values.  Appending is often desired, and appending to a vector is just as efficient as inserting at any other position.  `conj` works on sets and maps too - but in those cases the idea of insertion position is not usually meaningful.
 
 
 ### higher-order functions
@@ -416,12 +404,9 @@ That's just the world that we live in, I suppose.
 ### `hash_map`
 
 All JavaScript objects are maps.  But those can only use strings as
-keys.[^maps in es6]  The `hash_map` provided by Mori can use any values as keys.
+keys.[^es6-maps]  The `hash_map` provided by Mori can use any values as keys.
 
-[^maps in es6]: It does look like ECMAScript 6 will add
-[a Map implementation][ES6 Map] and a [WeakMap][] to the language spec,
-both of which will take arbitrary objects as keys (only non-primitives
-in the WeakMap case).  But those implementations will not be immutable!
+[^es6-maps]: It does look like ECMAScript 6 will add [a Map implementation][ES6 Map] and a [WeakMap][] to the language spec, both of which will take arbitrary objects as keys (only non-primitives in the WeakMap case).  But those implementations will not be immutable!
 
 [ES6 Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map
 [WeakMap]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap
@@ -462,7 +447,7 @@ All of this also applies to `array_map`, `sorted_map`, and
 `sorted_map_by`.  See [Different map and set implementations][impls]
 below for information about those.
 
-[impls]: #different_map_and_set_implementations
+[impls]: #different-map-and-set-implementations
 
 There is a common pattern in JavaScript of passing options objects to
 constructors to avoid having functions that take zillions of arguments.
