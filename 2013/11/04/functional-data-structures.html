@@ -121,6 +121,7 @@ standard library for use in JavaScript code.</p>
 <ul id="markdown-toc">
   <li><a href="#functional-data-structures">Functional data structures</a></li>
   <li><a href="#clojure-clojurescript-and-mori">Clojure, ClojureScript, and Mori</a></li>
+  <li><a href="#installing-and-running">Installing and running</a></li>
   <li><a href="#examples">Examples</a>    <ul>
       <li><a href="#vector"><code>vector</code></a></li>
       <li><a href="#higher-order-functions">higher-order functions</a></li>
@@ -272,6 +273,16 @@ provided by Mori comes from Clojure, if you cannot find information that
 you need in the Mori docs you can also look at the Clojure docs.
 I provided links to the Clojure documentation for each data structure
 where more detailed descriptions are available.</p>
+
+<h2 id="installing-and-running">Installing and running</h2>
+
+<p>To get Mori, install the <a href="https://docs.nodejitsu.com/articles/getting-started/npm/what-is-npm">npm</a> package <code>mori</code>.  Then you can require
+the package <code>'mori'</code> in a <a href="http://nodejs.org/">Node.js</a> project; or copy the file
+<code>mori.js</code> from the installed package and drop it into a web browser.</p>
+
+<pre><code>$ npm install mori
+$ cp node_modules/mori/mori.js my_app/public/scripts/
+</code></pre>
 
 <h2 id="examples">Examples</h2>
 
@@ -1169,6 +1180,8 @@ encourages writing code in a way that makes most logical sense rather
 than thinking about performance.  You can write what are logically many
 iterations over a collection and the library will rearrange computations
 to minimize the actual work that is done.</p>
+
+<p><em>Updated 2013-11-12: Added section on installing Mori.</em></p>
 <div class="footnotes">
   <ol>
     <li id="fn:polymorphism">
