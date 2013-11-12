@@ -123,6 +123,17 @@ I provided links to the Clojure documentation for each data structure
 where more detailed descriptions are available.
 
 
+## Installing and running
+
+To get Mori, install the [npm][] package `mori`.  Then you can require
+the package `'mori'` in a [Node.js][] project; or copy the file
+`mori.js` from the installed package and drop it into a web browser.
+
+    $ npm install mori
+    $ cp node_modules/mori/mori.js my_app/public/scripts/
+
+[npm]: https://docs.nodejitsu.com/articles/getting-started/npm/what-is-npm
+
 ## Examples
 
 Let's take a look at the particular advantages of some of these
@@ -1063,3 +1074,5 @@ encourages writing code in a way that makes most logical sense rather
 than thinking about performance.  You can write what are logically many
 iterations over a collection and the library will rearrange computations
 to minimize the actual work that is done.
+
+_Updated 2013-11-12: Added section on installing Mori._
