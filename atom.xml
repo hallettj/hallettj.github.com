@@ -4,7 +4,7 @@
   <title><![CDATA[sitr.us]]></title>
   <link href="http://sitr.us/atom.xml" rel="self"/>
   <link href="http://sitr.us/"/>
-  <updated>2013-11-12T04:35:28-08:00</updated>
+  <updated>2013-11-12T04:38:32-08:00</updated>
   <id>http://sitr.us/</id>
   <author>
     <name><![CDATA[Jesse Hallett]]></name>
@@ -183,7 +183,7 @@ where more detailed descriptions are available.</p>
 <h2 id="installing-and-running">Installing and running</h2>
 
 <p>To get Mori, install the <a href="https://docs.nodejitsu.com/articles/getting-started/npm/what-is-npm">npm</a> package <code>mori</code>.  Then you can require
-the package <code>'mori'</code> in a <a href="http://nodejs.org/">Node.js</a> project; or copy the file
+the module <code>'mori'</code> in a <a href="http://nodejs.org/">Node.js</a> project; or copy the file
 <code>mori.js</code> from the installed package and drop it into a web browser.</p>
 
 <pre><code>$ npm install mori
