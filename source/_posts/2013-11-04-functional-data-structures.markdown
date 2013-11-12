@@ -126,7 +126,7 @@ where more detailed descriptions are available.
 ## Installing and running
 
 To get Mori, install the [npm][] package `mori`.  Then you can require
-the package `'mori'` in a [Node.js][] project; or copy the file
+the module `'mori'` in a [Node.js][] project; or copy the file
 `mori.js` from the installed package and drop it into a web browser.
 
     $ npm install mori
