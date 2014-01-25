@@ -11,10 +11,11 @@
   <body>
     <div data-role="page" id="main">
       <div data-role="header" class="jqm-header">
-        <h1>Configurable Fuzzy Text</h1>
+        <h1>Configure Fuzzy Text</h1>
       </div>
 
-      <form id="config" data-role="content">
+      <div data-role="content">
+      <form id="config">
 
         <div data-role="fieldcontain">
           <label for="invert">Invert colors:</label>
@@ -27,13 +28,13 @@
         <div data-role="fieldcontain">
           <fieldset data-role="controlgroup">
             <legend>Text align:</legend>
-            <input type="radio" name="align" id="align-center" checked="checked" class="custom" />
+            <input type="radio" name="align" value="center" id="align-center" checked="checked" class="custom" />
             <label for="align-center">center</label>
 
-            <input type="radio" name="align" id="align-left" class="custom" />
+            <input type="radio" name="align" value="left" id="align-left" class="custom" />
             <label for="align-left">left</label>
 
-            <input type="radio" name="align" id="align-right" class="custom" />
+            <input type="radio" name="align" value="right" id="align-right" class="custom" />
             <label for="align-right">right</label>
             </fieldset>
           </div>
@@ -41,12 +42,13 @@
 
         <div class="ui-body ui-body-b">
           <fieldset class="ui-grid-a">
-              <div class="ui-block-a"><button data-theme="d" id="b-cancel">Cancel</button></div>
+              <div class="ui-block-a"><button type="submit" data-theme="d" id="b-cancel">Cancel</button></div>
               <div class="ui-block-b"><button type="submit" data-theme="a" id="b-submit">Submit</button></div>
             </fieldset>
           </div>
         </div>
       </form>
+      </div>
     </div>
     <script>
       function saveOptions() {
@@ -54,20 +56,18 @@
           'invert': $("#invert").val() === "on",
           'text_align': ($('#config').serializeArray().filter(function(pair) {
             return pair.name === "align"
-          })[0] || {}).value || 'center';
+          })[0] || {}).value || 'center'
         }
         return options;
       }
 
       $().ready(function() {
-        $("#b-cancel").click(function(event) {
-          event.preventDefault();
+        $("#b-cancel").click(function() {
           console.log("Cancel");
           document.location = "pebblejs://close";
         });
 
-        $("#config").submit(function(event) {
-          event.preventDefault();
+        $("#b-submit").click(function() {
           console.log("Submit");
 
           var location = "pebblejs://close#" + encodeURIComponent(JSON.stringify(saveOptions()));
