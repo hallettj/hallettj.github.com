@@ -61,6 +61,22 @@
         return options;
       }
 
+      function applyOptions() {
+        var params = window.location.hash;
+        var opts;
+        params.replace(/(?:^|[#&])options=([^&]*)/, function(_, json) {
+            opts = JSON.parse(decodeURIComponent(json));
+        });
+        if (opts && opts.invert) {
+          $("#invert").val('on').slider('refresh');
+        }
+        if (opts && opts.text_align) {
+          $(document.getElementById('align-'+ opts.text_align))
+            .prop('checked', true)
+          $('[name="align"]').checkboxradio('refresh');
+        }
+      }
+
       $().ready(function() {
         $("#b-cancel").click(function() {
           console.log("Cancel");
@@ -76,6 +92,7 @@
           document.location = location;
         });
 
+        applyOptions();
       });
     </script>
   </body>
