@@ -1,0 +1,69 @@
+==================================================================
+https://keybase.io/hallettj
+--------------------------------------------------------------------
+
+I hereby claim:
+
+  * I am an admin of http://sitr.us
+  * I am hallettj (https://keybase.io/hallettj) on keybase.
+  * I have a public key with fingerprint A378 B079 9F05 93C0 B499  DD02 8FB4 E35F E86B 913B
+
+To claim this, I am signing this object:
+
+{
+    "body": {
+        "key": {
+            "fingerprint": "a378b0799f0593c0b499dd028fb4e35fe86b913b",
+            "host": "keybase.io",
+            "key_id": "8FB4E35FE86B913B",
+            "uid": "ee47a8df1c5f502d0679ce8c310bb900",
+            "username": "hallettj"
+        },
+        "service": {
+            "hostname": "sitr.us",
+            "protocol": "http:"
+        },
+        "type": "web_service_binding",
+        "version": 1
+    },
+    "ctime": 1396045568,
+    "expire_in": 157680000,
+    "prev": "55022b6389b805c3cc16ef2060b5a0f05655ad8d65d0ebe1f53b72418a7e5347",
+    "seqno": 3,
+    "tag": "signature"
+}
+
+with the aforementioned key, yielding the PGP signature:
+
+-----BEGIN PGP MESSAGE-----
+Version: GnuPG v1
+
+owGbwMvMwMRomyTHtfSM9mPG0wfeJDEEm35nqFZKyk+pVLKqVspOBVNpmXnpqUUF
+RZl5JUpWSonG5hZJBuaWlmkGppbGyQZJJpaWKSkGRhZpSSapxqZpqRZmSZaGxklK
+OkoZ+cUgHUBjkhKLU/Uy84FiQE58ZgpQ1MLNycTV2NTN1cLMCajeCShXCpZITTUx
+T7RISTNMNk0zNTBKMTAzt0xOtUg2NjRISrI0MAApLE4tykvMTQWqzkjMyUktKclS
+qtVRAoqWZSangtwMshqqojizpEivtBioraAovyQ/OT8HpK2kpMAKpKeksgCkqDw1
+KR6qPT4pMy8F6GWghrLUouLM/DwlK0OgyuSSTJB5hsaWZgYmpqZmFjpKqRUFmUWp
+8ZkgFabmZhYGQACyJrUMaKQp0PFGSWbGFpZJFgamycbJyYZmqWlGBmYGSaaJBsDQ
+MzM1TUyxSDEzTTFITUo1TDM1TjI3MjG0SDRPNTU2MVcCeagwL1/JyhjozMR0sFfS
+8xJLSotSlWo7mWRYGBiZGNhYmUCRxsDFKQCLyh/fBBgmdxzjP+E7yyyAZcbDEoW4
+Y1vmXbvWdqmWOWjRrUAJPgc9sRPeX3rFvE71PVn3bm1f70n5zZUrOusKf+TObD8h
+tF7zzrIzhVt3Zfw6Hy86UeoM81uBjYv/pKuUcjMc1rNd+OxXzcQpPv+fund8YzEp
+2Tdt04HmfCapxGzewt2rDCLyF51Ma9ner7FP55DHkfc5R1yVJV5ycBxcuuHmJzmv
+vEmCLNejoi/7mG0ONN5+8lVOynGRHatPzs4pYfGZOtPwq+bF822btPxDjrH4/WdQ
+nXPR2nv/ivmr2zpXGpu7mkp3nV5dZfq1beX1+pytS1SPr0/WePKv6eKbBTWRKmsj
+tz4QrtdeNuH6JO8tygXfNjlJ1ogKck4+k+Jj6592+EH6nEfLflq8sNut6JIVM+Pt
+LjaDH4tmp7dEcVY809S003jd13Lzoo2R/JkqnXVlsezb2bdzXlbdc1w7b9q8mcJz
+O44vKBC8XfXgJuukLQymUZtcGOb/OT9/xQeBmU+t0oz6ZvvteyO6TOeZcLzIPyPe
+5TdWChU8nuDKwBPfIDrd+A7HwpWNr6JPJm5es+c4i2OPZUa+Ys1BA934Q3t5PbfF
+xrtIbZTS6Vn6qbCgdOVV3g0cjyZrb5ZvlKkNbot85527bsbRyU+6n6R8tvz8f92h
+e1mO/J+2Wdb2G1VsTvBcZDTnwNw2CW2fW20L8ktPvOuw89mWqbd790uZIOF1AA==
+=/S8G
+-----END PGP MESSAGE-----
+
+And finally, I am proving ownership of this host by posting or
+appending to this document.
+
+View my publicly-auditable identity here: https://keybase.io/hallettj
+
+==================================================================
