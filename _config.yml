@@ -58,6 +58,8 @@ default_asides: [asides/recent_posts.html, asides/talks.html, asides/projects.ht
 # post_asides:
 # page_asides:
 
+include: [".well-known", ".nojekyll"]
+
 # ----------------------- #
 #   3rd Party Settings    #
 # ----------------------- #
