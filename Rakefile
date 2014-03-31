@@ -57,7 +57,6 @@ task :generate do
   puts "## Generating Site with Jekyll"
   system "compass compile --css-dir #{source_dir}/stylesheets"
   system "jekyll"
-  Rake::Task[:wellknown].invoke(source_dir, public_dir)
 end
 
 desc "Watch the site and regenerate when it changes"
@@ -236,11 +235,6 @@ task :copydot, :source, :dest do |t, args|
   FileList["#{args.source}/**/.*"].exclude("**/.", "**/..", "**/.DS_Store", "**/._*").each do |file|
     cp_r file, file.gsub(/#{args.source}/, "#{args.dest}") unless File.directory?(file)
   end
-end
-
-desc "copy .well-known files"
-task :wellknown, :source, :dest do |t, args|
-  cp_r File.join(args.source, ".well-known"), File.join(args.dest)
 end
 
 desc "Deploy website via rsync"
