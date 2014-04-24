@@ -1,72 +1,78 @@
-body {
-    font-family: "Gill Sans", Helvetica, Arial, sans-serif;
-}
-
-#preso, .slide {
-    background: #fff;
-    width: 1020px;
-    height: 740px;
-    margin-left:auto;
-    margin-right:auto;
-    overflow:hidden;
-}
-
-#footer {
-    background: #eee;
-    padding: 2px;
-    width: 1010px;
-    height: 20px;
-    margin-left:auto;
-    margin-right:auto;
-}
-
-/* iPhone */
-/* Portrait */
-@media screen and (max-width: 320px)
-{
-  #preso { 
-      margin: 0;
-      padding: 0;
-      width: 320px;
-      max-height: 356px;
-      margin-left:auto; 
-      margin-right:auto;
-/*      overflow:hidden;*/
+@media screen {
+  body {
+      font-size: 100%;
+      font-family: "Gill Sans", Helvetica, Arial, sans-serif;
+      background:#333;
+      overflow:hidden;
+      margin:0;
+      padding:0;
   }
-  #footer { 
-      background: #eee;
-      margin: 0;
-      padding: 2px;
-      width: 320px;
+
+  #preso, .slide {
+      background: #fff;
+      width: 1024px;
+      height: 768px;
+      margin-left:auto;
+      margin-right:auto;
+      overflow:hidden;
+      -webkit-box-shadow:0 0 25px rgba(0,0,0,0.35);
+      -moz-box-shadow:0 0 25px rgba(0,0,0,0.35);
+      box-shadow:0 0 25px rgba(0,0,0,0.35);
+  }
+
+  #footer {
+      background: rgba(221,221,221,0.75);
+      color:#333;
+      padding: 2px 5px;
+      width: 1005px;
       height: 20px;
-      margin-left:auto; 
-      margin-right:auto;
+      line-height:20px;
+      font-size:14px;
+      position:relative;
+      top:-24px;
+      margin:0 auto;
+      -webkit-border-top-left-radius: 3px;
+      -webkit-border-top-right-radius: 3px;
+      -moz-border-radius-topleft: 3px;
+      -moz-border-radius-topright: 3px;
+      border-top-left-radius: 3px;
+      border-top-right-radius: 3px;
+      z-index: 2147483647; /* max, see http://www.puidokas.com/max-z-index/ */
+      display: none;
   }
-}
-/* Landscape */
-@media screen and (max-width: 480px)
-{
-  #preso { 
-      margin: 0;
-      padding: 0;
-/*      min-height: 320px;*/
-      width: 480px;
-      margin-left:auto; 
-      margin-right:auto;
+  #followMode {
+    display: none;
   }
-  #footer { 
-      background: #eee;
-      margin: 0;
-      padding: 2px;
-      width: 480px;
-      height: 20px;
-      margin-left:auto; 
-      margin-right:auto;
+  #pauseScreen {
+      background: rgba(0, 0, 0, 0.85);
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      display: none;
+      margin: auto;
+      color: white;
+      font-size: 2em;
+      padding: 1em;
+      z-index: 2147483647; /* max, see http://www.puidokas.com/max-z-index/ */
+      text-align: center;
   }
 }
 
-.slide {
-    border: 1px solid #fff;
+/* plain (non-bullet) text */
+.content > p {
+	font-size: 2em;
+    margin: 1em;
+	text-align: center;
+}
+
+.content > pre {
+    font-size: 300%;
+}
+.content > blockquote {
+    font-size: 250%;
+    margin: 2em;
 }
 
 .center img {
@@ -83,21 +89,61 @@ body {
   vertical-align: middle;
 }
 
-.bullets ul {
-    font-size: 3em;
+/* numbered lists are numbered */
+.content ol {
+    margin-left: 40px;
+	font-size: 3em;
+	text-align: left;
+	padding-left: 40px;
 }
-.bullets ul li {
+.content ol > li {
+    list-style: decimal;
+    display: list-item;
+}
+
+
+/* ironically, normal lists have bullets and 'bullets' lists don't */
+.content > ul {
+    list-style: disc;
+}
+.content > ul {
+	font-size: 3em;
+	text-align: left;
+	padding-left: 40px;
+}
+.content > ul > li {
+    padding: .5em;
+    margin-left: 40px;
+}
+
+/* ironically, normal lists have bullets and 'bullets' lists don't */
+.bullets > ul {
+    list-style: none;
+	font-size: 3em;
+	padding-left: 0px;
+}
+.bullets > ul > li {
     text-align: center;
     padding: 25px;
 }
-
-.smbullets ul {
-    font-size: 2em;
+.smbullets > ul {
+    font-size: 2.5em;
 }
-.smbullets ul li {
+.smbullets > ul > li {
     text-align: center;
     padding: 10px;
 }
+
+/* nested lists get their bullets back */
+.content ul ul,
+.content ol ul {
+  list-style: disc;
+  margin: 10px 10px;
+  padding-left: 40px;
+  text-align: left;
+}
+
+.bullets ul ul > li { font-size: 80%; }
 
 .commandline pre {
     font-size: 2em;
@@ -122,9 +168,10 @@ body {
     font-family: monospace;
 }
 
-.subsection {
+.subsection h1 {
     background: #008;
     color: #fff;
+	padding: .25em;
 }
 
 .small {
@@ -135,27 +182,47 @@ body {
     font-size: 70%;
 }
 
-h1 { font-size: 5em; font-weight: normal; text-align: center;}
-h2 { font-size: 3em; font-weight: normal; text-align: center; }
-h3 { font-size: 2em; font-weight: normal; text-align: center; }
+h1,h2,h3 { font-weight: normal; text-align: center; margin: 0.5em 0; }
+h1 { font-size: 5em; }
+h2 { font-size: 3em; }
+h3 { font-size: 2em; }
 
-h1, h2, h3 {
-  margin: 0.5em 0;
-}
+pre { margin: 1em 40px; padding: .25em; }
 
-pre { margin-left: 40px; margin-top: 40px; font-size: 2.8em; }
-
-.notes { display: none }
+.notes, .handouts, .instructor, .solguide { display: none }
 .hidden { position:absolute; top:0; left:-9999px; width:1px; height:1px; overflow:hidden; }
+.buttonNav { display: none }
 .offscreen { position:absolute; top:0; left:-9999px; overflow:hidden; }
 #debugInfo { margin-left: 30px; }
+#notesInfo { margin-left: 30px; display: none }
+#slideFilename {
+  position: absolute;
+  right: 5px;
+  bottom: 0px;
+  height: 23px;
+  padding-left: 10px;
+  background: #ccc;
+  z-index: 2147483647;
+}
+img#disconnected {
+  float: right;
+  display: none;
+}
+
+#preshow { display: none; }
+/* define the screen blocking view */
+/* we define it as invisible because we use jQuery to animate its presentation */
+#screenblanker {
+  height: 100%;
+  display: none;
+}
 
 #help {
     background: #9f9;
     position: absolute;
     right: 80px;
     display: none;
-    z-index: 2147483647; //max, see http://www.puidokas.com/max-z-index/
+    z-index: 2147483647; /* max, see http://www.puidokas.com/max-z-index/ */
 }
 #help table tr td.key {
     text-align: right;
@@ -164,8 +231,90 @@ pre { margin-left: 40px; margin-top: 40px; font-size: 2.8em; }
     font-weight: bold;
 }
 
+
+#feedbackWrapper {
+  float: left;
+  height: 100%;
+  position: fixed;
+  background-color: #dfdfdf;
+  opacity: 0.98;
+  z-index: 2147483647; /* max, see http://www.puidokas.com/max-z-index/ */
+}
+
+#feedbackSidebar {
+  height: 100%;
+  width: 200px;
+  background: transparent url(grippy-close.png) no-repeat right center;
+  display: none;
+}
+
+#feedbackSidebar img#feedbackActivity {
+  position: absolute;
+  right: 3px;
+  top: 3px;
+  display: none;
+}
+
+#feedbackHandle {
+  height: 100%;
+  width: 9px;
+  background: transparent url(grippy.png) no-repeat center;
+}
+
+#feedbackSidebar div.row {
+  text-align: center;
+  margin: 5px 0;
+  padding: 5px 0;
+}
+
+#feedbackWrapper h4 {
+  text-align: left;
+  margin-left: 3px;
+}
+#feedbackSidebar span.buttonWrapper {
+  height: 60px;
+  width: 85px;
+  padding: 5px;
+  display: inline-block;
+}
+#feedbackSidebar span.buttonWrapper button {
+  margin: 44px auto 0 auto;
+}
+
+#feedbackSidebar span.buttonWrapper.slower {
+  background: transparent url(slow.png) no-repeat center top;
+}
+
+#feedbackSidebar span.buttonWrapper.faster {
+  background: transparent url(fast.png) no-repeat center top;
+}
+
+#feedbackSidebar textarea {
+  height: 85px;
+  width: 85%;
+}
+
+#feedbackSidebar #disclaimer {
+  position: absolute;
+  bottom: 25px;
+  width: 100%;
+  text-align: center;
+}
+
+#feedbackSidebar div.row.tools {
+  position: absolute;
+  bottom: 30px;
+  width: 100%;
+  text-align: center;
+}
+
+#feedbackSidebar div.row.tools button#editSlide {
+  width: 90%%;
+  margin: auto 5%;
+}
+
 .fg-menu-container {
-    z-index: 2147483647; //max, see http://www.puidokas.com/max-z-index/
+    z-index: 2147483647; /* max, see http://www.puidokas.com/max-z-index/ */
 }
 
 .fg-button { clear:left; margin:0 4px 40px 20px; padding: .4em 1em; text-decoration:none !important; cursor:pointer; position: relative; text-align: center; zoom: 1; }
@@ -176,7 +325,13 @@ a.fg-button { float:left; }
 
 .fg-button.ui-state-loading .ui-icon { background: url(spinner_bar.gif) no-repeat 0 0; }
 
-#navmenu { position: absolute; top: 10px; left: 10px; width: 50px; }
+#navmenu, #stylemenu {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 50px;
+  z-index: 2147483647; /* max, see http://www.puidokas.com/max-z-index/ */
+}
 
 .code .c { color: #999988; font-style: italic } /* Comment */
 .code .err { color: #a61717; background-color: #e3d2d2 } /* Error */
@@ -249,10 +404,330 @@ a.fg-button { float:left; }
   padding:15px;
   margin:0px;
   font-family: monospace;
-  z-index: 2147483647; //max, see http://www.puidokas.com/max-z-index/
+  z-index: 2147483647; /* max, see http://www.puidokas.com/max-z-index/ */
 }
 
 .executing {
   color:#0000FF !important;
   background-color: yellow;
+}
+
+.executing:hover {
+  cursor: pointer;
+}
+
+#tips, #preshow_timer {
+  display:inline;
+  background-color:#000;
+  color:#fff;
+  font-size:3em;
+  border:2px solid black;
+  position: fixed;
+  padding:25px;
+  margin:0px;
+  z-index: 2147483647; /* max, see http://www.puidokas.com/max-z-index/ */
+}
+
+#tips {
+  top: 0px;
+  right: 0px;
+  text-align:right;
+}
+
+#preshow_timer {
+  bottom: 0px;
+}
+
+/**********************************
+ ***     table of contents      ***
+ **********************************/
+#toc a {
+  text-decoration: none;
+}
+#toc a::after {
+  content: leader(".") target-counter(attr(href), page);
+}
+
+/**********************************
+ ***   supplemental materials   ***
+ **********************************/
+#slides.supplemental .slide {
+  max-height: none !important;
+  height: auto;
+  padding: 0.5em;
+  width: 8.1in;
+}
+
+.supplemental h1 { font-family: 'Arvo'; text-align: left; }
+.supplemental h2,
+    .supplemental h3,
+    .supplemental h4,
+    .supplemental h5,
+    .supplemental h6 { font-family: 'PT Sans'; text-align: left; }
+
+.supplemental h1 { font-size: 2em; }
+.supplemental h2 { font-size: 1.5em; }
+.supplemental h3,
+    .supplemental h4,
+    .supplemental h5,
+    .supplemental h6 { font-size: 1.3em; text-align: left; }
+
+.supplemental .content > p,
+    .supplemental .content > ol,
+    .supplemental .content > ul { font-size: 1em; }
+
+.supplemental img { max-width: 7in; }
+.supplemental .content > pre,
+  .supplemental .content > pre > code { font-size: 10pt; font-family: 'Courier New', Courier, monospace; }
+.supplemental ul { list-style: disc; margin-left: 1.25em !important; padding-left: inherit !important; }
+.supplemental .content table { font-size: 0.65em; } /* Ugly hack for tables, which never seem to scale properly. Ick */
+
+/* downloads page */
+/* we want scrolls! */
+body#download {
+  overflow:auto;
+  height: auto;
+}
+#download h1 {
+  font-size: 3em;
+}
+ul#downloads {
+    margin-left:  20%;
+    font-size: large;
+    list-style-type: disc;
+}
+ul#downloads li {
+    margin: 0.5em;
+}
+
+/**********************
+ ***   stats page   ***
+ **********************/
+/* we want scrolls! */
+body#stats {
+  overflow:auto;
+  height: auto;
+}
+
+/* apply some nifty rounding styles to the row */
+#stats div.row {
+  position: relative;
+  margin: 0.25em 1em;
+  padding: 0.1em;
+  background-color: #dfdfdf;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -khtml-border-radius: 5px;
+  border-radius: 5px;
+}
+/* and to the bar inside the row */
+#stats div.bar {
+  height: 1.25em;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -khtml-border-radius: 5px;
+  border-radius: 5px;
+}
+/* position the label to the top left and time to the top right */
+#stats div.row span.label {
+  position: absolute;
+  top: 0.15em;
+  left: 0.25em;
+}
+#stats div.time {
+  position: absolute;
+  top: 0.15em;
+  right: 0.25em;
+}
+
+/* style all three boxes */
+#stats div#least,
+#stats div#most,
+#stats div#all {
+  width: 45%;
+  border: 1px solid black;
+  -moz-border-radius: 1em;
+  -webkit-border-radius: 1em;
+  -khtml-border-radius: 1em;
+  border-radius: 1em;
+}
+
+/* least box */
+#stats div#least {
+  float: left;
+  margin-left: 3%;}
+#stats div#least div.bar {
+  background: #f5f56f;
+}
+
+/* most box */
+#stats div#most {
+  float: right;
+  margin-right: 3%;
+}
+#stats div#most div.bar {
+  background: #f45f5f;
+}
+
+/* listing of all stats */
+#stats div#all {
+  clear: both;
+  position: relative;
+  top: 3em;
+  margin: 0 3% 5em 3%;
+  width: 94%;
+}
+#stats div#all div.bar {
+  background: #66b366;
+}
+
+/* detail view */
+#stats div#all div.detail {
+  margin: 0 5em 0 1em;
+}
+#stats div#all div.detail div.bar {
+  background: #8484dd;
+}
+/**********************
+ *** end stats page ***
+ **********************/
+
+/**********************
+ ** presenter popups **
+ **********************/
+.tipsy-inner { text-align: left; max-width: 500px; }
+.tipsy-inner h1 { font-size: 1.5em; }
+.tipsy-inner h2 { font-size: 1.35em; }
+.tipsy-inner h3 { font-size: 1.25em; }
+.tipsy-inner a { color: #0d8dfd; }
+.tipsy-inner a:hover { color: #04ffff; }
+
+.tipsy-inner p.newpage { text-align: right; padding-bottom: 0.25em; }
+.tipsy-inner p.newpage a {
+  color: white;
+  padding: 0.25em;
+  text-decoration: none;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -khtml-border-radius: 5px;
+  border-radius: 5px;
+  border: 1px solid black;
+}
+.tipsy-inner p.newpage a:hover {
+  font-weight: bold;
+  background-color: #222;
+  border: 1px solid white;
+}
+
+
+.tipsy-inner #stats { min-width: 450px; }
+.tipsy-inner #stats .row { color: black; }
+.tipsy-inner #stats #all { max-height: 325px; overflow: auto; }
+
+.tipsy-inner ul#downloads { font-size: 1em; margin-left: 0.25em; }
+/************************
+ * end presenter popups *
+ ************************/
+
+/* iPhone */
+/* Portrait */
+@media screen and (max-width: 320px)
+{
+  html,body,#footer {
+    min-width: 320px !important;
+    max-width: 320px !important;
+    width: 320px !important;
+    margin: 0;
+    padding: 0;
+  }
+  body > #preso {
+    width: 976px;
+    zoom: 0.32;
+  }
+  #preso .slide {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+}
+
+/* Landscape */
+/*
+@media screen and (max-width: 480px)
+{
+  #preso {
+      margin: 0;
+      padding: 0;
+      width: 480px;
+      margin-left:auto;
+      margin-right:auto;
+  }
+  #footer {
+      background: #eee;
+      margin: 0;
+      padding: 2px;
+      width: 480px;
+      height: 20px;
+      margin-left:auto;
+      margin-right:auto;
+  }
+}
+*/
+
+/** Print **/
+@media print {
+  body {
+    font-size: 70%;
+  }
+
+  #sidebarWrapper,
+  #sidebar,
+  #sidebarHandle {
+    display:none,
+
+  }
+
+  #preso, .slide {
+    border: 1px solid #999;
+  }
+
+  .slide .center {
+    width: 800px;
+    height: 600px;
+    display: table-cell;
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  #preso, .slide {
+      background: #fff;
+      width: 800px;
+      height: 600px;
+      margin-left:auto;
+      margin-right:auto;
+      overflow:hidden;
+  }
+
+  #footer {
+      background: #eee;
+      padding: 2px;
+      width: 590px;
+      height: 20  px;
+      margin-left:auto;
+      margin-right:auto;
+  }
+
+  pre, code {
+    font-family: Monaco, monospace;
+  }
+
+  /* page break styling */
+  div.break {
+    page-break-after: always;
+    font-size: small;
+    font-style: italic;
+    padding-top: 0.25em;
+    padding-bottom: 0.25em;
+  }
 }
