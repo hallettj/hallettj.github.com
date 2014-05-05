@@ -1,0 +1,206 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang=en>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+<link rel="stylesheet" href="../css/style.css" />
+<script src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=default"></script>
+<title>Learn You An Agda - Propositions and Predicates </title>
+</head>
+<body>
+<div class=container>
+<div class='titleimage'>Learn you an Agda</div>
+<div id="content">
+<div class='header'>
+<ul class=headerlist>
+<li style="text-align:left"><a href="peano.html">← Hello, Peano</a></li>
+<li style="text-align:center">
+<a href="../toc.html">Table of Contents</a></li>
+<li style="text-align:right"><a href="#">Peano Proofs →</a></li>
+</ul>
+</div>
+<div class='title'>Propositions and Predicates</div>
+<div class='date'>16th Febuary 2011</div>
+<h1 id="logic-is-the-art-of-going-wrong-with-confidence">“Logic is the art of going wrong with confidence”</h1>
+<p>Now that we’ve defined the natural numbers, we’re going to do some simple example proofs of some basic mathematical properties. We’ll first discuss logic and logic specification in <em>natural deduction</em>, and as we go, we’ll discuss the application to Agda.</p>
+<p>At a fundamental level, a logic is a system of <em>judgements</em>. Judgements are statements in a mathematical <em>language</em> that may be proven, or unproven. A <em>language</em> is usually described as a set of strings, which make up every <em>term</em> in the language, but this is a simplification: a language can be made up of arbitrary data structures. We just use strings to represent these structures because any data structure can be represented in some string form.</p>
+<p>For our example, we will define a very simple logic based on the language of <em>natural numbers</em> <span class="math">\(\mathbb{N}\)</span> we used earlier.</p>
+<p>We’re going to have just one type of judgement, of the form <span class="math">\(\mathbb{N}\ \textbf{even}\)</span>, which is provable only when the given number is even.</p>
+<p>A logic consists of a set of <em>axioms</em>, and a set of <em>rules</em>. Axioms are the foundation of the logic: they’re the basic, simple statements that are assumed to be true. <em>Rules</em> describe how to produce new proven statements, or <em>theorems</em>, given some existing theorems. We can formally specify these axioms and rules in a <em>meta-logic</em> called <em>natural deduction</em>, by writing them in the form of <em>inference rules</em>, which look like this:</p>
+<p><span class="math">\[\frac{P_1 \quad P_2\quad\cdots\quad P_n}{C} {\rm N\scriptsize AME}_{}\]</span></p>
+<p>This says that if we can prove all of the <em>premises</em> <span class="math">\(P_1 \cdots P_n\)</span>, then we can prove the <em>conclusion</em> <span class="math">\(C\)</span>.</p>
+<p>For our purposes, we have just one axiom, that the number zero is even. Axioms are written as inference rules with no premises:</p>
+<p><span class="math">\[\frac{}{\mathtt{zero}\ \textbf{even}}{\rm Z\scriptsize ERO}\]</span></p>
+<p>Then, based on the inductive reasoning we used earlier, our <em>rules</em> for our logic need to express that if some number <span class="math">\(m\)</span> is even, then <span class="math">\(m + 2\)</span> is also even. We do this by writing an <em>inference rule schema</em>, which is a way of describing a <em>set</em> of rules, by including one or more <em>metavariables</em> in an inference rule. If I have some metavariable <span class="math">\(x\)</span> in a rule schema, I can substitute <span class="math">\(x\)</span> for <em>any</em> term in the language, and I will have a valid rule.</p>
+<p><span class="math">\[\frac{x\ \textbf{even}}{\mathtt{suc}\ (\mathtt{suc}\ x)\ \textbf{even}}{\rm S\scriptsize TEP}\]</span></p>
+<p>If I wanted to show that four was even, I would be able to apply this rule twice (once where <span class="math">\(x\)</span> is two, and once when <span class="math">\(x\)</span> is zero), leaving the obligation <span class="math">\(\mathtt{zero}\ \textbf{even}\)</span> which is shown by the axiom <span class="math">\({\rm Z\scriptsize ERO}\)</span>. We can write this proof using natural deduction in a “proof tree” format:</p>
+<p><span class="math">\[ \frac{\large \frac{\LARGE \frac{}{\mathtt{zero}\ \textbf{even}}{\rm\large Z\normalsize ERO}}
+                      {\mathtt{suc}\ (\mathtt{suc}\ \mathtt{zero})\ \textbf{even}}
+                      {\rm\small S\scriptsize TEP}}
+         {\mathtt{suc}\ (\mathtt{suc}\ (\mathtt{suc}\ (\mathtt{suc}\ \mathtt{zero})))\ \textbf{even}}
+         {\rm S\scriptsize TEP} \]</span></p>
+<p>When proving a theorem, we work from the bottom of this tree upwards, applying rules that fit the form of the goal as we go. When reading the proof, we work <em>downwards</em>, reasoning from known axioms to the theorem that we want.</p>
+<h1 id="how-does-this-all-relate-to-agda">How does this all relate to Agda?</h1>
+<p>Agda’s types correspond to judgements. If we can construct a value of a certain type, we have simultaneously constructed a <em>proof</em> that the theorem encoded by that type holds. As types are judgements, and values are theorems, <em>data constructors</em> for a type correspond to <em>inference rules</em> for the corresponding proposition. Let’s encode the judgement <span class="math">\(\textbf{even}\)</span> in Agda, based on our definition in natural deduction.</p>
+<p>We’ll use the mix-fix name <code>_even</code> here rather than just <code>even</code> so that we can use the judgement in post-fix form. As our judgement is over the language of natural numbers, we <em>index</em> the type constructor for our judgement by the type <code>ℕ</code>.</p>
+<pre class="agda"><code>data _even : ℕ → Set where</code></pre>
+<p>This allows us to define the axiom <span class="math">\({\rm Z\scriptsize ERO}\)</span> as a simple constructor for the type <code>zero even</code>:</p>
+<pre class="agda"><code>   ZERO : zero even</code></pre>
+<p><span class="math">\({\rm S\scriptsize TEP}\)</span> is a little more complicated however, due to the presence of the metavariable <span class="math">\(x\)</span>. Just writing the rule as-is will result in an error, as <span class="math">\(x\)</span> is not in scope:</p>
+<pre class="agda"><code>   STEP : x even → suc (suc x) even -- x not in scope</code></pre>
+<p>To solve this, we make <code>STEP</code> take a <em>dependent</em> parameter, a natural number <span class="math">\(x\)</span>, and “lift” the number on to type level:</p>
+<pre class="agda"><code>   STEP : (x : ℕ) → x even → suc (suc x) even</code></pre>
+<p>By using dependent types, we can define rule schema: <code>STEP zero</code> here refers to the rule <code>zero even → suc (suc zero) even</code>, which shows that <code>STEP</code> the same substitution semantics that we described for metavariables earlier.</p>
+<p>In this case, the type of <code>x</code> can be inferred from its usage, as we use it with <code>_even</code> which takes an <code>ℕ</code> as an argument, so we can use the special <code>∀</code> symbol to introduce <code>x</code> and omit the type:</p>
+<pre class="agda"><code>   STEP : ∀ x → x even → suc (suc x) even</code></pre>
+<p>So, our final definition of <code>_even</code> is:</p>
+<pre class="agda"><code>data _even : ℕ → Set where
+   ZERO : zero even
+   STEP : ∀ x → x even → suc (suc x) even</code></pre>
+<p>Now we’ll prove in Agda that four is even. Type the following into an emacs buffer, and type <code>C-c C-l</code>:</p>
+<pre class="agda"><code>-- \_1 to type ₁
+proof₁ : suc (suc (suc (suc zero))) even
+proof₁ = ?</code></pre>
+<p>Agda will show a small “hole” in the code, which looks like this:</p>
+<pre class="agda"><code>proof₁ : suc (suc (suc (suc zero))) even
+proof₁ = { }0</code></pre>
+<p>and in a separate window will be shown:</p>
+<pre><code>?0 : suc (suc (suc (suc zero))) even</code></pre>
+<p>This tells us that our proof obligation at hole <code>?0</code> is <code>suc (suc (suc (suc zero))) even</code>. Next, put your cursor into the hole, and type <code>STEP ? ?</code> into it, then type <code>C-c C-space</code>. This will split your hole into two more holes: <code>?1</code> is the number to provide for <code>x</code> in <code>STEP</code>, and <code>?2</code> is a proof obligation to show that two is even:</p>
+<pre class="agda"><code>proof₁ : suc (suc (suc (suc zero))) even
+proof₁ = STEP { }1 { }2</code></pre>
+<p>In this case, there is only one constructor for hole <code>?2</code> that fits – <code>STEP</code>, so we can just type <code>C-c C-r</code> in that hole and Agda will split it into another <code>STEP</code> call for us, resulting in two more holes <code>?3</code> and <code>?4</code>:</p>
+<pre class="agda"><code>proof₁ : suc (suc (suc (suc zero))) even
+proof₁ = STEP { }1 (STEP { }3 { }4)</code></pre>
+<p><code>C-c C-r</code> will happilly fill in <code>ZERO</code> for us in hole <code>?4</code>, and the remaining two holes, <code>?1</code> and <code>?3</code>, are already known to Agda from the surrounding context. We can see what <em>constraints</em> Agda knows about on our holes by using the “Show Constraints” option or typing <code>C-c C-=</code>. This will print out:</p>
+<pre><code>?1 := suc (suc zero)
+?3 := zero</code></pre>
+<p>Seeing as this is the case, we can have Agda fill in the holes for us by using the “Solve Constraints” option or <code>C-c C-s</code>. Our final proof becomes:</p>
+<pre class="agda"><code>proof₁ : suc (suc (suc (suc zero))) even
+proof₁ = STEP (suc (suc zero)) (STEP zero ZERO)</code></pre>
+<p>Another feature worth mentioning is Agsy, an automatic proof searcher for Agda. Simply type <code>C-c C-a</code> in any hole and Agsy will search for an appropriate term to fill it. It’s not guaranteed to find anything, but it can be useful (it works well in this case).</p>
+<div class="aside">
+<h2>Implicits</h2>
+<p>It can be annoying, though, to have to pass in those numbers to <code>STEP</code> explicitly, when Agda already knows from surrounding context exactly what they are. In these situations, you can use a single underscore (<code>_</code>) to indicate that you wish Agda to infer the value in this position during typechecking.</p>
+<pre class="agda"><code>proof₁ : suc (suc (suc (suc zero))) even
+proof₁ = STEP _ (STEP _ ZERO)</code></pre>
+<p>If Agda cannot infer the value of the implicit underscore, an “unsolved metavariable” will be shown in the goals window, and the underscore will be highlighted in yellow.</p>
+<p>For this particular judgement, however, it is almost always obvious from known constraints what the value of those numbers should be. In these cases, it’s common to use an <em>implicit parameter</em> when declaring the type:</p>
+<pre class="agda"><code>data _even : ℕ → Set where
+   ZERO : zero even
+   STEP : ∀ {x} → x even → suc (suc x) even    -- long form { x : ℕ } is also fine</code></pre>
+<p>Note that here we have added braces around the variable <code>x</code> in our definition of <code>STEP</code>. This lets us omit the number entirely when writing our proof:</p>
+<pre class="agda"><code>proof₁ : suc (suc (suc (suc zero))) even
+proof₁ = STEP (STEP ZERO)</code></pre>
+<p>If Agda cannot, for whatever reason, infer the value of the implicit parameter, yellow highlighting and an unsolved metavariable will be added, as before. In those scenarios, you can manually specify the value of the implicit parameter by using braces:</p>
+<pre class="agda"><code>proof₁ : suc (suc (suc (suc zero))) even
+proof₁ = STEP {suc (suc zero)} (STEP {zero} ZERO)</code></pre>
+<p>For <code>_even</code>, this is not usually necessary, but if you find yourself specifying implicit parameters frequently, you may wish to consider making it explicit.</p>
+</div>
+<p>TODO: REVISE</p>
+<h2 id="implication">Implication</h2>
+<p>What if we wanted to prove a more complicated proposition than the one above? If we wanted to show an implication, for example? In Agda, an implication proposition corresponds to a <em>function type</em>.</p>
+<p>When we prove an implication, say <code>A ⇒ B</code>, we assume the premise (<code>A</code>) to be true, and from there try and derive the conclusion (<code>B</code>). If we think in terms of proof by construction, this is the same as implementing a function - a function, when given an argument of type <code>A</code>, constructs an return value of type <code>B</code>. In other words, when given a proof (by construction) of some proposition <code>A</code>, our function will produce a proof of some proposition <code>B</code> - This is exactly the same as our proof method for implication! If we can write such a function (and Agda checks it), then simply by writing that function we have constructed a proof of <code>A ⇒ B</code>.</p>
+<p>Consider a simple statement that is tautologically true: <code>A ⇒ A</code> (or, if A is true, then A is true). Let’s prove this obvious statement in Agda!</p>
+<p>First, let’s prove it just for the proposition that natural numbers exist (i.e if natural numbers exist, then natural numbers exist).</p>
+<pre class="agda"><code>
+proof₂ : ℕ → ℕ
+proof₂ ν = ν      -- \nu to type ν.
+</code></pre>
+<p>So, this tautology proof corresponds to the identity function. The reason for this is fairly clear: Given a proof of <code>A</code>, there’s only one real way to produce a proof of <code>A</code>, and that is to produce the proof you were just given.</p>
+<h2 id="universal-quantification">Universal Quantification</h2>
+<p>It would be nice though, to make this proof about <em>all</em> propositions, not merely the proposition that natural numbers exist - after all, the proof is the same regardless of the proposition involved!</p>
+<p>To do this, we have to exploit Agda’s flexible type system a little. We make our identity function take an additional parameter - a type. Given a type, we then return an identity function, instantiated for that type.</p>
+<pre class="agda"><code>proof₂′ : (A : Set) → A → A
+proof₂′ _ x = x</code></pre>
+<p>The new type signature here means: Given some value of type <code>Set</code> (i.e a type), called <code>A</code>, this returns a function from <code>A</code> to <code>A</code>. Alternatively, we could view it as a logical statement: For any proposition <code>A</code>, <code>A ⇒ A</code>. In logic, we use the symbol <code>∀</code> to mean “for any” or “for all”. So, the above type signature could be written in logic as:</p>
+<pre><code>∀A ⇒ A ⇒ A</code></pre>
+<p>Making propositions about <em>all</em> members of a set (or universe) is called <em>Universal Quantification</em>, and it corresponds to parametric polymorphism (including Java generics and C++ templates) in type system lingo.</p>
+<p>Now we can implement our special case proof in terms of the more general one:</p>
+<pre class="agda"><code>proof₂ : ℕ → ℕ
+proof₂ = proof₂′ ℕ</code></pre>
+<h2 id="conjunction">Conjunction</h2>
+<p>Unlike universal quantification or implication, Conjunction and disjunction do not correspond to built-in types in Agda, however they are fairly straightforward to define.</p>
+<p>When we prove a conjunction on pen and paper, we simply prove both of the two components of the conjunction. If we have a proof for both components, then we automatically have a proof of a conjunction. This means that conjunction corresponds to a <em>pair</em> or a <em>tuple</em> (more formally known as a <em>product type</em>) in Agda.</p>
+<pre class="agda"><code>data _∧_ (P : Set) (Q : Set) : Set where -- \and for ∧
+   ∧-intro : P → Q → (P ∧ Q)</code></pre>
+<p>Here we’ve defined a new data type, this time it is <em>parameterized</em> by two types/propositions, which make up the components of the conjunction. Conjunction itself is also a proposition, so we give it the type Set.</p>
+<p>Notice how the <code>∧-intro</code> constructor can only produce a proof of <code>P ∧ Q</code> if it is passed both a proof of <code>P</code> and a proof of <code>Q</code>. This is how conjunction is demonstrated by <em>construction</em> - it is impossible to create a conjunction that is not supported by proofs for both components.</p>
+<p>Using this we can prove some simple properties about conjunctions, such as: <code>P ∧ Q ⇒ P</code>:</p>
+<pre class="agda"><code>proof₃ : {P Q : Set} → (P ∧ Q) → P
+proof₃ (∧-intro p q) = p</code></pre>
+<h2 id="bijection">Bijection</h2>
+<p>Now that we have defined conjunction and implication, we can define a notion of logical <em>equivalence</em>. Two propositions are <em>equivalent</em> if both propositions can be considered to be the same. This is defined as: if one is true, the other is also true. In logic, this is called <em>bijection</em> and is written as <code>A ⇔ B</code>. Bijection can be expressed simply as a conjunction of two implications: If A is true then B is true, and if B is true then A is true.</p>
+<pre class="agda"><code>_⇔_ : (P : Set) → (Q : Set) → Set -- \&lt;=&gt; to type ⇔
+a ⇔ b = (a → b) ∧ (b → a)</code></pre>
+<h2 id="serious-proofs">Serious Proofs</h2>
+<p>Using this we can come up with some proofs of the algebraic properties of conjunction. The commutative property says that <code>A ∧ B ⇔ B ∧ A</code>, i.e the order of arguments does not matter. Let’s prove it:</p>
+<pre class="agda"><code>∧-comm′ : {P Q : Set} → (P ∧ Q) → (Q ∧ P)
+∧-comm′ (∧-intro p q) = ∧-intro q p
+
+∧-comm : {P Q : Set} → (P ∧ Q) ⇔ (Q ∧ P)
+∧-comm = ∧-intro (∧-comm′ {P} {Q}) (∧-comm′ {Q} {P}) -- implicits provided for clarity only.</code></pre>
+<p>Let’s also prove associativity (i.e that brackets don’t matter):</p>
+<pre class="agda"><code>∧-assoc₁ : { P Q R : Set } → ((P ∧ Q) ∧ R) → (P ∧ (Q ∧ R))
+∧-assoc₁ (∧-intro (∧-intro p q) r) = ∧-intro p (∧-intro q r)
+
+∧-assoc₂ : { P Q R : Set } → (P ∧ (Q ∧ R)) → ((P ∧ Q) ∧ R)
+∧-assoc₂ (∧-intro p (∧-intro q r)) = ∧-intro (∧-intro p q) r
+
+∧-assoc : { P Q R : Set } → ((P ∧ Q) ∧ R) ⇔  (P ∧ (Q ∧ R))
+∧-assoc = ∧-intro ∧-assoc₁ ∧-assoc₂</code></pre>
+<h2 id="disjunction">Disjunction</h2>
+<p>If conjunction is a <em>pair</em>, because it requires <em>both</em> proofs to hold, then disjunction is a <em>sum type</em> (also known as an <code>Either</code> type), because it only requires one proof in order to hold. In order to model this in Agda, we add <em>two</em> constructors to the type, one for each possible component of the disjunction.</p>
+<pre class="agda"><code>data _∨_ (P Q : Set) : Set where
+   ∨-intro₁ : P → P ∨ Q
+   ∨-intro₂ : Q → P ∨ Q</code></pre>
+<p>Using this, we can come up with some interesting proofs. The simplest one to prove is <em>disjunction elimination</em>, which is: <code>∀A B C ⇒ ((A ⇒ C) ∧ (B ⇒ C) ∧ (A ∨ B))⇒ C</code>. In plain English, this means “If I know that <code>C</code> is true if <code>A</code> is true, and that <code>C</code> is true if <code>B</code> is true, and that <code>A</code> or <code>B</code> is true, then I know <code>C</code> is true”.</p>
+<pre class="agda"><code>∨-elim : {A B C : Set} → (A → C) → (B → C) → (A ∨ B) → C
+∨-elim ac bc (∨-intro₁ a) = ac a
+∨-elim ac bc (∨-intro₂ b) = bc b</code></pre>
+<p>We can also prove the algebraic properties of disjunction, such as commutativity:</p>
+<pre><code>∨-comm′ : {P Q : Set} → (P ∨ Q) → (Q ∨ P)
+∨-comm′ (∨-intro₁ p) = ∨-intro₂ p
+∨-comm′ (∨-intro₂ q) = ∨-intro₁ q
+
+∨-comm : {P Q : Set} → (P ∨ Q) ⇔ (Q ∨ P)
+∨-comm = ∧-intro ∨-comm′ ∨-comm′</code></pre>
+<p>The associativity proof is left as an exercise to the reader<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>.</p>
+<h2 id="negation">Negation</h2>
+<p>You have probably noticed if you’re familiar with boolean logic that I’ve avoided mentioning <em>false</em> throughout this entire chapter. Unlike boolean logic, Agda’s <em>intuitionistic</em> logic does not have a well-defined notion of “false”. In <em>classical</em> and boolean logics, all propositions are considered to be either true or false. Intuitionistic logic, by contrast, is purely <em>constructive</em>. You can either construct a proof for a proposition, making it true, or you fail to construct a proof, making you feel bad.</p>
+<p>The only “false” values that exist in intuitionistic logic, therefore, are values for which <em>there can exist no proof</em>. In Agda, this corresponds to a type that contains no values. We call this type <code>⊥</code>, pronounced “bottom”. We define it like so:</p>
+<pre class="agda"><code>data ⊥ : Set where -- nothing. for ⊥ type \bot
+</code></pre>
+<p>That’s right. No, it’s not a mistake. There are no constructors for <code>⊥</code>. It is a type for which it is <em>impossible</em> to produce a value.</p>
+<p>Having such a value allows us to define negation (<code>¬A</code>) as true if <code>A</code> being true would mean bottom is true (which is impossible). Or, in more formal terms: <code>¬A ⇔ (A ⇒ ⊥)</code></p>
+<pre class="agda"><code>¬ : Set → Set -- for ¬ type \neg
+¬ A = A → ⊥</code></pre>
+<h1 id="the-curry-howard-correspondence">The Curry Howard Correspondence</h1>
+<p>This chapter has taught you how to encode propositional logic into Agda’s type system. The correspondences discussed here between disjunction and sum types, conjunction and product types, functions and implication, and propositions and types are the fundamentals behind the Curry Howard correspondence. Using these tools, you can encode any constructive proof in Agda, which covers a vast range of possible proofs, including the vast majority of proofs encountered in program verification.</p>
+<p>The next chapter will introduce relational equality, and begin proving some theorems about the Peano numbers we introduced in the previous chapter. Happy Hacking!</p>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Muahahaha.<a href="#fnref1">↩</a></p></li>
+</ol>
+</div>
+<div class='header'>
+<ul class=headerlist>
+<li style="text-align:left"><a href="peano.html">← Hello, Peano</a></li>
+<li style="text-align:center">
+<a href="../toc.html">Table of Contents</a></li>
+<li style="text-align:right"><a href="#">Peano Proofs →</a></li>
+</ul>
+</div>
+<div class='footer'>
+    <p>Copyright (c) 2013, Liam O'Connor-Davis</p>
+    <p>Published here under the terms of the
+    <a href="https://github.com/hallettj/learn-you-an-agda/blob/master/LICENSE">
+        BSD 3-Clause license</a>.
+    </p>
+    <p>Site Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a> and <a href=http://www.haskell.org>Haskell</a></p>.
+</div>
+</div>
+</div>
+</body>
+</html>
