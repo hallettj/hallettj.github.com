@@ -34,6 +34,8 @@ dependent types can express quantification
 (i.e., the mathematical concepts of universal quantification (∀) and existential quantification (∃)).
 This makes it possible to translate a lot of interesting math into machine-verified code.
 
+<!-- more -->
+
 This post is written in literate Idris.
 The [original markup][] can be compiled and type-checked.
 Code blocks that are prefixed with greater-than symbols (>) in the markup are evaluated.
