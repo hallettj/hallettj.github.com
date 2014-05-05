@@ -6,7 +6,7 @@ url: http://sitr.us
 title: sitr.us
 subtitle: posts by Jesse Hallett
 author: Jesse Hallett
-simple_search: http://google.com/search
+simple_search: https://www.google.com/search
 description: posts by Jesse Hallett
 
 # Default date format is "ordinal" (resulting in "July 22nd 2007")
