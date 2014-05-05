@@ -9,7 +9,8 @@
   <meta name="author" content="Jesse Hallett">
 
   
-  <meta name="description" content="This information was written a long time ago and has become pretty outdated. Sinatra is a fun little web application microframework. Recently I &hellip;">
+  <meta name="description" content="CouchDB is a document-oriented database. It has no rows or tables. Instead
+CouchDB is a collection of JSON documents. It uses a map-reduce pattern to &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -28,7 +29,7 @@
   <link href="http://feeds.feedburner.com/hallettj" rel="alternate" title="sitr.us" type="application/atom+xml">
   <script src="/javascripts/modernizr-2.0.js"></script>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
 <link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
@@ -64,7 +65,7 @@
   
 </ul>
   
-<form action="http://google.com/search" method="get">
+<form action="https://www.google.com/search" method="get">
   <fieldset role="search">
     <input type="hidden" name="q" value="site:sitr.us" />
     <input class="search" type="text" name="q" results="0" placeholder="Search"/>
@@ -87,6 +88,88 @@
       
   <header>
     
+      <h1 class="entry-title"><a href="/2009/06/30/database-queries-the-couchdb-way.html">Database Queries the CouchDB Way</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2009-06-30T00:00:00-07:00" pubdate data-updated="true"></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://couchdb.apache.org/">CouchDB</a> is a document-oriented database. It has no rows or tables. Instead
+CouchDB is a collection of JSON documents. It uses a map-reduce pattern to
+index data. Queries in CouchDB pull data from what are essentially stored
+procedures called views. A view is made up of a map function and optionally a
+reduce function.  Ninety percent of the time all you need is the map function,
+so I will focus on map-only views here.</p>
+
+<p>A map function is a JavaScript function that takes a single document as an
+argument and emits any number of key/value pairs. Both the key and the value
+can be any JSON value you choose. The map function is run on every document in
+the database individually and the emitted key/value pairs are used to construct
+an index of your data.</p>
+
+<h2 id="a-simple-example">A Simple Example</h2>
+
+<p>Imagine you have a database with user records and you want a view of those
+records using the last name of each user as keys.</p>
+
+<div class="highlight"><pre><code class="js"><span class="kd">function</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">last_name</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">emit</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">last_name</span><span class="p">,</span> <span class="nx">doc</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>The above map function will produce and index something like the one below.
+Because <code>doc</code> is used as a value for each entry the entire content of each JSON
+document will be accessible as the indexed values.</p>
+
+<div class="highlight"><pre><code class="js"><span class="p">[</span>
+  <span class="p">...</span>
+  <span class="p">{</span> <span class="nx">key</span><span class="o">:</span> <span class="s2">&quot;Clarke&quot;</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="p">{</span> <span class="nx">last_name</span><span class="o">:</span> <span class="s2">&quot;Clarke&quot;</span><span class="p">,</span> <span class="p">...</span> <span class="p">}</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="nx">key</span><span class="o">:</span> <span class="s2">&quot;Kelly&quot;</span><span class="p">,</span>  <span class="nx">value</span><span class="o">:</span> <span class="p">{</span> <span class="nx">last_name</span><span class="o">:</span> <span class="s2">&quot;Kelly&quot;</span><span class="p">,</span>  <span class="p">...</span> <span class="p">}</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="nx">key</span><span class="o">:</span> <span class="s2">&quot;Smith&quot;</span><span class="p">,</span>  <span class="nx">value</span><span class="o">:</span> <span class="p">{</span> <span class="nx">last_name</span><span class="o">:</span> <span class="s2">&quot;Smith&quot;</span><span class="p">,</span>  <span class="p">...</span> <span class="p">}</span> <span class="p">},</span>
+  <span class="p">...</span>
+<span class="p">]</span>
+</code></pre></div>
+
+<p>Notice that the map function checks each document for a <code>last_name</code> attribute
+before emitting a key/value pair. There may be documents in the database that
+are not user records. By performing that check the view excludes any
+non-user-record documents from the resulting index.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/2009/06/30/database-queries-the-couchdb-way.html">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
       <h1 class="entry-title"><a href="/2008/07/29/how-to-use-rspec-to-describe-a-sinatra-application.html">How to use RSpec to describe a Sinatra application</a></h1>
     
     
@@ -103,7 +186,7 @@
   
 
 
-<time datetime="2008-07-29T00:00:00-07:00" pubdate data-updated="true">2008-07-29</time>
+<time datetime="2008-07-29T00:00:00-07:00" pubdate data-updated="true"></time>
         
       </p>
     
@@ -170,7 +253,7 @@ Test::Unit.</p>
   
 
 
-<time datetime="2007-10-02T00:00:00-07:00" pubdate data-updated="true">2007-10-02</time>
+<time datetime="2007-10-02T00:00:00-07:00" pubdate data-updated="true"></time>
         
       </p>
     
@@ -238,7 +321,7 @@ represented by “y”.</p>
   
 
 
-<time datetime="2007-09-24T00:00:00-07:00" pubdate data-updated="true">2007-09-24</time>
+<time datetime="2007-09-24T00:00:00-07:00" pubdate data-updated="true"></time>
         
       </p>
     
@@ -304,7 +387,7 @@ nucleus of the second syllable.</p>
   
 
 
-<time datetime="2007-09-17T00:00:00-07:00" pubdate data-updated="true">2007-09-17</time>
+<time datetime="2007-09-17T00:00:00-07:00" pubdate data-updated="true"></time>
         
       </p>
     
@@ -360,6 +443,10 @@ discourse to change too.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/2014/05/05/category-theory-proofs-in-idris.html">Category Theory proofs in Idris</a>
+      </li>
+    
+      <li class="post">
         <a href="/2013/11/04/functional-data-structures.html">Functional data structures in JavaScript with Mori</a>
       </li>
     
@@ -373,10 +460,6 @@ discourse to change too.</p>
     
       <li class="post">
         <a href="/2012/07/31/promise-pipelines-in-javascript.html">Promise Pipelines in JavaScript</a>
-      </li>
-    
-      <li class="post">
-        <a href="/2012/05/12/installing-a-custom-rom-on-the-transformer-prime.html">Installing a custom ROM on the Transformer Prime: A start-to-finish guide</a>
       </li>
     
   </ul>
