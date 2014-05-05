@@ -153,6 +153,7 @@ ERR
     # Returns string
     #
     def category_links(categories)
+     if categories != nil
       categories = categories.sort!.map { |c| category_link c }
 
       case categories.length
@@ -163,6 +164,7 @@ ERR
       else
         "#{categories[0...-1].join(', ')}, #{categories[-1]}"
       end
+     end
     end
 
     # Outputs a single category as an <a> link.
