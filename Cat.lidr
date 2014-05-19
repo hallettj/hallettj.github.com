@@ -827,6 +827,10 @@ as I continue to explore Category theory.
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/2014/05/19/kinesis-advantage-with-dsa-keycaps.html">Kinesis Advantage with DSA keycaps</a>
+      </li>
+    
+      <li class="post">
         <a href="/2014/05/05/category-theory-proofs-in-idris.html">Category Theory proofs in Idris</a>
       </li>
     
@@ -840,10 +844,6 @@ as I continue to explore Category theory.
     
       <li class="post">
         <a href="/2012/09/04/monkey-patching-document-write.html">Monkey patching document.write()</a>
-      </li>
-    
-      <li class="post">
-        <a href="/2012/07/31/promise-pipelines-in-javascript.html">Promise Pipelines in JavaScript</a>
       </li>
     
   </ul>
