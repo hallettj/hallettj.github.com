@@ -25,6 +25,8 @@ So I decided to get replacement keycaps.
 
 [Leopold]: http://imgur.com/a/XZ2hG
 
+<!-- more -->
+
 I did some research on buying PBT keycaps with the same profiles as the stock Kinesis keys.
 I assumed that I would end up getting blank keycaps -
 putting together a set with legends appropriate for a Kinesis seemed like it would be a painful undertaking,
