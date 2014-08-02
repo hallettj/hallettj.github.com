@@ -9,9 +9,8 @@
   <meta name="author" content="Jesse Hallett">
 
   
-  <meta name="description" content="I now have a Kinesis Advantage keyboard for use at work.
-I have been feeling some wrist strain recently;
-and some of my coworkers were encouraging &hellip;">
+  <meta name="description" content="tl;dr: ECMAScript 6 introduces a language feature called generators, which
+are really great for working with asynchronous code that uses promises. &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -89,6 +88,69 @@ and some of my coworkers were encouraging &hellip;">
       
   <header>
     
+      <h1 class="entry-title"><a href="/2014/08/02/javascript-generators-and-functional-reactive-programming.html">Javascript generators and functional reactive programming</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-08-02T00:00:00-07:00" pubdate data-updated="true">2014-08-02</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>tl;dr: ECMAScript 6 introduces a language feature called <a href="http://tobyho.com/2013/06/16/what-are-generators/">generators</a>, which
+are really great for working with asynchronous code that uses promises.  But
+they do not work well for <a href="http://sitr.us/2013/05/22/functional-reactive-programming-in-javascript.html">functional reactive programming</a>.</p>
+
+<p>ES6 generators allow asynchronous code to be written in a way that looks
+synchronous.  This example uses a hypothetical library called Do (implementation
+below) that makes <a href="http://sitr.us/2012/07/31/promise-pipelines-in-javascript.html">promises</a> work with generators:</p>
+
+<div class="highlight"><pre><code class="js"><span class="kd">var</span> <span class="nx">postWithAuthor</span> <span class="o">=</span> <span class="nx">Do</span><span class="p">(</span><span class="kd">function</span><span class="o">*</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">post</span>   <span class="o">=</span> <span class="nx">yield</span> <span class="nx">getJSON</span><span class="p">(</span><span class="s1">&#39;/posts/&#39;</span><span class="o">+</span><span class="nx">id</span><span class="p">)</span>
+    <span class="kd">var</span> <span class="nx">author</span> <span class="o">=</span> <span class="nx">yield</span> <span class="nx">getJSON</span><span class="p">(</span><span class="s1">&#39;/users/&#39;</span><span class="o">+</span><span class="nx">post</span><span class="p">.</span><span class="nx">authorId</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nx">_</span><span class="p">.</span><span class="nx">assign</span><span class="p">(</span><span class="nx">post</span><span class="p">,</span> <span class="p">{</span> <span class="nx">author</span><span class="o">:</span> <span class="nx">author</span> <span class="p">})</span>
+<span class="p">})</span>
+
+<span class="nx">Do</span><span class="p">(</span><span class="kd">function</span><span class="o">*</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">post</span> <span class="o">=</span> <span class="nx">yield</span> <span class="nx">postWithAuthor</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Post written by&#39;</span><span class="p">,</span> <span class="nx">post</span><span class="p">.</span><span class="nx">author</span><span class="p">.</span><span class="nx">name</span><span class="p">)</span>
+<span class="p">})()</span>
+</code></pre></div>
+
+<p>It is possible to use generators now in Node.js version 0.11 by using the
+<code>--harmony</code> flag.  Or you can use <a href="https://github.com/google/traceur-compiler">Traceur</a> to transpile ES6 code with
+generators into code that can be run in any ES5-compatible web browser.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/2014/08/02/javascript-generators-and-functional-reactive-programming.html">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
       <h1 class="entry-title"><a href="/2014/05/19/kinesis-advantage-with-dsa-keycaps.html">Kinesis Advantage with DSA keycaps</a></h1>
     
     
@@ -130,174 +192,12 @@ I would not enjoy going back to plain, old ABS.
 I also don’t want my keyboard to be just like every other Kinesis.
 So I decided to get replacement keycaps.</p>
 
-<p>I did some research on buying PBT keycaps with the same profiles as the stock Kinesis keys.
-I assumed that I would end up getting blank keycaps -
-putting together a set with legends appropriate for a Kinesis seemed like it would be a painful undertaking,
-since there don’t seem to be any sets made specifically for the Kinesis.</p>
-
-<p>Most keyboards - including the Kinesis Advantage - use what is called a DCS profile,
-where the keys in each row have different heights and angles.
-(That does not include laptop keyboards,
-or island-style keyboards such as the ones that Apple sells.
-Those are in their own categories.)
-<span class="caption-wrapper left"><img class="caption" src="/images/kinesis-dsa/angle3.jpg" width="" height="" title="DCS family: medium profile, cylindrical top, sculptured. &lt;br&gt; Image from Signature Plastics." /><span class="caption-text">DCS family: medium profile, cylindrical top, sculptured. <br /> Image from Signature Plastics.</span></span>
-Input Nirvana on Geekhack has a post with <a href="http://geekhack.org/index.php?topic=29875.0">a list of all necessary keycap sizes and profiles</a>
-to reproduce the arrangement on a stock Kinesis.
-It is possible to order these individually from Signature Plastics;
-but their inventory for <em>à la carte</em> orders varies depending on what they have left over
-from production of large batches.
-When I checked, SP did not have any row 5 PBT keycaps available.
-I got the impression that building a custom DCS set would be somewhat difficult.</p>
-
-<p>Then I saw prdlm2009 on Deskthority suggest that <a href="http://deskthority.net/photos-videos-f8/kinesis-advantage-with-spherical-keycaps-dsa-family-for-sp-t4842.html">DSA profile keycaps work well on a Kinesis</a>.
-DSA is a uniform profile -
-every key has the same height and angle.
-It makes everything much simpler when dealing with unusual keyboard layouts,
-or unusual keyboards.
-<span class="caption-wrapper right"><img class="caption" src="/images/kinesis-dsa/angle2.jpg" width="" height="" title="DSA family medium profile, spherical top, non-sculptured. &lt;br&gt; Image from Signature Plastics." /><span class="caption-text">DSA family medium profile, spherical top, non-sculptured. <br /> Image from Signature Plastics.</span></span>
-DSA also features spherical tops.
-If you look at the keys on a typical keyboard, you can see that the top curves up on the left and right sides -
-as though someone had shaped them around a cylinder.
-The tops of DSA keys are spherical; as though shaped around a large marble.
-So the keys cup the fingertips from all sides.</p>
-
-<p>Signature Plastics sells a variety of nice, blank DSA keycap sets.
-I did not order the optimal combination of keycap sets;
-but now I have a better idea of what that combination is.
-The key count on an Advantage is:</p>
-
-<ul>
-  <li>56 – 1x keys (optionally including two homing keys)</li>
-  <li>8 – 1.25x keys</li>
-  <li>4 – 2x keys</li>
-</ul>
-
-<p>1x, 2x, etc. refers to the lengths of the keys.</p>
-
-<p>One can get everything except the 1.25x keys with one <a href="http://keyshop.pimpmykeyboard.com/products/full-keysets/dsa-blank-numpad-sets-1">ErgoDox Base set</a>
-and two <a href="http://keyshop.pimpmykeyboard.com/products/full-keysets/dsa-blank-numpad-sets">Numpad sets</a>.
-The Numpad sets seem to be the cheapest way to get all 4 2x keycaps, along with additional 1x caps.
-The only set that includes 1.25x caps is the Standard Modifier set,
-which includes 7 of them.
-(So close!)
-I recommend ordering the 1.25x keycaps individually from the <a href="http://www.keycapsdirect.com/key-capsinventory.php">blank keycap inventory</a>.</p>
-
-<p><span class="caption-wrapper"><img class="caption" src="/images/kinesis-dsa/IMG_20140515_180022543_HDR.jpg" width="" height="" title="stock Kinesis keycaps (left), DSA keycaps (right)" /><span class="caption-text">stock Kinesis keycaps (left), DSA keycaps (right)</span></span></p>
-
-<p>The keycaps from SP are much thicker than the stock keycaps.
-And they are made from PBT plastic, which is denser than the more common keycap material, ABS.
-What I like most about PBT caps is their texture.
-The tops of the keys are usually slightly rough, somewhat pebbly.
-It gives a little bit of grippiness,
-and feels soothing on my fingers compared to featureless, flat plastic.
-I also think that the sound of PBT keys being pressed is nicer.
-It is slightly quieter, with a somewhat deeper tone.</p>
-
-<p><span class="caption-wrapper"><img class="caption" src="/images/kinesis-dsa/IMG_20140515_182527431_HDR.jpg" width="" height="" title="All of the stock keycaps have been removed, revealing Cherry MX Brown switches." /><span class="caption-text">All of the stock keycaps have been removed, revealing Cherry MX Brown switches.</span></span></p>
-
-<p>The Kinesis Advantage comes with either <a href="http://deskthority.net/wiki/Cherry_MX_Brown">Cherry MX Brown</a> or <a href="http://deskthority.net/wiki/Cherry_MX_Red">Cherry MX Red</a> switches.</p>
-
-<p>For anyone wondering how to remove keycaps from a keyboard with Cherry MX switches, here is a <a href="https://www.youtube.com/watch?v=FlUYCAZNNOw">video</a>.
-What the video does not mention is that it is a good idea to wiggle the keycap puller while pulling up on the keycap.
-That helps to avoid pulling with too much force, which could break a switch.</p>
-
-<p>I have another keyboard that also has Cherry MX Brown switches,
-and I really liked the change in key feel after installing o-rings.
-O-rings make typing a little quieter,
-and add some springiness to the bottom of the key travel.
-A tradeoff is that they reduce the length of key travel a bit.</p>
-
-<p><span class="caption-wrapper"><img class="caption" src="/images/kinesis-dsa/IMG_20140515_182759811.jpg" width="" height="" title="installing o-rings in the new keycaps" /><span class="caption-text">installing o-rings in the new keycaps</span></span></p>
-
-<p>I used <a href="http://www.wasdkeyboards.com/index.php/cherry-mx-rubber-o-ring-switch-dampeners-125pcs.html#ad-image-0">40A-R o-rings from WASD</a>, which are relatively thick and soft.
-But when I tried these out with the DSA keycaps I could not discern any difference
-between a key with an o-ring and one without.</p>
-
-<p>Comparing the underside of a DSA keycap to a typical DCS keycap reveals the issue:</p>
-
-<p><span class="caption-wrapper"><img class="caption" src="/images/kinesis-dsa/IMG_20140515_180233205.jpg" width="" height="" title="blank DSA keycaps from SP (top), keycaps from a Leopold FC660M (bottom)" /><span class="caption-text">blank DSA keycaps from SP (top), keycaps from a Leopold FC660M (bottom)</span></span></p>
-
-<p>DCS keycaps have cross-shaped supports under the cap,
-which contact the top of the switch housing when the key is fully depressed.
-O-rings sit between those supports and the switch housing,
-absorbing some force from contact.
-But the DSA keycaps lack those supports.
-That means that the switch can reach the bottom of its travel
-before the underside of the keycap contacts the switch housing.</p>
-
-<p>I found that doubling up o-rings pushed the rubber high enough to be effective.
-But I was concerned that two o-rings shorted key travel too much
-and introduced too much squishiness.
-In the end I left the o-rings out entirely.
-I may take another shot using either thinner, firmer o-rings,
-or with small washers in place of a second o-ring.</p>
-
-<p><span class="caption-wrapper"><img class="caption" src="/images/kinesis-dsa/IMG_20140515_183902311.jpg" width="" height="" title="two o-rings installed in one keycap" /><span class="caption-text">two o-rings installed in one keycap</span></span></p>
-
-<p>When I ordered my keycaps I got one ErgoDox Base set and one ErgoDox Modifier set.
-I did not do enough checking - I assumed that the 1.5x keys in the Modifier set
-would fit in the Kinesis.
-But it turns out that the keys in the leftmost and rightmost columns of the Kinesis
-take 1.25x keycaps.
-The larger keycaps do not fit.</p>
-
-<p><span class="caption-wrapper"><img class="caption" src="/images/kinesis-dsa/IMG_20140515_190504044_HDR.jpg" width="" height="" title="Whoops!  That was supposed to be a 1.25x key, not a 1.5x." /><span class="caption-text">Whoops!  That was supposed to be a 1.25x key, not a 1.5x.</span></span></p>
-
-<p>I have ordered some appropriately sized keycaps.
-In the meantime, I am using 1x keycaps in the 1.25x positions.</p>
-
-<p><span class="caption-wrapper"><img class="caption" src="/images/kinesis-dsa/IMG_20140515_190751151_HDR.jpg" width="" height="" title="stock 1.25x Tab key next to its intended, blank replacement" /><span class="caption-text">stock 1.25x Tab key next to its intended, blank replacement</span></span></p>
-
-<p>Even though the DSA keycaps are not the same shape as the stock caps,
-they fit quite well on the Kinesis.
-There are just two slightly problematic spots.
-The photo below shows the one key that comes into contact with the edge of the keyboard case when it is not depressed.
-Thankfully the operation of the key does not seem to be affected.</p>
-
-<p><span class="caption-wrapper"><img class="caption" src="/images/kinesis-dsa/IMG_20140515_190931944.jpg" width="" height="" title="The fit is tight in this corner." /><span class="caption-text">The fit is tight in this corner.</span></span></p>
-
-<p>Due to small differences in switch positioning,
-the key in the same position in the other well has a little bit of clearance.</p>
-
-<p>The other problem is that two of my 2x keys overlap very slightly.
-When I press the one on the right there is sometimes an extra <em>click</em>
-as it pushes past its neighbor.</p>
-
-<p><span class="caption-wrapper"><img class="caption" src="/images/kinesis-dsa/IMG_20140515_194515105.jpg" width="" height="" title="There is not quite enough space between these two keys." /><span class="caption-text">There is not quite enough space between these two keys.</span></span></p>
-
-<p>I am thinking of sanding down the corners of these keys a little bit to fix the problem.</p>
-
-<p>This is another case where there is no problem with the keys in the same positions on the other side of the board.
-It seems that the switches in the left thumb cluster just happen to be
-a little too close together on my board.</p>
-
-<p><span class="caption-wrapper"><img class="caption" src="/images/kinesis-dsa/IMG_20140515_194232464_HDR.jpg" width="" height="" title="All done!" /><span class="caption-text">All done!</span></span></p>
-
-<p>Since I had to use 1u keycaps for the leftmost and rightmost columns,
-I ended up not having enough keycaps to replace the two keycaps in the top of each thumb cluster.
-But I think that having tall keycaps there makes them easier to press -
-those positions are a bit difficult to reach otherwise.
-So I may just keep the stock caps on those keys.
-Or I might try to get tall, DCS profile, PBT caps for those positions.</p>
-
-<p><span class="caption-wrapper"><img class="caption" src="/images/kinesis-dsa/IMG_20140515_194415103_HDR.jpg" width="" height="" title="closeup of one of the wells to show key spacing" /><span class="caption-text">closeup of one of the wells to show key spacing</span></span></p>
-
-<p>The other positions where I think that DSA does not work really well are the four keys in the bottom row of each well.
-I curl my fingers down to reach those;
-and I tend to either hit the edges of the keys,
-or to press them with my fingernail instead of with my finger.
-The stock keycaps for those positions are angled toward the center of the well,
-making it easier to reach the tops of the keys.</p>
-
-<p>Those points aside,
-I am very pleased with how these new keycaps worked out!
-The DSA profile is quite comfortable.
-I love the texture of the PBT keycaps.
-And they make a more pleasant sound than the thinner ABS caps that came with the board.</p>
-
-<p><span class="caption-wrapper"><img class="caption" src="/images/kinesis-dsa/IMG_20140518_185154.jpg" width="" height="" title="shoe for science!" /><span class="caption-text">shoe for science!</span></span></p>
 </div>
   
+  
+    <footer>
+      <a rel="full-article" href="/2014/05/19/kinesis-advantage-with-dsa-keycaps.html">Read on &rarr;</a>
+    </footer>
   
 
 
@@ -888,81 +788,6 @@ aforementioned events on the new element.</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/2009/09/13/couchdb-notes.html">CouchDB Notes</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2009-09-13T00:00:00-07:00" pubdate data-updated="true"></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Recently I gave a talk at <a href="http://pdxruby.org/" title="Portland Ruby Brigade">Portland Ruby Brigade</a> meeting on
-<a href="http://couchdb.apache.org/" title="CouchDB">CouchDB</a>, a document-oriented database.  I thought I would share my notes
-from that talk.  In some respects this was a followup to <a href="http://groups.google.com/group/pdxruby/browse_thread/thread/6f8734846d3e16d3" title="Comparing MongoDB, Tokyo Tyrant, and CouchDB">an earlier talk that
-Igal Koshevoy gave comparing various post-relational databases</a>.
-Igal also wrote <a href="http://groups.google.com/group/pdxruby/browse_thread/thread/7865318fbc65d0d1" title="Ruby Persistence with CouchDB">some additional notes on my talk</a>.</p>
-
-<p>In summary, some of the distinguishing features of CouchDB are:</p>
-
-<ul>
-  <li>Schema-less data store stores documents containing arbitrary JSON data.</li>
-  <li>Incrementally updated map-reduce views provide fast access to data, support powerful data processing, and eliminate lookup penalties for data in large or deeply nested documents.</li>
-  <li>Map-reduce views - which are again, incrementally updated - provide fast access to aggregate data, such as sums or averages of document attributes.</li>
-  <li>Schema-less design means no schema migrations are ever required.  And new map-reduce views can be installed with no downtime.</li>
-  <li>“Crash-only” design protects data integrity in almost every crash scenario.  No recovery process is required when rebooting a crashed database server.</li>
-  <li>Lock-free design means that read requests never have to wait for other read or write requests to finish.  Writes are only serialized at the point where data is actually written to the disk.</li>
-  <li>Integrated, robust master-master replication with automatic conflict handling</li>
-  <li>MVCC, or “optimistic locking”, prevents data loss from multiple writes to the same document from different sources.</li>
-  <li>RESTful interface makes it easy to integrate CouchDB with any environment that speaks HTTP.</li>
-  <li>Documents can contain binary attachments.  Attachment support combined with the HTTP interface means that CouchDB can serve HTML, JavaScript, images, and anything else required to host a web application directly from the database.</li>
-</ul>
-
-<p>More detailed information on all of the above points can be found in <a href="http://couchdb.apache.org/docs/overview.html" title="CouchDB Technical Overview">CouchDB’s
-technical overview</a>.</p>
-
-<p>Some of the downsides:</p>
-
-<ul>
-  <li>Writes and single-document lookups are slower than other databases due to HTTP overhead and frequent disk access.</li>
-  <li>CouchDB optimizes CPU and RAM use by using lots of disk space.  The same data set will take up a lot more space in CouchDB than in other database systems.</li>
-  <li>You must create map-reduce views in advance for any queries you want to run.  SQL users are used to processing data at query time; but this is not allowed by the CouchDB design (assuming you are not using temporary views in production, which you should not do.)</li>
-  <li>There is a serious learning curve when learning to think in terms of map-reduce views.</li>
-  <li>Map-reduce views, though very powerful, are not as flexible as SQL queries.  There may be cases where it is necessary to push data processing to an asynchronous job or to the client.</li>
-  <li>CouchDB is a young project and its API is undergoing rapid changes.</li>
-  <li>Documentation can be sparse - especially when very new features are involved.  </li>
-</ul>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/2009/09/13/couchdb-notes.html">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -978,6 +803,10 @@ technical overview</a>.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/2014/08/02/javascript-generators-and-functional-reactive-programming.html">Javascript generators and functional reactive programming</a>
+      </li>
+    
+      <li class="post">
         <a href="/2014/05/19/kinesis-advantage-with-dsa-keycaps.html">Kinesis Advantage with DSA keycaps</a>
       </li>
     
@@ -991,10 +820,6 @@ technical overview</a>.</p>
     
       <li class="post">
         <a href="/2013/05/22/functional-reactive-programming-in-javascript.html">Functional Reactive Programming in JavaScript</a>
-      </li>
-    
-      <li class="post">
-        <a href="/2012/09/04/monkey-patching-document-write.html">Monkey patching document.write()</a>
       </li>
     
   </ul>

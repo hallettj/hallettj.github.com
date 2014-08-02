@@ -9,8 +9,9 @@
   <meta name="author" content="Jesse Hallett">
 
   
-  <meta name="description" content="Just for kicks I thought I would take another shot at some Haskell programming.
-To get all of the common libraries and the automated package &hellip;">
+  <meta name="description" content="Recently I gave a talk at Portland Ruby Brigade meeting on
+CouchDB, a document-oriented database. I thought I would share my notes
+from that talk. In &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -82,6 +83,81 @@ To get all of the common libraries and the automated package &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2009/09/13/couchdb-notes.html">CouchDB Notes</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2009-09-13T00:00:00-07:00" pubdate data-updated="true"></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Recently I gave a talk at <a href="http://pdxruby.org/" title="Portland Ruby Brigade">Portland Ruby Brigade</a> meeting on
+<a href="http://couchdb.apache.org/" title="CouchDB">CouchDB</a>, a document-oriented database.  I thought I would share my notes
+from that talk.  In some respects this was a followup to <a href="http://groups.google.com/group/pdxruby/browse_thread/thread/6f8734846d3e16d3" title="Comparing MongoDB, Tokyo Tyrant, and CouchDB">an earlier talk that
+Igal Koshevoy gave comparing various post-relational databases</a>.
+Igal also wrote <a href="http://groups.google.com/group/pdxruby/browse_thread/thread/7865318fbc65d0d1" title="Ruby Persistence with CouchDB">some additional notes on my talk</a>.</p>
+
+<p>In summary, some of the distinguishing features of CouchDB are:</p>
+
+<ul>
+  <li>Schema-less data store stores documents containing arbitrary JSON data.</li>
+  <li>Incrementally updated map-reduce views provide fast access to data, support powerful data processing, and eliminate lookup penalties for data in large or deeply nested documents.</li>
+  <li>Map-reduce views - which are again, incrementally updated - provide fast access to aggregate data, such as sums or averages of document attributes.</li>
+  <li>Schema-less design means no schema migrations are ever required.  And new map-reduce views can be installed with no downtime.</li>
+  <li>“Crash-only” design protects data integrity in almost every crash scenario.  No recovery process is required when rebooting a crashed database server.</li>
+  <li>Lock-free design means that read requests never have to wait for other read or write requests to finish.  Writes are only serialized at the point where data is actually written to the disk.</li>
+  <li>Integrated, robust master-master replication with automatic conflict handling</li>
+  <li>MVCC, or “optimistic locking”, prevents data loss from multiple writes to the same document from different sources.</li>
+  <li>RESTful interface makes it easy to integrate CouchDB with any environment that speaks HTTP.</li>
+  <li>Documents can contain binary attachments.  Attachment support combined with the HTTP interface means that CouchDB can serve HTML, JavaScript, images, and anything else required to host a web application directly from the database.</li>
+</ul>
+
+<p>More detailed information on all of the above points can be found in <a href="http://couchdb.apache.org/docs/overview.html" title="CouchDB Technical Overview">CouchDB’s
+technical overview</a>.</p>
+
+<p>Some of the downsides:</p>
+
+<ul>
+  <li>Writes and single-document lookups are slower than other databases due to HTTP overhead and frequent disk access.</li>
+  <li>CouchDB optimizes CPU and RAM use by using lots of disk space.  The same data set will take up a lot more space in CouchDB than in other database systems.</li>
+  <li>You must create map-reduce views in advance for any queries you want to run.  SQL users are used to processing data at query time; but this is not allowed by the CouchDB design (assuming you are not using temporary views in production, which you should not do.)</li>
+  <li>There is a serious learning curve when learning to think in terms of map-reduce views.</li>
+  <li>Map-reduce views, though very powerful, are not as flexible as SQL queries.  There may be cases where it is necessary to push data processing to an asynchronous job or to the client.</li>
+  <li>CouchDB is a young project and its API is undergoing rapid changes.</li>
+  <li>Documentation can be sparse - especially when very new features are involved.  </li>
+</ul>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/2009/09/13/couchdb-notes.html">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -510,6 +586,10 @@ discourse to change too.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/2014/08/02/javascript-generators-and-functional-reactive-programming.html">Javascript generators and functional reactive programming</a>
+      </li>
+    
+      <li class="post">
         <a href="/2014/05/19/kinesis-advantage-with-dsa-keycaps.html">Kinesis Advantage with DSA keycaps</a>
       </li>
     
@@ -523,10 +603,6 @@ discourse to change too.</p>
     
       <li class="post">
         <a href="/2013/05/22/functional-reactive-programming-in-javascript.html">Functional Reactive Programming in JavaScript</a>
-      </li>
-    
-      <li class="post">
-        <a href="/2012/09/04/monkey-patching-document-write.html">Monkey patching document.write()</a>
       </li>
     
   </ul>
