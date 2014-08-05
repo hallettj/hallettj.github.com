@@ -250,7 +250,7 @@ maybe someone more imaginative than me can come up with a more elegant solution.
 snippets.
 
 *Edited 2014-08-05:* The hypothetical generators that I describe are immutable,
-not stateless.  Thanks to Blix for pointing out the distinction.
+not stateless.  Thanks to Blixt for pointing out the distinction.
 
 [generators]: http://tobyho.com/2013/06/16/what-are-generators/
 [promises]: http://sitr.us/2012/07/31/promise-pipelines-in-javascript.html
