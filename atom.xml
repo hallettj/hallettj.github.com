@@ -4,7 +4,7 @@
   <title><![CDATA[sitr.us]]></title>
   <link href="http://sitr.us/atom.xml" rel="self"/>
   <link href="http://sitr.us/"/>
-  <updated>2014-08-05T14:04:44-07:00</updated>
+  <updated>2014-08-05T14:05:51-07:00</updated>
   <id>http://sitr.us/</id>
   <author>
     <name><![CDATA[Jesse Hallett]]></name>
@@ -255,7 +255,7 @@ maybe someone more imaginative than me can come up with a more elegant solution.
 snippets.</p>
 
 <p><em>Edited 2014-08-05:</em> The hypothetical generators that I describe are immutable,
-not stateless.  Thanks to Blix for pointing out the distinction.</p>
+not stateless.  Thanks to Blixt for pointing out the distinction.</p>
 
 ]]></content>
   </entry>
