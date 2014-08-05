@@ -251,4 +251,4 @@ maybe someone more imaginative than me can come up with a more elegant solution.
 [Koa]: https://github.com/koajs/koa
 [do notation]: http://learnyouahaskell.com/a-fistful-of-monads#do-notation
 [RxJS]: http://reactive-extensions.github.io/RxJS/
-[Bacon]: https://github.com/baconjs/bacon.js/
+[Bacon.js]: https://github.com/baconjs/bacon.js/
