@@ -156,9 +156,9 @@ var gen = function*() {
 
 g = gen()  // initialize the generator
 
-    assert(g.next().value === 1)
-    assert(g.next().value === 1)
-    assert(g.next().value === 3)
+assert(g.next().value === 1)
+assert(g.next().value === 1)
+assert(g.next().value === 3)
 assert(g.next().value === undefined)
 {% endhighlight %}
 
@@ -166,16 +166,16 @@ A stateless implementation would return a new object with a function for the
 next generator entry point, instead of modifying the original generator:
 
 {% highlight js %}
-    var g  = gen()
-    var g1 = g.next()
-    assert(g1.value === 1)
-    var g2 = g1.next()
-    assert(g2.value === 2)
-    var g3 = g2.next()
+var g  = gen()
+var g1 = g.next()
+assert(g1.value === 1)
+var g2 = g1.next()
+assert(g2.value === 2)
+var g3 = g2.next()
 assert(g3.value === 3)
 
-    // We can go back to previous entry points.
-    assert(g1.next().value === 2)
+// We can go back to previous entry points.
+assert(g1.next().value === 2)
 assert(g.next().value === 1)
 {% endhighlight %}
 
@@ -185,8 +185,8 @@ transforms.  The basic case:
 {% highlight js %}
 function*(args...) {
     preceding_statements
-        var y = yield x
-        following_statements
+    var y = yield x
+    following_statements
 }
 {% endhighlight %}
 
@@ -195,12 +195,12 @@ would transform to:
 {% highlight js %}
 function(args...) {
     preceding_statements
-        return {
+    return {
 value: x,
-           next: function(y) {
-               following_statements
-           }
+        next: function(y) {
+            following_statements
         }
+    }
 }
 {% endhighlight %}
 
@@ -217,21 +217,21 @@ top of the function, for example.
 {% highlight js %}
 var searchQueries = function(searchInput) {
     var inputs = $(searchInput).asEventStream('keyup change') 
-        frp(inputs, function*(inputs_) {
-                var singleInputEvent
-                while (true) {
-                singleInputEvent = yield inputs_
-                query = singleInputEvent.target.value
-                if (query.length > 2) {
+    frp(inputs, function*(inputs_) {
+        var singleInputEvent
+        while (true) {
+            singleInputEvent = yield inputs_
+            query = singleInputEvent.target.value
+            if (query.length > 2) {
                 // passes the query through
                 yield Bacon.once(query)
-                }
-                else {
+            }
+            else {
                 // excludes this query from the searchQueries stream
                 yield Bacon.never()
-                }
-                }
-                })
+            }
+        }
+    })
 }
 {% endhighlight %}
 
@@ -241,6 +241,9 @@ I do not know how to implement `resultView` as a loop, since it requires
 combining two event streams: search queries and JSON responses.  I do not see
 any advantage of loops in generators over asynchronous-style callbacks.  But
 maybe someone more imaginative than me can come up with a more elegant solution.
+
+*Edited 2014-08-04:* Fixed broken link, fixed incorrect indentation in code
+snippets.
 
 [generators]: http://tobyho.com/2013/06/16/what-are-generators/
 [promises]: http://sitr.us/2012/07/31/promise-pipelines-in-javascript.html
