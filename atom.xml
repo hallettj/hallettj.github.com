@@ -4,7 +4,7 @@
   <title><![CDATA[sitr.us]]></title>
   <link href="http://sitr.us/atom.xml" rel="self"/>
   <link href="http://sitr.us/"/>
-  <updated>2014-08-04T18:18:07-07:00</updated>
+  <updated>2014-08-04T18:20:04-07:00</updated>
   <id>http://sitr.us/</id>
   <author>
     <name><![CDATA[Jesse Hallett]]></name>
@@ -159,8 +159,8 @@ invocation:</p>
 
 <div class="highlight"><pre><code class="js"><span class="kd">var</span> <span class="nx">gen</span> <span class="o">=</span> <span class="kd">function</span><span class="o">*</span><span class="p">()</span> <span class="p">{</span>
     <span class="nx">yield</span> <span class="mi">1</span>
-        <span class="nx">yield</span> <span class="mi">2</span>
-        <span class="k">return</span> <span class="mi">3</span>
+    <span class="nx">yield</span> <span class="mi">2</span>
+    <span class="k">return</span> <span class="mi">3</span>
 <span class="p">}</span>
 
 <span class="nx">g</span> <span class="o">=</span> <span class="nx">gen</span><span class="p">()</span>  <span class="c1">// initialize the generator</span>
@@ -202,7 +202,7 @@ transforms.  The basic case:</p>
 <div class="highlight"><pre><code class="js"><span class="kd">function</span><span class="p">(</span><span class="nx">args</span><span class="p">...)</span> <span class="p">{</span>
     <span class="nx">preceding_statements</span>
     <span class="k">return</span> <span class="p">{</span>
-<span class="nx">value</span><span class="o">:</span> <span class="nx">x</span><span class="p">,</span>
+        <span class="nx">value</span><span class="o">:</span> <span class="nx">x</span><span class="p">,</span>
         <span class="nx">next</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">y</span><span class="p">)</span> <span class="p">{</span>
             <span class="nx">following_statements</span>
         <span class="p">}</span>
