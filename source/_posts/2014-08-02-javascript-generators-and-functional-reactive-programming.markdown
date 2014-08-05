@@ -143,9 +143,9 @@ contain a loop).  With the Bacon example, after the first `keyup` or `change`
 event the search result list will just stop updating.
 
 Getting synchronous-style functional reactive programming to work well would
-require stateless, reentrant generators.  ES6 generators are stateful: every
+require immutable, reentrant generators.  ES6 generators are stateful: every
 invocation of a generator changes the way that it will behave on the next
-invocation:
+invocation.  In other words, a generated is mutated on every invocation:
 
 {% highlight js %}
 var gen = function*() {
@@ -162,8 +162,8 @@ assert(g.next().value === 3)
 assert(g.next().value === undefined)
 {% endhighlight %}
 
-A stateless implementation would return a new object with a function for the
-next generator entry point, instead of modifying the original generator:
+An immutable implementation would return a new object with a function for the
+next generator entry point, instead of mutating the original generator:
 
 {% highlight js %}
 var g  = gen()
@@ -179,7 +179,7 @@ assert(g1.next().value === 2)
 assert(g.next().value === 1)
 {% endhighlight %}
 
-A stateless generator could be implemented with some simple syntactic
+An immutable generator could be implemented with some simple syntactic
 transforms.  The basic case:
 
 {% highlight js %}
@@ -203,6 +203,10 @@ function(args...) {
     }
 }
 {% endhighlight %}
+
+The `next` property is returned is a generator that is used to invoke the next
+step.  In this view generators are just functions.  Not only that - a generator
+is a closure that has access to the results of previous steps via closure scope.
 
 There would just need to be a few cases to handle appearances of `yield` in
 a `return` statement, a `try`-`catch` block, or as its own statement.  With that
@@ -244,6 +248,9 @@ maybe someone more imaginative than me can come up with a more elegant solution.
 
 *Edited 2014-08-04:* Fixed broken link, fixed incorrect indentation in code
 snippets.
+
+*Edited 2014-08-05:* The hypothetical generators that I describe are immutable,
+not stateless.  Thanks to Blix for pointing out the distinction.
 
 [generators]: http://tobyho.com/2013/06/16/what-are-generators/
 [promises]: http://sitr.us/2012/07/31/promise-pipelines-in-javascript.html
