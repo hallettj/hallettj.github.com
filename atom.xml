@@ -4,7 +4,7 @@
   <title><![CDATA[sitr.us]]></title>
   <link href="http://sitr.us/atom.xml" rel="self"/>
   <link href="http://sitr.us/"/>
-  <updated>2014-08-02T15:26:18-07:00</updated>
+  <updated>2014-08-04T18:03:06-07:00</updated>
   <id>http://sitr.us/</id>
   <author>
     <name><![CDATA[Jesse Hallett]]></name>
@@ -61,7 +61,7 @@ notation</a> feature in Haskell.  With just a little tweaking, the use of
 generators that Co has pioneered can almost be generalized to work with any
 kind of monad.</p>
 
-<p>For example, libraries like <a href="http://reactive-extensions.github.io/RxJS/">RxJs</a> and [Bacon.js][] implement event streams,
+<p>For example, libraries like <a href="http://reactive-extensions.github.io/RxJS/">RxJs</a> and <a href="https://github.com/baconjs/bacon.js/">Bacon.js</a> implement event streams,
 which are a lot like promises, except that callbacks on event streams can run
 more than once.  This example uses Bacon to manage a typeahead search feature in
 a web interface:</p>
