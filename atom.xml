@@ -4,7 +4,7 @@
   <title><![CDATA[sitr.us]]></title>
   <link href="http://sitr.us/atom.xml" rel="self"/>
   <link href="http://sitr.us/"/>
-  <updated>2014-08-04T18:03:06-07:00</updated>
+  <updated>2014-08-04T18:18:07-07:00</updated>
   <id>http://sitr.us/</id>
   <author>
     <name><![CDATA[Jesse Hallett]]></name>
@@ -165,25 +165,25 @@ invocation:</p>
 
 <span class="nx">g</span> <span class="o">=</span> <span class="nx">gen</span><span class="p">()</span>  <span class="c1">// initialize the generator</span>
 
-    <span class="nx">assert</span><span class="p">(</span><span class="nx">g</span><span class="p">.</span><span class="nx">next</span><span class="p">().</span><span class="nx">value</span> <span class="o">===</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="nx">assert</span><span class="p">(</span><span class="nx">g</span><span class="p">.</span><span class="nx">next</span><span class="p">().</span><span class="nx">value</span> <span class="o">===</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="nx">assert</span><span class="p">(</span><span class="nx">g</span><span class="p">.</span><span class="nx">next</span><span class="p">().</span><span class="nx">value</span> <span class="o">===</span> <span class="mi">3</span><span class="p">)</span>
+<span class="nx">assert</span><span class="p">(</span><span class="nx">g</span><span class="p">.</span><span class="nx">next</span><span class="p">().</span><span class="nx">value</span> <span class="o">===</span> <span class="mi">1</span><span class="p">)</span>
+<span class="nx">assert</span><span class="p">(</span><span class="nx">g</span><span class="p">.</span><span class="nx">next</span><span class="p">().</span><span class="nx">value</span> <span class="o">===</span> <span class="mi">1</span><span class="p">)</span>
+<span class="nx">assert</span><span class="p">(</span><span class="nx">g</span><span class="p">.</span><span class="nx">next</span><span class="p">().</span><span class="nx">value</span> <span class="o">===</span> <span class="mi">3</span><span class="p">)</span>
 <span class="nx">assert</span><span class="p">(</span><span class="nx">g</span><span class="p">.</span><span class="nx">next</span><span class="p">().</span><span class="nx">value</span> <span class="o">===</span> <span class="kc">undefined</span><span class="p">)</span>
 </code></pre></div>
 
 <p>A stateless implementation would return a new object with a function for the
 next generator entry point, instead of modifying the original generator:</p>
 
-<div class="highlight"><pre><code class="js">    <span class="kd">var</span> <span class="nx">g</span>  <span class="o">=</span> <span class="nx">gen</span><span class="p">()</span>
-    <span class="kd">var</span> <span class="nx">g1</span> <span class="o">=</span> <span class="nx">g</span><span class="p">.</span><span class="nx">next</span><span class="p">()</span>
-    <span class="nx">assert</span><span class="p">(</span><span class="nx">g1</span><span class="p">.</span><span class="nx">value</span> <span class="o">===</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="kd">var</span> <span class="nx">g2</span> <span class="o">=</span> <span class="nx">g1</span><span class="p">.</span><span class="nx">next</span><span class="p">()</span>
-    <span class="nx">assert</span><span class="p">(</span><span class="nx">g2</span><span class="p">.</span><span class="nx">value</span> <span class="o">===</span> <span class="mi">2</span><span class="p">)</span>
-    <span class="kd">var</span> <span class="nx">g3</span> <span class="o">=</span> <span class="nx">g2</span><span class="p">.</span><span class="nx">next</span><span class="p">()</span>
+<div class="highlight"><pre><code class="js"><span class="kd">var</span> <span class="nx">g</span>  <span class="o">=</span> <span class="nx">gen</span><span class="p">()</span>
+<span class="kd">var</span> <span class="nx">g1</span> <span class="o">=</span> <span class="nx">g</span><span class="p">.</span><span class="nx">next</span><span class="p">()</span>
+<span class="nx">assert</span><span class="p">(</span><span class="nx">g1</span><span class="p">.</span><span class="nx">value</span> <span class="o">===</span> <span class="mi">1</span><span class="p">)</span>
+<span class="kd">var</span> <span class="nx">g2</span> <span class="o">=</span> <span class="nx">g1</span><span class="p">.</span><span class="nx">next</span><span class="p">()</span>
+<span class="nx">assert</span><span class="p">(</span><span class="nx">g2</span><span class="p">.</span><span class="nx">value</span> <span class="o">===</span> <span class="mi">2</span><span class="p">)</span>
+<span class="kd">var</span> <span class="nx">g3</span> <span class="o">=</span> <span class="nx">g2</span><span class="p">.</span><span class="nx">next</span><span class="p">()</span>
 <span class="nx">assert</span><span class="p">(</span><span class="nx">g3</span><span class="p">.</span><span class="nx">value</span> <span class="o">===</span> <span class="mi">3</span><span class="p">)</span>
 
-    <span class="c1">// We can go back to previous entry points.</span>
-    <span class="nx">assert</span><span class="p">(</span><span class="nx">g1</span><span class="p">.</span><span class="nx">next</span><span class="p">().</span><span class="nx">value</span> <span class="o">===</span> <span class="mi">2</span><span class="p">)</span>
+<span class="c1">// We can go back to previous entry points.</span>
+<span class="nx">assert</span><span class="p">(</span><span class="nx">g1</span><span class="p">.</span><span class="nx">next</span><span class="p">().</span><span class="nx">value</span> <span class="o">===</span> <span class="mi">2</span><span class="p">)</span>
 <span class="nx">assert</span><span class="p">(</span><span class="nx">g</span><span class="p">.</span><span class="nx">next</span><span class="p">().</span><span class="nx">value</span> <span class="o">===</span> <span class="mi">1</span><span class="p">)</span>
 </code></pre></div>
 
@@ -192,8 +192,8 @@ transforms.  The basic case:</p>
 
 <div class="highlight"><pre><code class="js"><span class="kd">function</span><span class="o">*</span><span class="p">(</span><span class="nx">args</span><span class="p">...)</span> <span class="p">{</span>
     <span class="nx">preceding_statements</span>
-        <span class="kd">var</span> <span class="nx">y</span> <span class="o">=</span> <span class="nx">yield</span> <span class="nx">x</span>
-        <span class="nx">following_statements</span>
+    <span class="kd">var</span> <span class="nx">y</span> <span class="o">=</span> <span class="nx">yield</span> <span class="nx">x</span>
+    <span class="nx">following_statements</span>
 <span class="p">}</span>
 </code></pre></div>
 
@@ -201,12 +201,12 @@ transforms.  The basic case:</p>
 
 <div class="highlight"><pre><code class="js"><span class="kd">function</span><span class="p">(</span><span class="nx">args</span><span class="p">...)</span> <span class="p">{</span>
     <span class="nx">preceding_statements</span>
-        <span class="k">return</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span>
 <span class="nx">value</span><span class="o">:</span> <span class="nx">x</span><span class="p">,</span>
-           <span class="nx">next</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">y</span><span class="p">)</span> <span class="p">{</span>
-               <span class="nx">following_statements</span>
-           <span class="p">}</span>
+        <span class="nx">next</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">y</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">following_statements</span>
         <span class="p">}</span>
+    <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
 
@@ -222,21 +222,21 @@ top of the function, for example.</p>
 
 <div class="highlight"><pre><code class="js"><span class="kd">var</span> <span class="nx">searchQueries</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">searchInput</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">inputs</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="nx">searchInput</span><span class="p">).</span><span class="nx">asEventStream</span><span class="p">(</span><span class="s1">&#39;keyup change&#39;</span><span class="p">)</span> 
-        <span class="nx">frp</span><span class="p">(</span><span class="nx">inputs</span><span class="p">,</span> <span class="kd">function</span><span class="o">*</span><span class="p">(</span><span class="nx">inputs_</span><span class="p">)</span> <span class="p">{</span>
-                <span class="kd">var</span> <span class="nx">singleInputEvent</span>
-                <span class="k">while</span> <span class="p">(</span><span class="kc">true</span><span class="p">)</span> <span class="p">{</span>
-                <span class="nx">singleInputEvent</span> <span class="o">=</span> <span class="nx">yield</span> <span class="nx">inputs_</span>
-                <span class="nx">query</span> <span class="o">=</span> <span class="nx">singleInputEvent</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">value</span>
-                <span class="k">if</span> <span class="p">(</span><span class="nx">query</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">frp</span><span class="p">(</span><span class="nx">inputs</span><span class="p">,</span> <span class="kd">function</span><span class="o">*</span><span class="p">(</span><span class="nx">inputs_</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">singleInputEvent</span>
+        <span class="k">while</span> <span class="p">(</span><span class="kc">true</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">singleInputEvent</span> <span class="o">=</span> <span class="nx">yield</span> <span class="nx">inputs_</span>
+            <span class="nx">query</span> <span class="o">=</span> <span class="nx">singleInputEvent</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">value</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">query</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
                 <span class="c1">// passes the query through</span>
                 <span class="nx">yield</span> <span class="nx">Bacon</span><span class="p">.</span><span class="nx">once</span><span class="p">(</span><span class="nx">query</span><span class="p">)</span>
-                <span class="p">}</span>
-                <span class="k">else</span> <span class="p">{</span>
+            <span class="p">}</span>
+            <span class="k">else</span> <span class="p">{</span>
                 <span class="c1">// excludes this query from the searchQueries stream</span>
                 <span class="nx">yield</span> <span class="nx">Bacon</span><span class="p">.</span><span class="nx">never</span><span class="p">()</span>
-                <span class="p">}</span>
-                <span class="p">}</span>
-                <span class="p">})</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">})</span>
 <span class="p">}</span>
 </code></pre></div>
 
@@ -246,6 +246,9 @@ I do not know how to implement <code>resultView</code> as a loop, since it requi
 combining two event streams: search queries and JSON responses.  I do not see
 any advantage of loops in generators over asynchronous-style callbacks.  But
 maybe someone more imaginative than me can come up with a more elegant solution.</p>
+
+<p><em>Edited 2014-08-04:</em> Fixed broken link, fixed incorrect indentation in code
+snippets.</p>
 
 ]]></content>
   </entry>
