@@ -150,8 +150,8 @@ invocation:
 {% highlight js %}
 var gen = function*() {
     yield 1
-        yield 2
-        return 3
+    yield 2
+    return 3
 }
 
 g = gen()  // initialize the generator
@@ -196,7 +196,7 @@ would transform to:
 function(args...) {
     preceding_statements
     return {
-value: x,
+        value: x,
         next: function(y) {
             following_statements
         }
