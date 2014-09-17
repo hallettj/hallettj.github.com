@@ -2,114 +2,114 @@
 <urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
     <url>
         <loc>http://sitr.us/2007/09/17/deixis.html</loc>
-        <lastmod>2014-05-05T01:20:14-07:00</lastmod>
+        <lastmod>2014-04-23T17:48:56-07:00</lastmod>
     </url>
     <url>
         <loc>http://sitr.us/2007/09/24/anatomy-of-a-syllable.html</loc>
-        <lastmod>2014-05-05T01:20:14-07:00</lastmod>
+        <lastmod>2014-04-23T17:48:56-07:00</lastmod>
     </url>
     <url>
         <loc>http://sitr.us/2007/10/02/international-phonetic-alphabet.html</loc>
-        <lastmod>2014-05-05T01:20:14-07:00</lastmod>
+        <lastmod>2014-04-23T17:48:56-07:00</lastmod>
     </url>
     <url>
         <loc>
             http://sitr.us/2008/07/29/how-to-use-rspec-to-describe-a-sinatra-application.html
         </loc>
-        <lastmod>2014-05-05T01:20:14-07:00</lastmod>
+        <lastmod>2014-04-23T17:48:56-07:00</lastmod>
     </url>
     <url>
         <loc>http://sitr.us/2009/06/30/database-queries-the-couchdb-way.html</loc>
-        <lastmod>2014-05-05T01:20:14-07:00</lastmod>
+        <lastmod>2014-04-23T17:48:56-07:00</lastmod>
     </url>
     <url>
         <loc>http://sitr.us/2009/07/02/how-to-install-haskell-platform-on-ubuntu-jaunty.html</loc>
-        <lastmod>2014-05-05T01:20:14-07:00</lastmod>
+        <lastmod>2014-04-23T17:48:56-07:00</lastmod>
     </url>
     <url>
         <loc>http://sitr.us/2009/09/13/couchdb-notes.html</loc>
-        <lastmod>2014-05-05T01:20:14-07:00</lastmod>
+        <lastmod>2014-04-23T17:48:56-07:00</lastmod>
     </url>
     <url>
         <loc>http://sitr.us/2011/07/28/how-mobile-safari-emulates-mouse-events.html</loc>
-        <lastmod>2014-05-05T01:20:14-07:00</lastmod>
+        <lastmod>2014-04-23T17:48:56-07:00</lastmod>
     </url>
     <url>
         <loc>http://sitr.us/2011/08/26/cookies-are-bad-for-you.html</loc>
-        <lastmod>2014-05-05T01:20:14-07:00</lastmod>
+        <lastmod>2014-04-23T17:48:56-07:00</lastmod>
     </url>
     <url>
         <loc>http://sitr.us/2012/05/12/installing-a-custom-rom-on-the-transformer-prime.html</loc>
-        <lastmod>2014-05-05T01:20:14-07:00</lastmod>
+        <lastmod>2014-04-23T17:48:56-07:00</lastmod>
     </url>
     <url>
         <loc>http://sitr.us/2012/07/31/promise-pipelines-in-javascript.html</loc>
-        <lastmod>2014-05-05T01:20:14-07:00</lastmod>
+        <lastmod>2014-04-23T17:48:56-07:00</lastmod>
     </url>
     <url>
         <loc>http://sitr.us/2012/09/04/monkey-patching-document-write.html</loc>
-        <lastmod>2014-05-05T01:20:14-07:00</lastmod>
+        <lastmod>2014-04-23T17:48:56-07:00</lastmod>
     </url>
     <url>
         <loc>http://sitr.us/2013/05/22/functional-reactive-programming-in-javascript.html</loc>
-        <lastmod>2014-05-05T01:20:14-07:00</lastmod>
+        <lastmod>2014-04-23T17:48:56-07:00</lastmod>
     </url>
     <url>
         <loc>http://sitr.us/2013/11/04/functional-data-structures.html</loc>
-        <lastmod>2014-05-05T01:20:14-07:00</lastmod>
+        <lastmod>2014-04-23T17:48:56-07:00</lastmod>
     </url>
     <url>
         <loc>http://sitr.us/2014/05/05/category-theory-proofs-in-idris.html</loc>
-        <lastmod>2014-05-05T11:49:44-07:00</lastmod>
+        <lastmod>2014-05-18T18:55:48-07:00</lastmod>
     </url>
     <url>
         <loc>http://sitr.us/2014/05/19/kinesis-advantage-with-dsa-keycaps.html</loc>
-        <lastmod>2014-08-02T14:56:15-07:00</lastmod>
+        <lastmod>2014-08-27T14:25:21-07:00</lastmod>
     </url>
     <url>
         <loc>
             http://sitr.us/2014/08/02/javascript-generators-and-functional-reactive-programming.html
         </loc>
-        <lastmod>2014-08-05T14:05:29-07:00</lastmod>
-    </url>
-    <url>
-        <loc>http://sitr.us/</loc>
-        <lastmod>2014-08-05T14:05:29-07:00</lastmod>
-    </url>
-    <url>
-        <loc>http://sitr.us/talks/js-type-classes/</loc>
-        <lastmod>2014-08-05T14:05:29-07:00</lastmod>
-    </url>
-    <url>
-        <loc>http://sitr.us/talks/emberjs/</loc>
-        <lastmod>2014-08-05T14:05:29-07:00</lastmod>
-    </url>
-    <url>
-        <loc>http://sitr.us/talks/javascript-modules/</loc>
-        <lastmod>2014-08-05T14:05:29-07:00</lastmod>
-    </url>
-    <url>
-        <loc>http://sitr.us/talks/monadic-promises/</loc>
-        <lastmod>2014-08-05T14:05:29-07:00</lastmod>
-    </url>
-    <url>
-        <loc>http://sitr.us/talks/oo-patterns/</loc>
-        <lastmod>2014-08-05T14:05:29-07:00</lastmod>
-    </url>
-    <url>
-        <loc>http://sitr.us/tumbles/</loc>
-        <lastmod>2014-08-05T14:05:29-07:00</lastmod>
+        <lastmod>2014-08-27T14:25:21-07:00</lastmod>
     </url>
     <url>
         <loc>http://sitr.us/blog/archives/</loc>
-        <lastmod>2014-08-05T14:05:29-07:00</lastmod>
+        <lastmod>2014-08-27T14:25:21-07:00</lastmod>
+    </url>
+    <url>
+        <loc>http://sitr.us/tumbles/</loc>
+        <lastmod>2014-08-27T14:25:21-07:00</lastmod>
     </url>
     <url>
         <loc>http://sitr.us/Cat.lidr</loc>
-        <lastmod>2014-05-05T11:42:21-07:00</lastmod>
+        <lastmod>2014-05-18T18:55:48-07:00</lastmod>
+    </url>
+    <url>
+        <loc>http://sitr.us/</loc>
+        <lastmod>2014-08-27T14:25:21-07:00</lastmod>
+    </url>
+    <url>
+        <loc>http://sitr.us/talks/oo-patterns/</loc>
+        <lastmod>2014-08-27T14:25:21-07:00</lastmod>
+    </url>
+    <url>
+        <loc>http://sitr.us/talks/emberjs/</loc>
+        <lastmod>2014-08-27T14:25:21-07:00</lastmod>
+    </url>
+    <url>
+        <loc>http://sitr.us/talks/monadic-promises/</loc>
+        <lastmod>2014-08-27T14:25:21-07:00</lastmod>
+    </url>
+    <url>
+        <loc>http://sitr.us/talks/javascript-modules/</loc>
+        <lastmod>2014-08-27T14:25:21-07:00</lastmod>
+    </url>
+    <url>
+        <loc>http://sitr.us/talks/js-type-classes/</loc>
+        <lastmod>2014-08-27T14:25:21-07:00</lastmod>
     </url>
     <url>
         <loc>http://sitr.us/robots.txt</loc>
-        <lastmod>2014-05-05T00:50:26-07:00</lastmod>
+        <lastmod>2014-04-23T17:48:56-07:00</lastmod>
     </url>
 </urlset>

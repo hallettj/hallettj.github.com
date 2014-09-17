@@ -4,7 +4,7 @@
   <title><![CDATA[sitr.us]]></title>
   <link href="http://sitr.us/atom.xml" rel="self"/>
   <link href="http://sitr.us/"/>
-  <updated>2014-08-05T14:05:51-07:00</updated>
+  <updated>2014-09-17T15:35:43-07:00</updated>
   <id>http://sitr.us/</id>
   <author>
     <name><![CDATA[Jesse Hallett]]></name>
@@ -153,9 +153,9 @@ contain a loop).  With the Bacon example, after the first <code>keyup</code> or 
 event the search result list will just stop updating.</p>
 
 <p>Getting synchronous-style functional reactive programming to work well would
-require immutable, reentrant generators.  ES6 generators are stateful: every
+require stateless, reentrant generators.  ES6 generators are stateful: every
 invocation of a generator changes the way that it will behave on the next
-invocation.  In other words, a generated is mutated on every invocation:</p>
+invocation:</p>
 
 <div class="highlight"><pre><code class="js"><span class="kd">var</span> <span class="nx">gen</span> <span class="o">=</span> <span class="kd">function</span><span class="o">*</span><span class="p">()</span> <span class="p">{</span>
     <span class="nx">yield</span> <span class="mi">1</span>
@@ -171,8 +171,8 @@ invocation.  In other words, a generated is mutated on every invocation:</p>
 <span class="nx">assert</span><span class="p">(</span><span class="nx">g</span><span class="p">.</span><span class="nx">next</span><span class="p">().</span><span class="nx">value</span> <span class="o">===</span> <span class="kc">undefined</span><span class="p">)</span>
 </code></pre></div>
 
-<p>An immutable implementation would return a new object with a function for the
-next generator entry point, instead of mutating the original generator:</p>
+<p>A stateless implementation would return a new object with a function for the
+next generator entry point, instead of modifying the original generator:</p>
 
 <div class="highlight"><pre><code class="js"><span class="kd">var</span> <span class="nx">g</span>  <span class="o">=</span> <span class="nx">gen</span><span class="p">()</span>
 <span class="kd">var</span> <span class="nx">g1</span> <span class="o">=</span> <span class="nx">g</span><span class="p">.</span><span class="nx">next</span><span class="p">()</span>
@@ -187,7 +187,7 @@ next generator entry point, instead of mutating the original generator:</p>
 <span class="nx">assert</span><span class="p">(</span><span class="nx">g</span><span class="p">.</span><span class="nx">next</span><span class="p">().</span><span class="nx">value</span> <span class="o">===</span> <span class="mi">1</span><span class="p">)</span>
 </code></pre></div>
 
-<p>An immutable generator could be implemented with some simple syntactic
+<p>A stateless generator could be implemented with some simple syntactic
 transforms.  The basic case:</p>
 
 <div class="highlight"><pre><code class="js"><span class="kd">function</span><span class="o">*</span><span class="p">(</span><span class="nx">args</span><span class="p">...)</span> <span class="p">{</span>
@@ -209,10 +209,6 @@ transforms.  The basic case:</p>
     <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-
-<p>The <code>next</code> property is returned is a generator that is used to invoke the next
-step.  In this view generators are just functions.  Not only that - a generator
-is a closure that has access to the results of previous steps via closure scope.</p>
 
 <p>There would just need to be a few cases to handle appearances of <code>yield</code> in
 a <code>return</code> statement, a <code>try</code>-<code>catch</code> block, or as its own statement.  With that
@@ -253,9 +249,6 @@ maybe someone more imaginative than me can come up with a more elegant solution.
 
 <p><em>Edited 2014-08-04:</em> Fixed broken link, fixed incorrect indentation in code
 snippets.</p>
-
-<p><em>Edited 2014-08-05:</em> The hypothetical generators that I describe are immutable,
-not stateless.  Thanks to Blixt for pointing out the distinction.</p>
 
 ]]></content>
   </entry>
