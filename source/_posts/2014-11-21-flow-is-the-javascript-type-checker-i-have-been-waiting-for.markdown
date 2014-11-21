@@ -104,10 +104,10 @@ The inferred return type of `foo` is `string | number`.
 That is a type union,
 meaning that values returned by `foo` might be of type `string` or of type
 `number`.
-The type checks in `bar` narrow the possible types of `x` and `y` in the `if`
-body to just `number`.
+The `typeof` checks in `bar` narrow the possible types of `x` and `y` in the
+`if` body to just `number`.
 That means that it is safe to multiply values returned by `bar` -
-The type checker knows that `bar` will always return a number.
+the type checker knows that `bar` will always return a number.
 
 A coworker told me that what he would like is support for type-checked structs.
 That would let him add or remove properties from an object in one part of
@@ -192,7 +192,7 @@ time.
 
 In the past I have talked to one or two people who said that they would only be
 interested in type-checked JavaScript if it supported [algebraic types][].
-(These are the kind of people I work with :)).
+(These are the kind of people I work with :))
 That is possible too - here is an example that I wrote:
 
 [algebraic types]: https://en.wikipedia.org/wiki/Algebraic_data_type
@@ -239,18 +239,20 @@ Thanks to type narrowing, accessing `tree.value` passes type-checking in the
 Without that check, the type checker would not allow accessing properties that
 do not exist on both `Node` and `EmptyTree`.
 
-Some points to note in this example:
+There are some details in this example that I want to call out:
 
 - The `class` syntax is from ECMAScript 6 -
-  but it is extended by Flow to support type annotations for properties.
-- `Tree` is a type alias.  It has no runtime representation. And unlike
-  a superclass, it is _sealed_, meaning that it is not possible to add more
-  subtypes to `Tree` elsewhere in the codebase.
+  but it is extended in Flow to support type annotations for properties.
+- `Tree` is a type alias.  It has no runtime representation.
+  None is needed, since `Node` and `EmptyTree` have no shared behavior.
+  And unlike a superclass, `Tree` is _sealed_, meaning that it is not possible to
+  add more subtypes to `Tree` elsewhere in the codebase.
 - Flow supports parameterized types
   (a.k.a. generics, a.k.a. parametric polymorphism).
 - You can specify the exact type of function values (in this case, the type of `predicate`).
-- `find` might return a value from a tree, or it might return `undefined`. So
-  the return type is `T | void` (where `void` is the type of `undefined`).
+- `find` might return a value from a tree, or it might return `undefined`.
+  So the return type is `T | void` (where `void` is the type of `undefined`).
+  Writing `?T` would also work.
 
 I have not been sold on prior JavaScript type checkers.
 They did not seem to "get" JavaScript.
