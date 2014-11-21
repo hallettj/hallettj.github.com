@@ -202,10 +202,10 @@ This example (which passes the type checker) comes from the documentation:</p>
 That is a type union,
 meaning that values returned by <code>foo</code> might be of type <code>string</code> or of type
 <code>number</code>.
-The type checks in <code>bar</code> narrow the possible types of <code>x</code> and <code>y</code> in the <code>if</code>
-body to just <code>number</code>.
+The <code>typeof</code> checks in <code>bar</code> narrow the possible types of <code>x</code> and <code>y</code> in the
+<code>if</code> body to just <code>number</code>.
 That means that it is safe to multiply values returned by <code>bar</code> -
-The type checker knows that <code>bar</code> will always return a number.</p>
+the type checker knows that <code>bar</code> will always return a number.</p>
 
 <p>A coworker told me that what he would like is support for type-checked structs.
 That would let him add or remove properties from an object in one part of
@@ -282,7 +282,7 @@ time.
 
 <p>In the past I have talked to one or two people who said that they would only be
 interested in type-checked JavaScript if it supported <a href="https://en.wikipedia.org/wiki/Algebraic_data_type">algebraic types</a>.
-(These are the kind of people I work with :)).
+(These are the kind of people I work with :))
 That is possible too - here is an example that I wrote:</p>
 
 <div class="highlight"><pre><code class="js"><span class="nx">type</span> <span class="nx">Tree</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span> <span class="o">=</span> <span class="nx">Node</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span> <span class="o">|</span> <span class="nx">EmptyTree</span>
@@ -326,19 +326,21 @@ That is possible too - here is an example that I wrote:</p>
 Without that check, the type checker would not allow accessing properties that
 do not exist on both <code>Node</code> and <code>EmptyTree</code>.</p>
 
-<p>Some points to note in this example:</p>
+<p>There are some details in this example that I want to call out:</p>
 
 <ul>
   <li>The <code>class</code> syntax is from ECMAScript 6 -
-but it is extended by Flow to support type annotations for properties.</li>
-  <li><code>Tree</code> is a type alias.  It has no runtime representation. And unlike
-a superclass, it is <em>sealed</em>, meaning that it is not possible to add more
-subtypes to <code>Tree</code> elsewhere in the codebase.</li>
+but it is extended in Flow to support type annotations for properties.</li>
+  <li><code>Tree</code> is a type alias.  It has no runtime representation.
+None is needed, since <code>Node</code> and <code>EmptyTree</code> have no shared behavior.
+And unlike a superclass, <code>Tree</code> is <em>sealed</em>, meaning that it is not possible to
+add more subtypes to <code>Tree</code> elsewhere in the codebase.</li>
   <li>Flow supports parameterized types
 (a.k.a. generics, a.k.a. parametric polymorphism).</li>
   <li>You can specify the exact type of function values (in this case, the type of <code>predicate</code>).</li>
-  <li><code>find</code> might return a value from a tree, or it might return <code>undefined</code>. So
-the return type is <code>T | void</code> (where <code>void</code> is the type of <code>undefined</code>).</li>
+  <li><code>find</code> might return a value from a tree, or it might return <code>undefined</code>.
+So the return type is <code>T | void</code> (where <code>void</code> is the type of <code>undefined</code>).
+Writing <code>?T</code> would also work.</li>
 </ul>
 
 <p>I have not been sold on prior JavaScript type checkers.
