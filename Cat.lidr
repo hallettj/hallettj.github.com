@@ -827,6 +827,10 @@ as I continue to explore Category theory.
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/2014/11/21/flow-is-the-javascript-type-checker-i-have-been-waiting-for.html">Flow is the JavaScript type checker I have been waiting for</a>
+      </li>
+    
+      <li class="post">
         <a href="/2014/08/02/javascript-generators-and-functional-reactive-programming.html">Javascript generators and functional reactive programming</a>
       </li>
     
@@ -840,10 +844,6 @@ as I continue to explore Category theory.
     
       <li class="post">
         <a href="/2013/11/04/functional-data-structures.html">Functional data structures in JavaScript with Mori</a>
-      </li>
-    
-      <li class="post">
-        <a href="/2013/05/22/functional-reactive-programming-in-javascript.html">Functional Reactive Programming in JavaScript</a>
       </li>
     
   </ul>

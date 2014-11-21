@@ -9,8 +9,8 @@
   <meta name="author" content="Jesse Hallett">
 
   
-  <meta name="description" content="tl;dr: ECMAScript 6 introduces a language feature called generators, which
-are really great for working with asynchronous code that uses promises. &hellip;">
+  <meta name="description" content="I am very excited about Flow, a new JavaScript type checker from Facebook.
+I have put some thought into what a type checker for JavaScript should do &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -82,6 +82,277 @@ are really great for working with asynchronous code that uses promises. &hellip;
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2014/11/21/flow-is-the-javascript-type-checker-i-have-been-waiting-for.html">Flow is the JavaScript type checker I have been waiting for</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-11-21T00:00:00-08:00" pubdate data-updated="true">2014-11-21</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I am very excited about <a href="https://code.facebook.com/posts/1505962329687926/flow-a-new-static-type-checker-for-javascript/">Flow</a>, a new JavaScript type checker from Facebook.
+I have put some thought into what a type checker for JavaScript should do -
+and in my opinion Facebook gets it right.
+The designers of Flow took great effort to make it work well with JavaScript
+idioms,
+and with off-the-shelf JavaScript code.
+The key features that make that possible are type inference
+and <a href="http://flowtype.org/docs/nullable-types.html#type-annotating-null">path-sensitive</a> <a href="http://flowtype.org/docs/dynamic-type-tests.html#_">analysis</a>.
+I think that Flow has the potential to enable sweeping improvements to the code
+quality of countless web apps and Node apps.</p>
+
+<p>From the announcement post:</p>
+
+<blockquote>
+  <p>…underlying the design of Flow is the assumption that most JavaScript code
+is implicitly statically typed; even though types may not appear anywhere in
+the code, they are in the developer’s mind as a way to reason about the
+correctness of the code. Flow infers those types automatically wherever
+possible, which means that it can find type errors without needing any changes
+to the code at all.</p>
+</blockquote>
+
+<blockquote>
+  <p>This makes Flow fundamentally different than existing JavaScript type systems
+(such as TypeScript), which make the weaker assumption that most JavaScript
+code is dynamically typed, and that it is up to the developer to express which
+code may be amenable to static typing.</p>
+</blockquote>
+
+<p>Path-sensitive analysis means that Flow reads control flow to narrow types where
+appropriate.
+This example comes from the announcement post:</p>
+
+<div class="highlight"><pre><code class="js"><span class="kd">function</span> <span class="nx">length</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">x</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kd">var</span> <span class="nx">total</span> <span class="o">=</span> <span class="nx">length</span><span class="p">(</span><span class="s1">&#39;Hello&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="nx">length</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span>
+<span class="c1">// Type error: x might be null</span>
+</code></pre></div>
+
+<p>The presence of a use of <code>length</code> with a <code>null</code> argument informs Flow that there
+should be a null check in that function.
+This version does type-check:</p>
+
+<div class="highlight"><pre><code class="js"><span class="kd">function</span> <span class="nx">length</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">x</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">var</span> <span class="nx">total</span> <span class="o">=</span> <span class="nx">length</span><span class="p">(</span><span class="s1">&#39;Hello&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="nx">length</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span>
+</code></pre></div>
+
+<p>Flow is able to infer that <code>x</code> cannot be <code>null</code> inside the <code>if</code> body.</p>
+
+<p>An alternate fix would be to get rid of any invocations of <code>length</code> where the
+argument might be <code>null</code>.
+That would cause Flow to infer a non-nullable type for <code>x</code>.</p>
+
+<p>This capability goes further - here is an example from the Flow documentation:</p>
+
+<div class="highlight"><pre><code class="js"><span class="kd">var</span> <span class="nx">o</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+<span class="k">if</span> <span class="p">(</span><span class="nx">o</span> <span class="o">==</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">o</span> <span class="o">=</span> <span class="s1">&#39;hello&#39;</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="nx">print</span><span class="p">(</span><span class="nx">o</span><span class="p">.</span><span class="nx">length</span><span class="p">);</span>
+</code></pre></div>
+
+<p>The type of <code>o</code> is initially <code>null</code>.
+But Flow is able to determine that the type of <code>o</code> changes when <code>o</code> is
+reassigned,
+and that its type is definitely <code>string</code> on the last line.</p>
+
+<p>In addition to null checks,
+Flow also narrows types when it sees dynamic type checks.
+This example (which passes the type checker) comes from the documentation:</p>
+
+<div class="highlight"><pre><code class="js"><span class="kd">function</span> <span class="nx">foo</span><span class="p">(</span><span class="nx">b</span><span class="p">)</span> <span class="p">{</span> <span class="k">if</span> <span class="p">(</span><span class="nx">b</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="mi">21</span><span class="p">;</span> <span class="p">}</span> <span class="k">else</span> <span class="p">{</span> <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="p">;</span> <span class="p">}</span> <span class="p">}</span>
+<span class="kd">function</span> <span class="nx">bar</span><span class="p">(</span><span class="nx">b</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">x</span> <span class="o">=</span> <span class="nx">foo</span><span class="p">(</span><span class="nx">b</span><span class="p">);</span>
+  <span class="kd">var</span> <span class="nx">y</span> <span class="o">=</span> <span class="nx">foo</span><span class="p">(</span><span class="nx">b</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">x</span> <span class="o">==</span> <span class="s1">&#39;number&#39;</span> <span class="o">&amp;&amp;</span> <span class="k">typeof</span> <span class="nx">y</span> <span class="o">==</span> <span class="s1">&#39;number&#39;</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">x</span> <span class="o">+</span> <span class="nx">y</span><span class="p">;</span> <span class="p">}</span>
+  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="kd">var</span> <span class="nx">n</span> <span class="o">=</span> <span class="nx">bar</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="nx">bar</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+</code></pre></div>
+
+<p>The inferred return type of <code>foo</code> is <code>string | number</code>.
+That is a type union,
+meaning that values returned by <code>foo</code> might be of type <code>string</code> or of type
+<code>number</code>.
+The type checks in <code>bar</code> narrow the possible types of <code>x</code> and <code>y</code> in the <code>if</code>
+body to just <code>number</code>.
+That means that it is safe to multiply values returned by <code>bar</code> -
+The type checker knows that <code>bar</code> will always return a number.</p>
+
+<p>A coworker told me that what he would like is support for type-checked structs.
+That would let him add or remove properties from an object in one part of
+a program,
+and be assured that the rest of the program is using the new object format
+correctly.
+Struct types work using structural types and type aliases:</p>
+
+<div class="highlight"><pre><code class="js"><span class="nx">type</span> <span class="nx">Point</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">x</span><span class="o">:</span> <span class="nx">number</span><span class="p">;</span> <span class="nx">y</span><span class="o">:</span> <span class="nx">number</span> <span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">mkPoint</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">)</span><span class="o">:</span> <span class="nx">Point</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="p">{</span> <span class="nx">x</span><span class="o">:</span> <span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="o">:</span> <span class="nx">y</span> <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">var</span> <span class="nx">p</span> <span class="o">=</span> <span class="nx">mkPoint</span><span class="p">(</span><span class="s1">&#39;2&#39;</span><span class="p">,</span> <span class="s1">&#39;3&#39;</span><span class="p">)</span>
+<span class="c1">// Type error: string is incompatible with number</span>
+
+<span class="kd">var</span> <span class="nx">q</span> <span class="o">=</span> <span class="nx">mkPoint</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="nx">q</span><span class="p">.</span><span class="nx">z</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="c1">// Type error: property `z` not found in object type</span>
+
+<span class="kd">var</span> <span class="nx">r</span><span class="o">:</span> <span class="nx">Point</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">x</span><span class="o">:</span> <span class="mi">5</span> <span class="p">}</span>
+<span class="c1">// Type error: property y not found in object literal</span>
+</code></pre></div>
+
+<p>Notice the <code>type</code> keyword and type annotation on <code>mkPoint</code> -
+Facebook’s literature is a little misleading,
+in that Flow is really a new language that compiles to JavaScript.
+But the only differences between Flow and regular JavaScript are the added
+syntax for type aliases and type annotations,
+and the type-checking step.
+Flow can be applied to regular JavaScript code without type annotations.  </p>
+
+<p>How well that works will depend on how that code is written.
+If the JavaScript is cleanly written,
+you might get a lot of help from Flow without ever needing type annotations.
+But there are some valid JavaScript idioms that will not type-check
+(at least not at this time.)
+For example, optional arguments are not allowed unless you use either
+<a href="http://flowtype.org/docs/functions.html#too-few-arguments">Flow’s syntax</a> or <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Default_parameters">ECMAScript 6’s default parameter syntax</a>.</p>
+
+<p>These are early days for Flow.
+I am optimistic that over time it will only get better at operating on code that
+was not written with Flow in mind.</p>
+
+<p>There is a side benefit to using the Flow language:
+it supports <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/New_in_JavaScript/ECMAScript_6_support_in_Mozilla">ECMAScript 6</a>,
+but <a href="http://flowtype.org/docs/running.html#_">compiling Flow programs</a> produces ECMAScript 5 code that can run in most
+browsers.</p>
+
+<p>One of my favorite features of Flow is that <code>null</code> and <code>undefined</code> are <em>not</em>
+treated as bottom types.
+A value is only allowed to be <code>null</code> if it has a nullable type.
+This makes Flow better at catching null pointer exceptions than almost any other
+object-oriented language.</p>
+
+<p>For example:</p>
+
+<div class="highlight"><pre><code class="js"><span class="kd">var</span> <span class="nx">n</span><span class="o">:</span> <span class="nb">Object</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+<span class="c1">// Type error: null is incompatible with object type</span>
+
+<span class="kd">var</span> <span class="nx">m</span><span class="o">:</span> <span class="o">?</span><span class="nb">Object</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+<span class="c1">// this is ok</span>
+
+<span class="kd">var</span> <span class="nx">o</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+<span class="c1">// this is ok too - Flow infers that o has a nullable type</span>
+</code></pre></div>
+
+<p>A type expression <code>?T</code> behaves pretty much like <code>T | null | undefined</code>.
+(From what I can tell, <code>null</code> and <code>undefined</code> are distinct types in Flow -
+but it does not seem to be possible to use them in type annotations at this
+time.
+<code>void</code> is allowed, which seems to be an alias for <code>undefined</code>.)</p>
+
+<p>In the past I have talked to one or two people who said that they would only be
+interested in type-checked JavaScript if it supported <a href="https://en.wikipedia.org/wiki/Algebraic_data_type">algebraic types</a>.
+(These are the kind of people I work with :)).
+That is possible too - here is an example that I wrote:</p>
+
+<div class="highlight"><pre><code class="js"><span class="nx">type</span> <span class="nx">Tree</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span> <span class="o">=</span> <span class="nx">Node</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span> <span class="o">|</span> <span class="nx">EmptyTree</span>
+
+<span class="kr">class</span> <span class="nx">Node</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span> <span class="p">{</span>
+  <span class="nx">value</span><span class="o">:</span> <span class="nx">T</span><span class="p">;</span>
+  <span class="nx">left</span><span class="o">:</span>  <span class="nx">Tree</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">;</span>
+  <span class="nx">right</span><span class="o">:</span> <span class="nx">Tree</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">;</span>
+  <span class="nx">constructor</span><span class="p">(</span><span class="nx">value</span><span class="p">,</span> <span class="nx">left</span><span class="p">,</span> <span class="nx">right</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">value</span> <span class="o">=</span> <span class="nx">value</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">left</span>  <span class="o">=</span> <span class="nx">left</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">right</span> <span class="o">=</span> <span class="nx">right</span>
+  <span class="p">};</span>
+<span class="p">}</span>
+<span class="kr">class</span> <span class="nx">EmptyTree</span> <span class="p">{}</span>
+
+<span class="kd">function</span> <span class="nx">find</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">predicate</span><span class="o">:</span> <span class="p">(</span><span class="nx">v</span><span class="o">:</span> <span class="nx">T</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="kr">boolean</span><span class="p">,</span> <span class="nx">tree</span><span class="o">:</span> <span class="nx">Tree</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">)</span><span class="o">:</span> <span class="nx">T</span> <span class="o">|</span> <span class="k">void</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">leftResult</span>
+
+  <span class="k">if</span> <span class="p">(</span><span class="nx">tree</span> <span class="k">instanceof</span> <span class="nx">Node</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">leftResult</span> <span class="o">=</span> <span class="nx">find</span><span class="p">(</span><span class="nx">predicate</span><span class="p">,</span> <span class="nx">tree</span><span class="p">.</span><span class="nx">left</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">leftResult</span> <span class="o">!==</span> <span class="s1">&#39;undefined&#39;</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">leftResult</span>
+    <span class="p">}</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">predicate</span><span class="p">(</span><span class="nx">tree</span><span class="p">.</span><span class="nx">value</span><span class="p">))</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">tree</span><span class="p">.</span><span class="nx">value</span>
+    <span class="p">}</span>
+    <span class="k">else</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">find</span><span class="p">(</span><span class="nx">predicate</span><span class="p">,</span> <span class="nx">tree</span><span class="p">.</span><span class="nx">right</span><span class="p">)</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">tree</span> <span class="k">instanceof</span> <span class="nx">EmptyTree</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="kc">undefined</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Thanks to type narrowing, accessing <code>tree.value</code> passes type-checking in the
+<code>if</code> body where <code>tree instanceof Node</code> is true.
+Without that check, the type checker would not allow accessing properties that
+do not exist on both <code>Node</code> and <code>EmptyTree</code>.</p>
+
+<p>Some points to note in this example:</p>
+
+<ul>
+  <li>The <code>class</code> syntax is from ECMAScript 6 -
+but it is extended by Flow to support type annotations for properties.</li>
+  <li><code>Tree</code> is a type alias.  It has no runtime representation. And unlike
+a superclass, it is <em>sealed</em>, meaning that it is not possible to add more
+subtypes to <code>Tree</code> elsewhere in the codebase.</li>
+  <li>Flow supports parameterized types
+(a.k.a. generics, a.k.a. parametric polymorphism).</li>
+  <li>You can specify the exact type of function values (in this case, the type of <code>predicate</code>).</li>
+  <li><code>find</code> might return a value from a tree, or it might return <code>undefined</code>. So
+the return type is <code>T | void</code> (where <code>void</code> is the type of <code>undefined</code>).</li>
+</ul>
+
+<p>I have not been sold on prior JavaScript type checkers.
+They did not seem to “get” JavaScript.
+Flow is a type checker that I actually plan to use.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -717,77 +988,6 @@ Plain cookie authentication is vulnerable to all three.</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/2011/07/28/how-mobile-safari-emulates-mouse-events.html">How Mobile Safari emulates mouse events</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-07-28T00:00:00-07:00" pubdate data-updated="true"></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>When you are adapting web apps to touchscreen devices particular
-challenges come up around events like <code>mouseover</code> and <code>mouseout</code>.
-Touchscreen devices like the iPad do not have a cursor, so the user
-cannot exactly move the mouse over an HTML element.  However, Mobile
-Safari, the web browser that comes with the iPhone and iPad, has
-a fallback for websites that require hovering or cursor movement.</p>
-
-<p>Usually when you tap on an element on a link or other clickable element
-Mobile Safari translates that into a regular <code>click</code> event.  The browser
-also produces some touch events that do not exist in a lot of browsers.
-But from the perspective of a web page that was not designed with
-a touchscreen in mind, what you get is a plain <code>click</code>.  More
-specifically, the browser fires <code>mousedown</code>, <code>mouseup</code>, and <code>click</code> in
-that order.  But if a clickable element also does something on
-<code>mouseover</code> then tapping on that element will trigger a <code>mouseover</code> event
-instead of a <code>click</code>.  Tapping on the same element again will produce
-a <code>click</code> event.  A random example of a page that exhibits this behavior
-is <a href="http://opensourcebridge.org/events/2011/schedule">the schedule page</a> from the <a href="http://opensourcebridge.org/">Open Source Bridge</a>
-website.  Try tapping on session titles and see what happens.</p>
-
-<p>Mobile Safari will only produce mouse events when the user taps on
-a clickable element, like a link.  You can make an element clickable by
-adding an onClick event handler to it, even if that handler does
-nothing.  On tap Mobile Safari fires the events <code>mouseover</code>,
-<code>mousemove</code>, <code>mousedown</code>, <code>mouseup</code>, and <code>click</code> in that order - with
-some caveats which are explained below.  Those events all fire together
-after the user lifts her finger.  You might expect the <code>mousedown</code> event
-to fire as soon as the user presses her finger to the screen - but it
-does not.  When the user taps on another clickable element the browser
-fires a <code>mouseout</code> event on the first element in addition to firing the
-aforementioned events on the new element.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/2011/07/28/how-mobile-safari-emulates-mouse-events.html">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -803,6 +1003,10 @@ aforementioned events on the new element.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/2014/11/21/flow-is-the-javascript-type-checker-i-have-been-waiting-for.html">Flow is the JavaScript type checker I have been waiting for</a>
+      </li>
+    
+      <li class="post">
         <a href="/2014/08/02/javascript-generators-and-functional-reactive-programming.html">Javascript generators and functional reactive programming</a>
       </li>
     
@@ -816,10 +1020,6 @@ aforementioned events on the new element.</p>
     
       <li class="post">
         <a href="/2013/11/04/functional-data-structures.html">Functional data structures in JavaScript with Mori</a>
-      </li>
-    
-      <li class="post">
-        <a href="/2013/05/22/functional-reactive-programming-in-javascript.html">Functional Reactive Programming in JavaScript</a>
       </li>
     
   </ul>

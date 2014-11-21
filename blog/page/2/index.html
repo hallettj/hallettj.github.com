@@ -9,9 +9,9 @@
   <meta name="author" content="Jesse Hallett">
 
   
-  <meta name="description" content="Recently I gave a talk at Portland Ruby Brigade meeting on
-CouchDB, a document-oriented database. I thought I would share my notes
-from that talk. In &hellip;">
+  <meta name="description" content="When you are adapting web apps to touchscreen devices particular
+challenges come up around events like mouseover and mouseout.
+Touchscreen devices &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -83,6 +83,77 @@ from that talk. In &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2011/07/28/how-mobile-safari-emulates-mouse-events.html">How Mobile Safari emulates mouse events</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-07-28T00:00:00-07:00" pubdate data-updated="true"></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>When you are adapting web apps to touchscreen devices particular
+challenges come up around events like <code>mouseover</code> and <code>mouseout</code>.
+Touchscreen devices like the iPad do not have a cursor, so the user
+cannot exactly move the mouse over an HTML element.  However, Mobile
+Safari, the web browser that comes with the iPhone and iPad, has
+a fallback for websites that require hovering or cursor movement.</p>
+
+<p>Usually when you tap on an element on a link or other clickable element
+Mobile Safari translates that into a regular <code>click</code> event.  The browser
+also produces some touch events that do not exist in a lot of browsers.
+But from the perspective of a web page that was not designed with
+a touchscreen in mind, what you get is a plain <code>click</code>.  More
+specifically, the browser fires <code>mousedown</code>, <code>mouseup</code>, and <code>click</code> in
+that order.  But if a clickable element also does something on
+<code>mouseover</code> then tapping on that element will trigger a <code>mouseover</code> event
+instead of a <code>click</code>.  Tapping on the same element again will produce
+a <code>click</code> event.  A random example of a page that exhibits this behavior
+is <a href="http://opensourcebridge.org/events/2011/schedule">the schedule page</a> from the <a href="http://opensourcebridge.org/">Open Source Bridge</a>
+website.  Try tapping on session titles and see what happens.</p>
+
+<p>Mobile Safari will only produce mouse events when the user taps on
+a clickable element, like a link.  You can make an element clickable by
+adding an onClick event handler to it, even if that handler does
+nothing.  On tap Mobile Safari fires the events <code>mouseover</code>,
+<code>mousemove</code>, <code>mousedown</code>, <code>mouseup</code>, and <code>click</code> in that order - with
+some caveats which are explained below.  Those events all fire together
+after the user lifts her finger.  You might expect the <code>mousedown</code> event
+to fire as soon as the user presses her finger to the screen - but it
+does not.  When the user taps on another clickable element the browser
+fires a <code>mouseout</code> event on the first element in addition to firing the
+aforementioned events on the new element.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/2011/07/28/how-mobile-safari-emulates-mouse-events.html">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -586,6 +657,10 @@ discourse to change too.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/2014/11/21/flow-is-the-javascript-type-checker-i-have-been-waiting-for.html">Flow is the JavaScript type checker I have been waiting for</a>
+      </li>
+    
+      <li class="post">
         <a href="/2014/08/02/javascript-generators-and-functional-reactive-programming.html">Javascript generators and functional reactive programming</a>
       </li>
     
@@ -599,10 +674,6 @@ discourse to change too.</p>
     
       <li class="post">
         <a href="/2013/11/04/functional-data-structures.html">Functional data structures in JavaScript with Mori</a>
-      </li>
-    
-      <li class="post">
-        <a href="/2013/05/22/functional-reactive-programming-in-javascript.html">Functional Reactive Programming in JavaScript</a>
       </li>
     
   </ul>
