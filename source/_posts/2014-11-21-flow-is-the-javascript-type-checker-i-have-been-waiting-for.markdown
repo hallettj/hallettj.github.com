@@ -37,6 +37,7 @@ From the [announcement post][]:
 
 Path-sensitive analysis means that Flow reads control flow to narrow types where
 appropriate.
+<!-- more -->
 This example comes from the announcement post:
 
 {% highlight js %}
