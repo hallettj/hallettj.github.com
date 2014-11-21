@@ -16,7 +16,7 @@ and [path-sensitive][] [analysis][].
 I think that Flow has the potential to enable sweeping improvements to the code
 quality of countless web apps and Node apps.
 
-From the announcement post:
+From the [announcement post][]:
 
 > ...underlying the design of Flow is the assumption that most JavaScript code
 > is implicitly statically typed; even though types may not appear anywhere in
@@ -30,7 +30,8 @@ From the announcement post:
 > code is dynamically typed, and that it is up to the developer to express which
 > code may be amenable to static typing.
 
-[Flow]: https://code.facebook.com/posts/1505962329687926/flow-a-new-static-type-checker-for-javascript/
+[Flow]: http://flowtype.org/
+[announcement post]: https://code.facebook.com/posts/1505962329687926/flow-a-new-static-type-checker-for-javascript/
 [path-sensitive]: http://flowtype.org/docs/nullable-types.html#type-annotating-null
 [analysis]: http://flowtype.org/docs/dynamic-type-tests.html#_
 
