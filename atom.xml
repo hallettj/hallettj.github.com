@@ -4,7 +4,7 @@
   <title><![CDATA[sitr.us]]></title>
   <link href="http://sitr.us/atom.xml" rel="self"/>
   <link href="http://sitr.us/"/>
-  <updated>2014-11-21T01:05:43-08:00</updated>
+  <updated>2014-11-21T01:08:05-08:00</updated>
   <id>http://sitr.us/</id>
   <author>
     <name><![CDATA[Jesse Hallett]]></name>
@@ -49,6 +49,7 @@ code may be amenable to static typing.</p>
 
 <p>Path-sensitive analysis means that Flow reads control flow to narrow types where
 appropriate.
+<!-- more -->
 This example comes from the announcement post:</p>
 
 <div class="highlight"><pre><code class="js"><span class="kd">function</span> <span class="nx">length</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="p">{</span>
