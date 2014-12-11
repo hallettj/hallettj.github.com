@@ -56,3 +56,7 @@ ul#markdown-toc {
 aside.translations {
   font-style: italic;
 }
+
+code { font-size: 120%; }
+.highlight code { line-height: 1.2em; }
+p code, li code { font-size: 85%; }
