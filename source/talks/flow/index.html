@@ -73,6 +73,41 @@ This type is incompatible with
 </section>
 <section class="slide level6">
 
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">function</span> <span class="fu">length</span>(x) {
+  <span class="kw">return</span> <span class="ot">x</span>.<span class="fu">length</span>;
+}</code></pre>
+<div class="fragment">
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> total = <span class="fu">length</span>(<span class="st">&#39;Hello&#39;</span>) + <span class="fu">length</span>(<span class="kw">null</span>);</code></pre>
+</div>
+<div class="fragment">
+<pre><code>Type error: x might be null</code></pre>
+</div>
+</section>
+<section class="slide level6">
+
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> fs = <span class="fu">require</span>(<span class="st">&#39;fs&#39;</span>);
+
+<span class="ot">fs</span>.<span class="fu">write</span>(<span class="st">&#39;log.txt&#39;</span>, <span class="st">&#39;an event occurred&#39;</span>);</code></pre>
+</section>
+<section class="slide level6" data-transition="none">
+
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> fs = <span class="fu">require</span>(<span class="st">&#39;fs&#39;</span>);
+
+<span class="ot">fs</span>.<span class="fu">write</span>(<span class="st">&#39;log.txt&#39;</span>, <span class="st">&#39;an event occurred&#39;</span>);
+<span class="co">//       ^          ^ should be a buffer</span>
+<span class="co">//       |</span>
+<span class="co">//       | should be a file descriptor</span></code></pre>
+</section>
+<section class="slide level6" data-transition="none">
+
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> fs = <span class="fu">require</span>(<span class="st">&#39;fs&#39;</span>);
+
+<span class="ot">fs</span>.<span class="fu">open</span>(<span class="st">&#39;log.txt&#39;</span>, <span class="st">&#39;a&#39;</span>, <span class="kw">function</span>(err, fd) {
+  <span class="ot">fs</span>.<span class="fu">write</span>(fd, <span class="kw">new</span> <span class="fu">Buffer</span>(<span class="st">&#39;an event occurred&#39;</span>));
+});</code></pre>
+</section>
+<section class="slide level6">
+
 <blockquote>
 <p>...underlying the design of Flow is the assumption that most JavaScript code is implicitly statically typed; even though types may not appear anywhere in the code, they are in the developer’s mind as a way to reason about the correctness of the code. Flow infers those types automatically wherever possible, which means that it can find type errors without needing any changes to the code at all.</p>
 </blockquote>
@@ -92,7 +127,7 @@ This type is incompatible with
 <span class="kw">var</span> total = <span class="fu">length</span>(<span class="st">&#39;Hello&#39;</span>) + <span class="fu">length</span>(<span class="kw">null</span>);</code></pre>
 <pre><code>Type error: x might be null</code></pre>
 </section>
-<section class="slide level6">
+<section class="slide level6" data-transition="none">
 
 <pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">function</span> <span class="fu">length</span>(x) {
   <span class="kw">if</span> (x) {
@@ -168,7 +203,23 @@ bar: (b: number) =&gt; number</code></pre>
 </section>
 <section class="slide level6">
 
-<p>(venn diagram)</p>
+<figure>
+<img src="string-union-number.svg" alt="string|number" /><figcaption>string|number</figcaption>
+</figure>
+</section>
+<section class="slide level6">
+
+<pre><code>number                mixed                 MyClass
+
+string                any                   Array&lt;T&gt;
+
+boolean               ?T                    [T, U, V]
+
+void                  T | U                 { x: T; y: U; z: Z }
+
+&quot;foo&quot;                 T &amp; U                 { [key:string]: T }
+
+                                            (x: T) =&gt; U</code></pre>
 </section>
 <section class="slide level6">
 
@@ -206,6 +257,20 @@ bar: (b: number) =&gt; number</code></pre>
 </section>
 <section class="slide level6">
 
+<pre class="sourceCode javascript"><code class="sourceCode javascript">type Foo = { <span class="dt">x</span>: number; <span class="dt">y</span>: string; [<span class="dt">key</span>:string]: any }
+type Bar = { <span class="dt">z</span>: boolean }
+
+type FooBar = Foo &amp; Bar
+
+<span class="kw">var</span> a: FooBar = { <span class="dt">x</span>: <span class="dv">1</span>, <span class="dt">y</span>: <span class="st">&#39;two&#39;</span>, <span class="dt">z</span>: <span class="kw">true</span>, <span class="dt">zz</span>: <span class="kw">false</span> }
+
+<span class="kw">var</span> b = <span class="ot">a</span>.<span class="fu">x</span>  <span class="co">// number</span>
+<span class="kw">var</span> c = <span class="ot">a</span>.<span class="fu">z</span>  <span class="co">// boolean</span>
+<span class="kw">var</span> d = <span class="ot">a</span>.<span class="fu">zz</span> <span class="co">// boolean</span>
+<span class="kw">var</span> e = <span class="ot">a</span>.<span class="fu">w</span>  <span class="co">// (unknown)</span></code></pre>
+</section>
+<section class="slide level6">
+
 <pre class="sourceCode javascript"><code class="sourceCode javascript">type Tree&lt;T&gt; = Node&lt;T&gt; | EmptyTree
 
 <span class="kw">class</span> Node&lt;T&gt; {
@@ -237,6 +302,14 @@ bar: (b: number) =&gt; number</code></pre>
     <span class="kw">return</span> <span class="kw">undefined</span>;
   }
 }</code></pre>
+</section>
+<section class="slide level6">
+
+<pre class="sourceCode javascript"><code class="sourceCode javascript">declare <span class="kw">class</span> UnderscoreStatic {
+  findWhere&lt;T&gt;(<span class="dt">list</span>: Array&lt;T&gt;, <span class="dt">properties</span>: {}): T;
+}
+
+declare <span class="kw">var</span> _: UnderscoreStatic;</code></pre>
 </section>
 <section class="slide level6">
 

@@ -21,6 +21,55 @@ foo('Hello, world!');
 
 ---
 
+~~~~ {.javascript}
+function length(x) {
+  return x.length;
+}
+~~~~~~~~~~~~~~~~~~~~~~
+
+. . .
+
+~~~~ {.javascript}
+var total = length('Hello') + length(null);
+~~~~~~~~~~~~~~~~~~~~~~
+
+. . .
+
+    Type error: x might be null
+
+---
+
+~~~~ {.javascript}
+var fs = require('fs');
+
+fs.write('log.txt', 'an event occurred');
+~~~~~~~~~~~~~~~~~~~~~~
+
+</section>
+<section class="slide level6" data-transition="none">
+
+~~~~ {.javascript}
+var fs = require('fs');
+
+fs.write('log.txt', 'an event occurred');
+//       ^          ^ should be a buffer
+//       |
+//       | should be a file descriptor
+~~~~~~~~~~~~~~~~~~~~~~
+
+</section>
+<section class="slide level6" data-transition="none">
+
+~~~~ {.javascript}
+var fs = require('fs');
+
+fs.open('log.txt', 'a', function(err, fd) {
+  fs.write(fd, new Buffer('an event occurred'));
+});
+~~~~~~~~~~~~~~~~~~~~~~
+
+---
+
 > ...underlying the design of Flow is the assumption that most JavaScript code
 > is implicitly statically typed; even though types may not appear anywhere in
 > the code, they are in the developer’s mind as a way to reason about the
@@ -47,7 +96,8 @@ var total = length('Hello') + length(null);
 
     Type error: x might be null
 
----
+</section>
+<section class="slide level6" data-transition="none">
 
 ~~~~ {.javascript}
 function length(x) {
@@ -139,8 +189,21 @@ var n = bar(1) * bar(2);  // bar() always returns a number
 
 ---
 
-(venn diagram)
+![string|number](string-union-number.svg)
 
+---
+
+    number                mixed                 MyClass
+
+    string                any                   Array<T>
+
+    boolean               ?T                    [T, U, V]
+
+    void                  T | U                 { x: T; y: U; z: Z }
+
+    "foo"                 T & U                 { [key:string]: T }
+
+										        (x: T) => U
 ---
 
 ~~~~ {.javascript}
@@ -187,6 +250,22 @@ T | null | undefined
 ---
 
 ~~~~ {.javascript}
+type Foo = { x: number; y: string; [key:string]: any }
+type Bar = { z: boolean }
+
+type FooBar = Foo & Bar
+
+var a: FooBar = { x: 1, y: 'two', z: true, zz: false }
+
+var b = a.x  // number
+var c = a.z  // boolean
+var d = a.zz // boolean
+var e = a.w  // (unknown)
+~~~~~~~~~~~~~~~~~~~~~~
+
+---
+
+~~~~ {.javascript}
 type Tree<T> = Node<T> | EmptyTree
 
 class Node<T> {
@@ -220,6 +299,16 @@ function find<T>(pred: (v: T) => boolean, tree: Tree<T>): T | void {
     return undefined;
   }
 }
+~~~~~~~~~~~~~~~~~~~~~~
+
+---
+
+~~~~ {.javascript}
+declare class UnderscoreStatic {
+  findWhere<T>(list: Array<T>, properties: {}): T;
+}
+
+declare var _: UnderscoreStatic;
 ~~~~~~~~~~~~~~~~~~~~~~
 
 ---
