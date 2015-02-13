@@ -1,6 +1,6 @@
 % Flow: <br> type-checked JavaScript
 % Jesse Hallett
-% February 12, 2015
+% February 13, 2015
 
 
 ~~~~ {.javascript}
@@ -174,6 +174,39 @@ var n = bar(1) * bar(2);  // bar() always returns a number
 
 ---
 
+    x                     x.prop
+
+    x == null             typeof x === 'type'
+
+    x && y                x instanceof Constructor
+
+    x || y                Array.isArray(x)
+
+    !x
+
+
+    (* predicate_of_condition, type_inference_js.ml *)
+
+---
+
+~~~~ {.javascript}
+typeof true         === 'boolean'
+
+typeof 3            === 'number'
+
+typeof 'foo'        === 'string'
+
+typeof undefined    === 'undefined'
+
+typeof (x => x + 1) === 'function'
+
+typeof { foo: 1 }   === 'object'
+
+typeof null         === 'object'
+~~~~~~~~~~~~~~~~~~~~~~
+
+---
+
     (* This module is the entry point of the typechecker. It sets up subtyping
        constraints for every expression, statement, and declaration form in a
        JavaScript AST; the subtyping constraints are themselves solved in module
@@ -181,6 +214,8 @@ var n = bar(1) * bar(2);  // bar() always returns a number
        scope information for every function (pushing/popping scopes, looking up
        variables) but also flow-sensitive information about local variables at every
        point inside a function (and when to narrow or widen their types). *)
+
+    (* type_inference_js.ml *)
 
 ---
 
@@ -196,6 +231,37 @@ var n = bar(1) * bar(2);  // bar() always returns a number
        together further concrete types and type variables to participate in
        subtyping. This process continues till a fixpoint is reached---which itself
        is guaranteed to exist, and is usually reached in very few steps. *)
+
+    (* flow_js.ml *)
+
+---
+
+~~~~ {.ocaml}
+  (* expr op null *)
+  | _, Binary { Binary.operator;
+      left;
+      right = _, Literal { Literal.value = Literal.Null; _ }
+    } ->
+      null_test operator left
+~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~ {.ocaml}
+  (* inspect a null equality test *)
+  let null_test op e =
+    let refinement = match refinable_lvalue e with
+    | None, t -> None
+    | Some name, t ->
+        match op with
+        | Binary.Equal | Binary.NotEqual ->
+            Some (name, t, IsP "maybe", op = Binary.Equal)
+        | Binary.StrictEqual | Binary.StrictNotEqual ->
+            Some (name, t, IsP "null", op = Binary.StrictEqual)
+        | _ -> None
+    in
+    match refinement with
+    | Some (name, t, p, sense) -> result BoolT.t name t p sense
+    | None -> empty_result BoolT.t
+~~~~~~~~~~~~~~~~~~~~~~
 
 ---
 
@@ -215,35 +281,6 @@ q.z = 4
 
 var r: Point = { x: 5 }
 // Type error: property y not found in object literal
-~~~~~~~~~~~~~~~~~~~~~~
-
----
-
-~~~~ {.javascript}
-var n: Object = null;
-// Type error: null is incompatible with object type
-
-var m: ?Object = null;
-// this is ok
-
-var o = null;
-// this is ok too
-~~~~~~~~~~~~~~~~~~~~~~
-
----
-
-~~~~ {.javascript}
-type Foo = { x: number; y: string; [key:string]: any }
-type Bar = { z: boolean }
-
-type FooBar = Foo & Bar
-
-var a: FooBar = { x: 1, y: 'two', z: true, zz: false }
-
-var b = a.x  // number
-var c = a.z  // boolean
-var d = a.zz // boolean
-var e = a.w  // (unknown)
 ~~~~~~~~~~~~~~~~~~~~~~
 
 ---
@@ -302,6 +339,63 @@ $ npm install -g react-tools
 
 ~~~~~~~~~~~~~~~~~~~~~~
 $ jsx --strip-types --harmony --watch src/ build/
+~~~~~~~~~~~~~~~~~~~~~~
+
+---
+
+~~~~ {.javascript}
+type Point = { x: number; y: number; [key:string]: any }
+type HasSize = { size: number; [key:string]: any }
+
+function translate_x(d: number, p: Point): Point {
+  return _.assign({ x: p.x + d }, p)
+}
+
+function scale(x: number, s: HasSize): HasSize {
+  return _.assign({ size: s.size * x }, s)
+}
+
+type Circle = Point & HasSize
+
+function zoom(d: number, x: number, obj: Circle): Circle {
+  return translate_x(d, scale(x, obj))
+}
+~~~~~~~~~~~~~~~~~~~~~~
+
+---
+
+~~~~ {.javascript}
+type Tree<T> = Node<T> | EmptyTree
+
+type Node<T> = { tag: 'Node'; value: T; left: Tree<T>; right: Tree<T> }
+
+type EmptyTree = { tag: 'EmptyTree' }
+
+function find<T>(pred: (v: T) => boolean, tree: Tree<T>): T | void {
+  if (tree.tag === 'Node') {
+    // ...
+  }
+  else if (tree.tag === 'EmptyTree') {
+    // ...
+  }
+}
+~~~~~~~~~~~~~~~~~~~~~~
+
+---
+
+~~~~ {.javascript}
+type Functor<F<_>> = {
+  map<A,B>: (f: (x: A) => U, F<A>) => F<B>
+}
+
+var PromiseFunctor: Functor<Promise<_>> = {
+  map = (f, promise) => promise.then(f)
+}
+
+function myFunc<T,A,B>(F: Functor<T<_>>, f: (x: A) => B): T<B> {
+  var xs: T<A> = getSomething()
+  return F.map(f, xs)
+}
 ~~~~~~~~~~~~~~~~~~~~~~
 
 ---

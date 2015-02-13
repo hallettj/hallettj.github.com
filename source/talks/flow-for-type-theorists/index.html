@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="generator" content="pandoc">
   <meta name="author" content="Jesse Hallett" />
-  <meta name="dcterms.date" content="2015-02-12" />
+  <meta name="dcterms.date" content="2015-02-13" />
   <title>Flow:  type-checked JavaScript</title>
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -53,7 +53,7 @@ code > span.er { color: #c3bf9f; }
 <section>
     <h1 class="title">Flow: <br> type-checked JavaScript</h1>
     <h2 class="author">Jesse Hallett</h2>
-    <h3 class="date">February 12, 2015</h3>
+    <h3 class="date">February 13, 2015</h3>
 </section>
 
 <section class="slide level6">
@@ -196,13 +196,46 @@ void                  T | U                 { x: T; y: U; z: Z }
 </section>
 <section class="slide level6">
 
+<pre><code>x                     x.prop
+
+x == null             typeof x === &#39;type&#39;
+
+x &amp;&amp; y                x instanceof Constructor
+
+x || y                Array.isArray(x)
+
+!x
+
+
+(* predicate_of_condition, type_inference_js.ml *)</code></pre>
+</section>
+<section class="slide level6">
+
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">typeof</span> <span class="kw">true</span>         === <span class="st">&#39;boolean&#39;</span>
+
+<span class="kw">typeof</span> <span class="dv">3</span>            === <span class="st">&#39;number&#39;</span>
+
+<span class="kw">typeof</span> <span class="st">&#39;foo&#39;</span>        === <span class="st">&#39;string&#39;</span>
+
+<span class="kw">typeof</span> <span class="kw">undefined</span>    === <span class="st">&#39;undefined&#39;</span>
+
+<span class="kw">typeof</span> (x =&gt; x + <span class="dv">1</span>) === <span class="st">&#39;function&#39;</span>
+
+<span class="kw">typeof</span> { <span class="dt">foo</span>: <span class="dv">1</span> }   === <span class="st">&#39;object&#39;</span>
+
+<span class="kw">typeof</span> <span class="kw">null</span>         === <span class="st">&#39;object&#39;</span></code></pre>
+</section>
+<section class="slide level6">
+
 <pre><code>(* This module is the entry point of the typechecker. It sets up subtyping
    constraints for every expression, statement, and declaration form in a
    JavaScript AST; the subtyping constraints are themselves solved in module
    Flow_js. It also manages environments, including not only the maintenance of
    scope information for every function (pushing/popping scopes, looking up
    variables) but also flow-sensitive information about local variables at every
-   point inside a function (and when to narrow or widen their types). *)</code></pre>
+   point inside a function (and when to narrow or widen their types). *)
+
+(* type_inference_js.ml *)</code></pre>
 </section>
 <section class="slide level6">
 
@@ -217,7 +250,33 @@ void                  T | U                 { x: T; y: U; z: Z }
    types remain; these flows are then viewed as links in a chain, bringing
    together further concrete types and type variables to participate in
    subtyping. This process continues till a fixpoint is reached---which itself
-   is guaranteed to exist, and is usually reached in very few steps. *)</code></pre>
+   is guaranteed to exist, and is usually reached in very few steps. *)
+
+(* flow_js.ml *)</code></pre>
+</section>
+<section class="slide level6">
+
+<pre class="sourceCode ocaml"><code class="sourceCode ocaml">  <span class="co">(* expr op null *)</span>
+  | _, <span class="dt">Binary</span> { Binary<span class="kw">.</span>operator;
+      left;
+      right = _, <span class="dt">Literal</span> { Literal<span class="kw">.</span>value = Literal<span class="kw">.</span><span class="dt">Null</span>; _ }
+    } -&gt;
+      null_test operator left</code></pre>
+<pre class="sourceCode ocaml"><code class="sourceCode ocaml">  <span class="co">(* inspect a null equality test *)</span>
+  <span class="kw">let</span> null_test op e =
+    <span class="kw">let</span> refinement = <span class="kw">match</span> refinable_lvalue e <span class="kw">with</span>
+    | <span class="dt">None</span>, t -&gt; <span class="dt">None</span>
+    | <span class="dt">Some</span> name, t -&gt;
+        <span class="kw">match</span> op <span class="kw">with</span>
+        | Binary<span class="kw">.</span><span class="dt">Equal</span> | Binary<span class="kw">.</span><span class="dt">NotEqual</span> -&gt;
+            <span class="dt">Some</span> (name, t, <span class="dt">IsP</span> <span class="st">&quot;maybe&quot;</span>, op = Binary<span class="kw">.</span><span class="dt">Equal</span>)
+        | Binary<span class="kw">.</span><span class="dt">StrictEqual</span> | Binary<span class="kw">.</span><span class="dt">StrictNotEqual</span> -&gt;
+            <span class="dt">Some</span> (name, t, <span class="dt">IsP</span> <span class="st">&quot;null&quot;</span>, op = Binary<span class="kw">.</span><span class="dt">StrictEqual</span>)
+        | _ -&gt; <span class="dt">None</span>
+    <span class="kw">in</span>
+    <span class="kw">match</span> refinement <span class="kw">with</span>
+    | <span class="dt">Some</span> (name, t, p, sense) -&gt; result BoolT<span class="kw">.</span>t name t p sense
+    | <span class="dt">None</span> -&gt; empty_result BoolT<span class="kw">.</span>t</code></pre>
 </section>
 <section class="slide level6">
 
@@ -236,31 +295,6 @@ void                  T | U                 { x: T; y: U; z: Z }
 
 <span class="kw">var</span> r: Point = { <span class="dt">x</span>: <span class="dv">5</span> }
 <span class="co">// Type error: property y not found in object literal</span></code></pre>
-</section>
-<section class="slide level6">
-
-<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> n: Object = <span class="kw">null</span>;
-<span class="co">// Type error: null is incompatible with object type</span>
-
-<span class="kw">var</span> m: ?Object = <span class="kw">null</span>;
-<span class="co">// this is ok</span>
-
-<span class="kw">var</span> o = <span class="kw">null</span>;
-<span class="co">// this is ok too</span></code></pre>
-</section>
-<section class="slide level6">
-
-<pre class="sourceCode javascript"><code class="sourceCode javascript">type Foo = { <span class="dt">x</span>: number; <span class="dt">y</span>: string; [<span class="dt">key</span>:string]: any }
-type Bar = { <span class="dt">z</span>: boolean }
-
-type FooBar = Foo &amp; Bar
-
-<span class="kw">var</span> a: FooBar = { <span class="dt">x</span>: <span class="dv">1</span>, <span class="dt">y</span>: <span class="st">&#39;two&#39;</span>, <span class="dt">z</span>: <span class="kw">true</span>, <span class="dt">zz</span>: <span class="kw">false</span> }
-
-<span class="kw">var</span> b = <span class="ot">a</span>.<span class="fu">x</span>  <span class="co">// number</span>
-<span class="kw">var</span> c = <span class="ot">a</span>.<span class="fu">z</span>  <span class="co">// boolean</span>
-<span class="kw">var</span> d = <span class="ot">a</span>.<span class="fu">zz</span> <span class="co">// boolean</span>
-<span class="kw">var</span> e = <span class="ot">a</span>.<span class="fu">w</span>  <span class="co">// (unknown)</span></code></pre>
 </section>
 <section class="slide level6">
 
@@ -308,6 +342,57 @@ declare <span class="kw">var</span> _: UnderscoreStatic;</code></pre>
 
 <pre><code>$ npm install -g react-tools</code></pre>
 <pre><code>$ jsx --strip-types --harmony --watch src/ build/</code></pre>
+</section>
+<section class="slide level6">
+
+<pre class="sourceCode javascript"><code class="sourceCode javascript">type Point = { <span class="dt">x</span>: number; <span class="dt">y</span>: number; [<span class="dt">key</span>:string]: any }
+type HasSize = { <span class="dt">size</span>: number; [<span class="dt">key</span>:string]: any }
+
+<span class="kw">function</span> <span class="fu">translate_x</span>(d: number, p: Point): Point {
+  <span class="kw">return</span> <span class="ot">_</span>.<span class="fu">assign</span>({ <span class="dt">x</span>: <span class="ot">p</span>.<span class="fu">x</span> + d }, p)
+}
+
+<span class="kw">function</span> <span class="fu">scale</span>(x: number, s: HasSize): HasSize {
+  <span class="kw">return</span> <span class="ot">_</span>.<span class="fu">assign</span>({ <span class="dt">size</span>: <span class="ot">s</span>.<span class="fu">size</span> * x }, s)
+}
+
+type Circle = Point &amp; HasSize
+
+<span class="kw">function</span> <span class="fu">zoom</span>(d: number, x: number, obj: Circle): Circle {
+  <span class="kw">return</span> <span class="fu">translate_x</span>(d, <span class="fu">scale</span>(x, obj))
+}</code></pre>
+</section>
+<section class="slide level6">
+
+<pre class="sourceCode javascript"><code class="sourceCode javascript">type Tree&lt;T&gt; = Node&lt;T&gt; | EmptyTree
+
+type Node&lt;T&gt; = { <span class="dt">tag</span>: <span class="st">&#39;Node&#39;</span>; <span class="dt">value</span>: T; <span class="dt">left</span>: Tree&lt;T&gt;; <span class="dt">right</span>: Tree&lt;T&gt; }
+
+type EmptyTree = { <span class="dt">tag</span>: <span class="st">&#39;EmptyTree&#39;</span> }
+
+<span class="kw">function</span> find&lt;T&gt;(pred: (v: T) =&gt; boolean, tree: Tree&lt;T&gt;): T | <span class="kw">void</span> {
+  <span class="kw">if</span> (<span class="ot">tree</span>.<span class="fu">tag</span> === <span class="st">&#39;Node&#39;</span>) {
+    <span class="co">// ...</span>
+  }
+  <span class="kw">else</span> <span class="kw">if</span> (<span class="ot">tree</span>.<span class="fu">tag</span> === <span class="st">&#39;EmptyTree&#39;</span>) {
+    <span class="co">// ...</span>
+  }
+}</code></pre>
+</section>
+<section class="slide level6">
+
+<pre class="sourceCode javascript"><code class="sourceCode javascript">type Functor&lt;F&lt;_&gt;&gt; = {
+  map&lt;A,B&gt;: (<span class="dt">f</span>: (<span class="dt">x</span>: A) =&gt; U, F&lt;A&gt;) =&gt; F&lt;B&gt;
+}
+
+<span class="kw">var</span> PromiseFunctor: Functor&lt;Promise&lt;_&gt;&gt; = {
+  map = (f, promise) =&gt; <span class="ot">promise</span>.<span class="fu">then</span>(f)
+}
+
+<span class="kw">function</span> myFunc&lt;T,A,B&gt;(F: Functor&lt;T&lt;_&gt;&gt;, f: (x: A) =&gt; B): T&lt;B&gt; {
+  <span class="kw">var</span> <span class="dt">xs</span>: T&lt;A&gt; = <span class="fu">getSomething</span>()
+  <span class="kw">return</span> <span class="ot">F</span>.<span class="fu">map</span>(f, xs)
+}</code></pre>
 </section>
 <section class="slide level6">
 
