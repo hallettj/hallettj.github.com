@@ -385,6 +385,10 @@ type EmptyTree = { <span class="dt">tag</span>: <span class="st">&#39;EmptyTree&
   map&lt;A,B&gt;: (<span class="dt">f</span>: (<span class="dt">x</span>: A) =&gt; U, F&lt;A&gt;) =&gt; F&lt;B&gt;
 }
 
+<span class="kw">var</span> ArrayFunctor: Functor&lt;Array&lt;_&gt;&gt; = {
+  map = (f, xs) =&gt; <span class="ot">xs</span>.<span class="fu">map</span>(f)
+}
+
 <span class="kw">var</span> PromiseFunctor: Functor&lt;Promise&lt;_&gt;&gt; = {
   map = (f, promise) =&gt; <span class="ot">promise</span>.<span class="fu">then</span>(f)
 }

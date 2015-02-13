@@ -388,6 +388,10 @@ type Functor<F<_>> = {
   map<A,B>: (f: (x: A) => U, F<A>) => F<B>
 }
 
+var ArrayFunctor: Functor<Array<_>> = {
+  map = (f, xs) => xs.map(f)
+}
+
 var PromiseFunctor: Functor<Promise<_>> = {
   map = (f, promise) => promise.then(f)
 }
