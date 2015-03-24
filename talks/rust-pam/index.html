@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="Jesse Hallett" />
+  <meta name="dcterms.date" content="2015-03-24" />
+  <title>Rust, its FFI, and PAM</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.0.0/css/reveal.min.css"/>
+    <style type="text/css">code{white-space: pre;}</style>
+    <style type="text/css">
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; background-color: #303030; color: #cccccc; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; }
+td.sourceCode { padding-left: 5px; }
+pre, code { color: #cccccc; background-color: #303030; }
+code > span.kw { color: #f0dfaf; }
+code > span.dt { color: #dfdfbf; }
+code > span.dv { color: #dcdccc; }
+code > span.bn { color: #dca3a3; }
+code > span.fl { color: #c0bed1; }
+code > span.ch { color: #dca3a3; }
+code > span.st { color: #cc9393; }
+code > span.co { color: #7f9f7f; }
+code > span.ot { color: #efef8f; }
+code > span.al { color: #ffcfaf; }
+code > span.fu { color: #efef8f; }
+code > span.er { color: #c3bf9f; }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.0.0/css/theme/black.css" id="theme">
+    <!-- If the query includes 'print-pdf', include the PDF print sheet -->
+    <script>
+      if( window.location.search.match( /print-pdf/gi ) ) {
+        var link = document.createElement( 'link' );
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = 'https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.0.0/css/print/pdf.css';
+        document.getElementsByTagName( 'head' )[0].appendChild( link );
+      }
+    </script>
+    <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.0.0/lib/js/html5shiv.js"></script>
+    <![endif]-->
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+<section>
+    <h1 class="title">Rust, its FFI, and PAM</h1>
+    <h2 class="author">Jesse Hallett</h2>
+    <h3 class="date">March 24, 2015</h3>
+</section>
+
+<section class="slide level2">
+
+<pre class="sourceCode rust"><code class="sourceCode rust"><span class="kw">fn</span> double(x: isize) -&gt; isize {
+    x * <span class="dv">2</span>
+}</code></pre>
+</section>
+<section class="slide level2">
+
+<pre class="sourceCode rust"><code class="sourceCode rust"><span class="kw">pub</span> <span class="kw">struct</span> Student {
+    name:    String,
+    age:     usize,
+    courses: Vec&lt;Course&gt;,
+}</code></pre>
+<div class="fragment">
+<pre class="sourceCode rust"><code class="sourceCode rust"><span class="kw">pub</span> <span class="kw">enum</span> <span class="kw">Option</span>&lt;T&gt; {
+    <span class="kw">Some</span>(T),
+    <span class="kw">None</span>,
+}</code></pre>
+</div>
+</section>
+<section class="slide level2">
+
+<pre class="sourceCode rust"><code class="sourceCode rust"><span class="kw">pub</span> <span class="kw">enum</span> <span class="kw">Option</span>&lt;T&gt; {
+    <span class="kw">Some</span>(T),
+    <span class="kw">None</span>,
+}</code></pre>
+<pre class="sourceCode rust"><code class="sourceCode rust"><span class="kw">fn</span> double(x: <span class="kw">Option</span>&lt;isize&gt;) -&gt; <span class="kw">Option</span>&lt;isize&gt; {
+    <span class="kw">match</span> x {
+        <span class="kw">Some</span>(n) =&gt; <span class="kw">Some</span>(n * <span class="dv">2</span>),
+        <span class="kw">None</span>    =&gt; <span class="kw">None</span>,
+    }
+}</code></pre>
+</section>
+<section class="slide level2">
+
+<pre class="sourceCode rust"><code class="sourceCode rust"><span class="kw">impl</span> &lt;T&gt; <span class="kw">Option</span>&lt;T&gt; {
+    <span class="kw">pub</span> <span class="kw">fn</span> map&lt;U, F&gt;(<span class="kw">self</span>, f: F) -&gt; <span class="kw">Option</span>&lt;U&gt;
+        where F: FnOnce(T) -&gt; U
+    {
+        <span class="kw">match</span> <span class="kw">self</span> {
+            <span class="kw">Some</span>(n) =&gt; <span class="kw">Some</span>(f(n)),
+            <span class="kw">None</span>    =&gt; <span class="kw">None</span>,
+        }
+    }
+}</code></pre>
+<div class="fragment">
+<pre class="sourceCode rust"><code class="sourceCode rust"><span class="kw">fn</span> double(x: <span class="kw">Option</span>&lt;isize&gt;) -&gt; <span class="kw">Option</span>&lt;isize&gt; {
+    x.map(|n| n * <span class="dv">2</span>)
+}</code></pre>
+</div>
+<div class="fragment">
+<pre class="sourceCode rust"><code class="sourceCode rust"><span class="kw">fn</span> double(x: <span class="kw">Option</span>&lt;isize&gt;) -&gt; <span class="kw">Option</span>&lt;isize&gt; {
+    <span class="kw">Option</span>::map(x, |n| n * <span class="dv">2</span>)
+}</code></pre>
+</div>
+</section>
+<section class="slide level2">
+
+<pre class="sourceCode rust"><code class="sourceCode rust"><span class="kw">pub</span> <span class="kw">enum</span> <span class="kw">Result</span>&lt;T,E&gt; {
+    <span class="kw">Ok</span>(T),
+    <span class="kw">Err</span>(E),
+}</code></pre>
+</section>
+<section class="slide level2">
+
+<pre class="sourceCode rust"><code class="sourceCode rust"><span class="kw">pub</span> <span class="kw">trait</span> Wrapper&lt;T&gt; {
+    <span class="kw">pub</span> <span class="kw">fn</span> unwrap(<span class="kw">self</span>) -&gt; T;
+}</code></pre>
+<div class="fragment">
+<pre class="sourceCode rust"><code class="sourceCode rust"><span class="kw">impl</span> &lt;T&gt; Wrapper&lt;T&gt; <span class="kw">for</span> <span class="kw">Option</span>&lt;T&gt; {
+    <span class="kw">fn</span> unwrap(<span class="kw">self</span>) -&gt; T {
+        <span class="kw">match</span> <span class="kw">self</span> {
+            <span class="kw">Some</span>(x) =&gt; x,
+            <span class="kw">None</span> =&gt; <span class="ot">panic!</span>(<span class="st">&quot;called `Option::unwrap()` on a `None` value&quot;</span>),
+        }
+    }
+}</code></pre>
+</div>
+<div class="fragment">
+<pre class="sourceCode rust"><code class="sourceCode rust"><span class="kw">impl</span> &lt;T,E&gt; Wrapper&lt;T&gt; <span class="kw">for</span> <span class="kw">Result</span>&lt;T,E&gt; {
+    <span class="kw">fn</span> unwrap(<span class="kw">self</span>) -&gt; T {
+        <span class="kw">match</span> <span class="kw">self</span> {
+            <span class="kw">Ok</span>(x) =&gt; x,
+            <span class="kw">Err</span>(_) =&gt; <span class="ot">panic!</span>(<span class="st">&quot;called `Result::unwrap()` on an `Err` value&quot;</span>),
+        }
+    }
+}</code></pre>
+</div>
+</section>
+<section class="slide level2">
+
+<pre class="sourceCode rust"><code class="sourceCode rust"><span class="kw">let</span> opt = <span class="kw">Some</span>(<span class="dv">3</span>);
+<span class="kw">let</span> res: <span class="kw">Result</span>&lt;<span class="kw">u8</span>,String&gt; = <span class="kw">Ok</span>(<span class="dv">4</span>);
+
+<span class="ot">println!</span>(<span class="st">&quot;{}&quot;</span>, opt.unwrap());
+<span class="ot">println!</span>(<span class="st">&quot;{}&quot;</span>, res.unwrap());</code></pre>
+<div class="fragment">
+<pre class="sourceCode rust"><code class="sourceCode rust"><span class="ot">println!</span>(<span class="st">&quot;{}&quot;</span>, Wrapper::unwrap(opt));
+<span class="ot">println!</span>(<span class="st">&quot;{}&quot;</span>, Wrapper::unwrap(res));</code></pre>
+</div>
+</section>
+<section class="slide level2">
+
+<pre class="sourceCode rust"><code class="sourceCode rust"><span class="kw">use</span> std::num::Int;
+
+<span class="kw">fn</span> square&lt;T: Int&gt;(x: <span class="kw">Option</span>&lt;T&gt;) -&gt; <span class="kw">Option</span>&lt;T&gt; {
+    x.map(|n| n * n)
+}</code></pre>
+</section>
+<section class="slide level2">
+
+<pre class="sourceCode rust"><code class="sourceCode rust"><span class="kw">use</span> std::io;
+
+<span class="kw">fn</span> main() {
+    <span class="kw">let</span> <span class="kw">mut</span> buf = String::new();
+    <span class="kw">match</span> io::stdin().read_line(&amp;<span class="kw">mut</span> buf) {
+        <span class="kw">Ok</span>(bytes_read) =&gt; <span class="ot">print!</span>(<span class="st">&quot;{}: {}&quot;</span>, bytes_read, buf),
+        <span class="kw">Err</span>(msg)       =&gt; <span class="ot">print!</span>(<span class="st">&quot;{}&quot;</span>, msg),
+    }
+}</code></pre>
+<div class="fragment">
+<pre><code>$ rustc echo.rs &amp;&amp; ./echo
+hello
+6: hello</code></pre>
+</div>
+</section>
+<section class="slide level2">
+
+<pre class="sourceCode c"><code class="sourceCode c"><span class="ot">#include &lt;stdio.h&gt;</span>
+<span class="ot">#include &lt;stdlib.h&gt;</span>
+
+<span class="dt">int</span> main()
+{
+    <span class="dt">char</span> *buf;
+    size_t n = <span class="dv">1024</span>;
+    buf = malloc(n);
+    <span class="kw">if</span> (getline(&amp;buf, &amp;n, stdin) == -<span class="dv">1</span>) {
+        printf(<span class="st">&quot;No line</span><span class="ch">\n</span><span class="st">&quot;</span>);
+    } <span class="kw">else</span> {
+        printf(<span class="st">&quot;%i: %s&quot;</span>, n, buf);
+    }
+    free(buf);
+    <span class="kw">return</span> <span class="dv">0</span>;
+}</code></pre>
+</section>
+<section class="slide level2">
+
+<pre class="sourceCode rust"><code class="sourceCode rust"><span class="kw">use</span> std::io::stdin;
+
+<span class="kw">fn</span> main() {
+    <span class="kw">let</span> <span class="kw">mut</span> s: &amp;<span class="kw">str</span>;
+
+    {
+        <span class="kw">let</span> <span class="kw">mut</span> buf = String::new();
+        <span class="kw">let</span> _ = stdin().read_line(&amp;<span class="kw">mut</span> buf);
+        s = &amp;buf;
+    }
+
+    <span class="ot">print!</span>(<span class="st">&quot;{}&quot;</span>, s);
+}</code></pre>
+<div class="fragment">
+<pre><code>$ rustc echo.rs
+echo.rs:9:14: 9:17 error: `buf` does not live long enough
+echo.rs:9         s = &amp;buf;
+                       ^~~</code></pre>
+</div>
+</section>
+<section class="slide level2">
+
+<pre class="sourceCode rust"><code class="sourceCode rust"><span class="kw">use</span> std::io::stdin;
+<span class="kw">use</span> std::mem::<span class="kw">drop</span>;
+
+<span class="kw">fn</span> main() {
+    <span class="kw">let</span> <span class="kw">mut</span> s: &amp;<span class="kw">str</span>;
+
+    {
+        <span class="kw">let</span> <span class="kw">mut</span> buf = String::new();
+        <span class="kw">let</span> _ = stdin().read_line(&amp;<span class="kw">mut</span> buf);
+        s = &amp;buf;
+        <span class="kw">drop</span>(buf);  <span class="co">// implicit</span>
+    }
+
+    <span class="ot">print!</span>(<span class="st">&quot;{}&quot;</span>, s);
+}</code></pre>
+</section>
+<section class="slide level2">
+
+<pre class="sourceCode rust"><code class="sourceCode rust"><span class="ot">#[</span>inline<span class="ot">]</span>
+<span class="ot">#[</span>stable<span class="ot">(</span>feature <span class="ot">=</span> <span class="st">&quot;rust1&quot;</span><span class="ot">,</span> since <span class="ot">=</span> <span class="st">&quot;1.0.0&quot;</span><span class="ot">)]</span>
+<span class="kw">pub</span> <span class="kw">fn</span> drop&lt;T&gt;(_x: T) { }</code></pre>
+</section>
+<section class="slide level2">
+
+<pre class="sourceCode rust"><code class="sourceCode rust"><span class="kw">fn</span> exclam(s: &amp;<span class="kw">mut</span> String) {
+    s.push_str(<span class="st">&quot;!!&quot;</span>);
+}
+
+<span class="kw">pub</span> <span class="kw">fn</span> main() {
+    <span class="kw">let</span> <span class="kw">mut</span> s = <span class="st">&quot;foo&quot;</span>.to_string();
+    exclam(&amp;<span class="kw">mut</span> s);
+    <span class="ot">println!</span>(<span class="st">&quot;{}&quot;</span>, s);
+}</code></pre>
+</section>
+<section class="slide level2">
+
+<pre class="sourceCode rust"><code class="sourceCode rust"><span class="kw">fn</span> exclam(<span class="kw">mut</span> s: String) {
+    s.push_str(<span class="st">&quot;!!&quot;</span>);
+}
+
+<span class="kw">pub</span> <span class="kw">fn</span> main() {
+    <span class="kw">let</span> <span class="kw">mut</span> s = <span class="st">&quot;foo&quot;</span>.to_string();
+    exclam(s);
+    <span class="ot">println!</span>(<span class="st">&quot;{}&quot;</span>, s);
+}</code></pre>
+<div class="fragment">
+<pre><code>$ rustc exclam.rs
+exclam.rs:8:20: 8:21 error: use of moved value: `s`
+exclam.rs:8     println!(&quot;{}&quot;, s);</code></pre>
+</div>
+</section>
+<section class="slide level2">
+
+<pre class="sourceCode rust"><code class="sourceCode rust"><span class="kw">fn</span> exclam(<span class="kw">mut</span> s: String) -&gt; String {
+    s.push_str(<span class="st">&quot;!!&quot;</span>);
+    s
+}
+
+<span class="kw">pub</span> <span class="kw">fn</span> main() {
+    <span class="kw">let</span> s = <span class="st">&quot;foo&quot;</span>.to_string();
+    <span class="kw">let</span> s_ = exclam(s);
+    <span class="ot">println!</span>(<span class="st">&quot;{}&quot;</span>, s_);
+}</code></pre>
+</section>
+<section class="slide level2">
+
+<figure>
+<img src="https://cloud.githubusercontent.com/assets/9622/6606788/53a4a684-c7f7-11e4-9164-9a90bb93d343.png" alt="QR code login challenge" /><figcaption>QR code login challenge</figcaption>
+</figure>
+</section>
+<section class="slide level2">
+
+<pre class="sourceCode c"><code class="sourceCode c"><span class="ot">#define PAM_SM_AUTH</span>
+<span class="ot">#include &lt;security/pam_modules.h&gt;</span>
+
+PAM_EXTERN <span class="dt">int</span> pam_sm_authenticate(pam_handle_t *pamh,
+                                   <span class="dt">int</span> flags,
+                                   <span class="dt">int</span> argc,
+                                   <span class="dt">const</span> <span class="dt">char</span> **argv);</code></pre>
+<div class="fragment">
+<pre class="sourceCode rust"><code class="sourceCode rust"><span class="ot">#[</span>no_mangle<span class="ot">]</span>
+<span class="kw">pub</span> <span class="kw">extern</span> <span class="kw">fn</span> pam_sm_authenticate(pamh: &amp;module::PamHandleT,
+                                  flags: PamFlag,
+                                  argc: c_int,
+                                  argv: *const *const c_char
+                                  ) -&gt; PamResultCode;</code></pre>
+</div>
+</section>
+<section class="slide level2">
+
+<pre class="sourceCode rust"><code class="sourceCode rust"><span class="kw">use</span> libc::{c_char};
+
+<span class="kw">pub</span> <span class="kw">enum</span> PamHandleT {}
+<span class="kw">pub</span> <span class="kw">enum</span> PamDataT {}
+
+<span class="ot">#[</span>link<span class="ot">(</span>name <span class="ot">=</span> <span class="st">&quot;pam&quot;</span><span class="ot">)]</span>
+<span class="kw">extern</span> {
+    <span class="kw">fn</span> pam_get_data(pamh: *const PamHandleT,
+                    module_data_name: *const c_char,
+                    data: &amp; *<span class="kw">mut</span> PamDataT,
+                    ) -&gt; PamResultCode;
+    <span class="kw">fn</span> pam_get_user(pamh: *const PamHandleT,
+                    user: &amp; *<span class="kw">mut</span> c_char,
+                    prompt: *const c_char,
+                    ) -&gt; PamResultCode;
+}</code></pre>
+</section>
+<section class="slide level2">
+
+<pre class="sourceCode rust"><code class="sourceCode rust"><span class="kw">use</span> libc::{c_int, c_uint};
+
+<span class="kw">pub</span> <span class="kw">type</span> PamItemType = c_int;
+
+<span class="co">// see /usr/include/security/_pam_types.h</span>
+<span class="kw">pub</span> const PAM_SERVICE:      PamItemType =  <span class="dv">1</span>;   <span class="co">/* The service name */</span>
+<span class="kw">pub</span> const PAM_USER:         PamItemType =  <span class="dv">2</span>;   <span class="co">/* The user name */</span>
+<span class="kw">pub</span> const PAM_TTY:          PamItemType =  <span class="dv">3</span>;   <span class="co">/* The tty name */</span>
+<span class="kw">pub</span> const PAM_RHOST:        PamItemType =  <span class="dv">4</span>;   <span class="co">/* The remote host name */</span>
+<span class="kw">pub</span> const PAM_CONV:         PamItemType =  <span class="dv">5</span>;   <span class="co">/* The pam_conv structure */</span>
+<span class="kw">pub</span> const PAM_AUTHTOK:      PamItemType =  <span class="dv">6</span>;   <span class="co">/* The authentication token (password) */</span>
+<span class="kw">pub</span> const PAM_OLDAUTHTOK:   PamItemType =  <span class="dv">7</span>;   <span class="co">/* The old authentication token */</span>
+<span class="kw">pub</span> const PAM_RUSER:        PamItemType =  <span class="dv">8</span>;   <span class="co">/* The remote user name */</span>
+<span class="kw">pub</span> const PAM_USER_PROMPT:  PamItemType =  <span class="dv">9</span>;   <span class="co">/* the prompt for getting a username */</span></code></pre>
+</section>
+<section class="slide level2">
+
+<pre class="sourceCode rust"><code class="sourceCode rust"><span class="kw">pub</span> <span class="kw">trait</span> PamItem {
+    <span class="kw">fn</span> item_type(_: <span class="kw">Option</span>&lt;<span class="kw">Self</span>&gt;) -&gt; PamItemType;
+}
+
+<span class="kw">enum</span> PamItemT {}
+
+<span class="kw">pub</span> <span class="kw">fn</span> get_item&lt;<span class="ot">&#39;a</span>, T: PamItem&gt;(pamh: &amp;<span class="ot">&#39;a</span> PamHandleT) -&gt; PamResult&lt;&amp;<span class="ot">&#39;a</span> T&gt; {
+    <span class="kw">let</span> ptr: *<span class="kw">mut</span> PamItemT = ptr::null_mut();
+    <span class="kw">let</span> (res, item) = <span class="kw">unsafe</span> {
+        <span class="kw">let</span> r = pam_get_item(pamh, PamItem::item_type(<span class="kw">None</span>::&lt;T&gt;), &amp;ptr);
+        <span class="kw">let</span> raw_item: &amp;PamItemT = ptr.as_ref().unwrap();
+        <span class="kw">let</span> t: &amp;T = mem::transmute(raw_item);
+        (r, t)
+    };
+    <span class="kw">if</span> constants::PAM_SUCCESS == res { <span class="kw">Ok</span>(item) } <span class="kw">else</span> { <span class="kw">Err</span>(res) }
+}</code></pre>
+</section>
+<section class="slide level2">
+
+<pre class="sourceCode rust"><code class="sourceCode rust"><span class="kw">fn</span> substr&lt;<span class="ot">&#39;a</span>&gt;(s: &amp;<span class="ot">&#39;a</span> <span class="kw">str</span>, until: <span class="kw">u32</span>) -&gt; &amp;<span class="ot">&#39;a</span> <span class="kw">str</span>;</code></pre>
+</section>
+<section class="slide level2">
+
+<pre class="sourceCode rust"><code class="sourceCode rust"><span class="kw">fn</span> substr(s: &amp;<span class="kw">str</span>, until: <span class="kw">u32</span>) -&gt; &amp;<span class="kw">str</span>;</code></pre>
+</section>
+<section class="slide level2">
+
+<pre class="sourceCode rust"><code class="sourceCode rust"><span class="kw">pub</span> <span class="kw">fn</span> send_request(<span class="co">/* ... */</span>) -&gt; <span class="kw">Result</span>&lt;Json, QErr&gt; {
+    Question::new(key_id, secret, method, params).map_err(QErr::EncoderError)
+    .and_then(|req| {
+        <span class="kw">let</span> <span class="kw">mut</span> client = Client::new();
+        <span class="kw">let</span> js = json::encode(&amp;req).unwrap();
+        client.post(api_url).body(js.as_slice()).send().map_err(QErr::HttpError)
+    })
+    .and_then(|<span class="kw">mut</span> res| {
+        Json::from_reader(&amp;<span class="kw">mut</span> res).map_err(QErr::ParserError)
+    })
+    .and_then(|json| {
+        <span class="kw">match</span> protocol::error_response(&amp;json.clone()) {
+            <span class="kw">Some</span>(errs) =&gt; <span class="kw">Err</span>(QErr::ErrorResponse(errs.clone())),
+            <span class="kw">None</span>       =&gt; <span class="kw">Ok</span>(json),
+        }
+    })}</code></pre>
+</section>
+<section class="slide level2">
+
+<pre class="sourceCode rust"><code class="sourceCode rust"><span class="ot">#[</span>no_mangle<span class="ot">]</span>
+<span class="kw">pub</span> <span class="kw">extern</span> <span class="kw">fn</span> pam_sm_authenticate(pamh: &amp;module::PamHandleT, flags: PamFlag,
+                                  argc: c_int, argv: *const *const c_char
+                                  ) -&gt; PamResultCode {
+    <span class="kw">let</span> args = <span class="kw">unsafe</span> { translate_args(argc, argv) };
+    <span class="kw">let</span> decision = <span class="ot">mdo!</span> {
+        user   =&lt;&lt; module::get_user(pamh, <span class="kw">None</span>).map_err(AErr::PamResult);
+        config =&lt;&lt; Config::build(&amp;user, &amp;args).map_err(AErr::ConfigError);
+        conv   =&lt;&lt; module::get_item::&lt;PamConv&gt;(pamh).map_err(AErr::PamResult);
+        login  =&lt;&lt; authenticate(&amp;config, &amp;user, &amp;conv);
+        ign show_info(conv, flags, &amp;<span class="ot">format!</span>(<span class="st">&quot;Hello, {}&quot;</span>, login.user_display));
+        ret <span class="kw">Ok</span>(constants::PAM_SUCCESS)
+    };
+    decision.unwrap_or_else(|e| { show_err(pamh, &amp;e); error_code(&amp;e) })
+}</code></pre>
+</section>
+<section class="slide level2">
+
+<pre class="sourceCode rust"><code class="sourceCode rust"><span class="ot">mdo!</span> {
+    x =&lt;&lt; exp1;
+    y =&lt;&lt; exp2;
+    z =&lt;&lt; exp3;
+    ret <span class="kw">Ok</span>(x, y, z)
+}</code></pre>
+<pre class="sourceCode rust"><code class="sourceCode rust">exp1.and_then(|x| {
+    exp2.and_then(|y| {
+        exp3.and_then(|z| {
+            <span class="kw">Ok</span>(x, y, z)
+        })
+    })
+})</code></pre>
+</section>
+<section id="code" class="slide level2">
+<h1>Code</h1>
+<dl>
+    <dt>
+toznyauth_pam
+</dt>
+    <dd>
+https://github.com/tozny/toznyauth-pam
+</dd>
+    <dt>
+sdk-rust
+</dt>
+    <dd>
+https://github.com/tozny/sdk-rust
+</dd>
+    <dd>
+crate: tozny_auth
+</dd>
+    <dt>
+rust-pam
+</dt>
+    <dd>
+https://github.com/tozny/rust-pam
+</dd>
+    <dd>
+crate: pam
+</dd>
+</dl>
+
+</section>
+<section id="references" class="slide level2">
+<h1>References</h1>
+<ul>
+<li><a href="https://doc.rust-lang.org/book/">The Rust Programming Language</a></li>
+<li><a href="http://words.steveklabnik.com/a-new-introduction-to-rust">An alternative introduction to Rust</a></li>
+<li><a href="http://www.linux-pam.org/Linux-PAM-html/Linux-PAM_MWG.html">The Linux-PAM Module Writers' Guide</a></li>
+</ul>
+</section>
+    </div>
+  </div>
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.0.0/lib/js/head.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.0.0/js/reveal.min.js"></script>
+
+  <script>
+
+      // Full list of configuration options available here:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        controls: true,
+        progress: true,
+        history: true,
+        center: true,
+        theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+        transition: 'slide', // default/cube/page/concave/zoom/linear/fade/none
+
+        // Optional libraries used to extend on reveal.js
+        dependencies: [
+          { src: 'https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.0.0/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+          { src: 'https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.0.0/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+          { src: 'https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.0.0/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } },
+//          { src: 'https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.0.0/plugin/search/search.js', async: true, condition: function() { return !!document.body.classList; }, }
+//          { src: 'https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.0.0/plugin/remotes/remotes.js', async: true, condition: function() { return !!document.body.classList; } }
+]});
+    </script>
+    </body>
+</html>
