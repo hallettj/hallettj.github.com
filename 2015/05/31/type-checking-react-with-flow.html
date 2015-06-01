@@ -1,0 +1,356 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Type checking React with Flow v0.11 - sitr.us</title>
+  <meta name="author" content="Jesse Hallett">
+
+  
+  <meta name="description" content="Flow v0.11 was released recently.
+The latest set of changes really improve type checking in React apps.
+But there are some guidelines to follow to &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- OpenID delegation -->
+  <link rel="openid2.provider" href="https://www.google.com/accounts/o8/ud">
+  <link rel="openid2.local_id" href="https://profiles.google.com/103016652009176760588">
+
+  
+  <link rel="canonical" href="http://sitr.us/2015/05/31/type-checking-react-with-flow.html">
+  <link href="/favicon.ico" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="http://feeds.feedburner.com/hallettj" rel="alternate" title="sitr.us" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=Ubuntu+Mono:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-327628-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">sitr.us</a></h1>
+  
+    <h2>posts by Jesse Hallett</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="http://feeds.feedburner.com/hallettj" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:sitr.us" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Type checking React with Flow v0.11</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-05-31T00:00:00-07:00" pubdate data-updated="true">2015-05-31</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Flow v0.11 was <a href="https://github.com/facebook/flow/blob/master/Changelog.md">released</a> recently.
+The latest set of changes really improve type checking in React apps.
+But there are some guidelines to follow to get the full benefits.</p>
+
+<!-- more -->
+
+<h3 id="use-es6-classes">Use ES6 classes</h3>
+
+<p>React added support in version 0.13 for implementing components as native Javascript classes
+(<a href="https://facebook.github.io/react/blog/2015/01/27/react-v0.13.0-beta-1.html">more information on that here</a>).
+The latest version of the React type definitions take full advantage of class-based type checking features.</p>
+
+<h3 id="reactcomponent-takes-type-parameters"><code>React.Component</code> takes type parameters</h3>
+
+<p>When creating a component, be sure to provide type parameters in your class
+declaration to describe the types of your props, default props, and state.
+Here is a modified example from the React blog:</p>
+
+<div class="highlight"><pre><code class="js"><span class="kr">import</span> <span class="nx">React</span> <span class="nx">from</span> <span class="s1">&#39;react&#39;</span>
+
+<span class="nx">type</span> <span class="nx">Props</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">initialCount</span><span class="o">:</span> <span class="nx">number</span> <span class="p">}</span>
+<span class="nx">type</span> <span class="nx">DefaultProps</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">initialCount</span><span class="o">:</span> <span class="nx">number</span> <span class="p">}</span>
+<span class="nx">type</span> <span class="nx">State</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">count</span><span class="o">:</span> <span class="nx">number</span> <span class="p">}</span>
+
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">Counter</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span><span class="o">&lt;</span><span class="nx">DefaultProps</span><span class="p">,</span><span class="nx">Props</span><span class="p">,</span><span class="nx">State</span><span class="o">&gt;</span> <span class="p">{</span>
+  <span class="nx">constructor</span><span class="p">(</span><span class="nx">props</span><span class="o">:</span> <span class="nx">Props</span><span class="p">,</span> <span class="nx">context</span><span class="o">:</span> <span class="nx">any</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kr">super</span><span class="p">(</span><span class="nx">props</span><span class="p">,</span> <span class="nx">context</span><span class="p">)</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="p">{</span><span class="nx">count</span><span class="o">:</span> <span class="nx">props</span><span class="p">.</span><span class="nx">initialCount</span><span class="p">}</span>
+  <span class="p">}</span>
+  <span class="nx">tick</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span><span class="nx">count</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">count</span> <span class="o">+</span> <span class="mi">1</span><span class="p">})</span>
+  <span class="p">}</span>
+  <span class="nx">render</span><span class="p">()</span><span class="o">:</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Element</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">(</span>
+      <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">onClick</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">tick</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">)}</span><span class="o">&gt;</span>
+        <span class="nx">Clicks</span><span class="o">:</span> <span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">count</span><span class="p">}</span>
+      <span class="o">&lt;</span><span class="err">/div&gt;</span>
+    <span class="p">)</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+<span class="nx">Counter</span><span class="p">.</span><span class="nx">propTypes</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">initialCount</span><span class="o">:</span> <span class="nx">React</span><span class="p">.</span><span class="nx">PropTypes</span><span class="p">.</span><span class="nx">number</span> <span class="p">}</span>
+<span class="nx">Counter</span><span class="p">.</span><span class="nx">defaultProps</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">initialCount</span><span class="o">:</span> <span class="mi">0</span> <span class="p">}</span>
+</code></pre></div>
+
+<p>The parameter signature is <code>React.Component&lt;DefaultProps,Props,State&gt;</code>.
+This is not exactly documented;
+but you can see types of React features in
+<a href="https://github.com/facebook/flow/blob/master/lib/react.js">Flow’s type declarations for React</a>.
+All of the type declarations in that folder are automatically loaded whenever Flow runs,
+unless you use the <code>--no-flowlib</code> option.</p>
+
+<p>If you define a constructor for your component,
+it is a good idea to annotate the <code>props</code> argument too.
+Unfortunately Flow does not make the connection that the constructor argument
+has the same type as <code>this.props</code>.</p>
+
+<p>Note that I included type annotations on <code>render()</code> and <code>context</code>.
+This is just because Flow generally requires type annotations for class method
+arguments and return values.</p>
+
+<p>When those type parameters are given,
+here are some of the things that Flow can check:</p>
+
+<ul>
+  <li>when instantiating your component, the required props are given with correctly typed values.</li>
+  <li>props that are not required have default values (checked only if <code>defaultProps</code> is defined)</li>
+  <li>references to <code>this.props</code> or <code>this.state</code> are checked to make sure that the properties accessed exist, and have a compatible type</li>
+  <li>properties set with <code>this.setState()</code> are declared in your state type and have the correct types</li>
+</ul>
+
+<h3 id="use-jsx">Use JSX</h3>
+
+<p>I mentioned above that Flow will check that components are given required props.
+In my testing, there were some cases where this worked when I used JSX syntax,
+but did not work with the plain Javascript <code>React.createElement</code> option.
+(The case I had trouble with was with a conditionally-rendered child in
+a <code>render</code> method -
+my uses of of <code>React.createElement</code> worked fine with both syntaxes.)
+I suspect that engineers at Facebook tend to prefer JSX,
+and, and maybe test code written with JSX syntax more heavily.</p>
+
+<h2 id="general-purpose-features">General-purpose features</h2>
+
+<p>What is nice is that most of the features that Flow uses to support React are general-purpose.
+As far as I can tell, the only feature in Flow that is React-specific is support for JSX syntax.
+But some of the features that make Flow work so well are not yet documented.
+For details,
+see my post on <a href="/2015/05/31/advanced-features-in-flow.html">Advanced features in Flow</a></p>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Jesse Hallett</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-05-31T00:00:00-07:00" pubdate data-updated="true">2015-05-31</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/2015/05/31/advanced-features-in-flow.html" title="Previous Post: Advanced features in Flow">&laquo; Advanced features in Flow</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/2015/05/31/type-checking-react-with-flow.html">Type checking React with Flow v0.11</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/05/31/advanced-features-in-flow.html">Advanced features in Flow</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2014/11/21/flow-is-the-javascript-type-checker-i-have-been-waiting-for.html">Flow is the JavaScript type checker I have been waiting for</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2014/08/02/javascript-generators-and-functional-reactive-programming.html">Javascript generators and functional reactive programming</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2014/05/19/kinesis-advantage-with-dsa-keycaps.html">Kinesis Advantage with DSA keycaps</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Talks</h1>
+  <ul id="talks">
+    <li><a href="http://opensourcebridge.org/sessions/1067">Mod your Android</a></li>
+    <li><a href="talks/intro-to-javascript/">Introduction to JavaScript</a></li>
+    <li><a href="http://lanyrd.com/2012/nodepdx/smyqm/">Object-oriented patterns in JavaScript</a></li>
+    <li><a href="talks/cookies/">Cookies are bad for you</a></li>
+    <li><a href="talks/professional-javascript/">Professional JavaScript</a></li>
+    <li><a href="http://opensourcebridge.org/2009/wiki/Clustering_Data_--_How_to_Have_Fun_in_n-Dimensions">Cluster Analysis: How to Have Fun in n Dimensions</a></li>
+    <li><a href="https://docs.google.com/presentation/d/1hx9Pzo07aAnZ2skMH4JPjH7a6IXx64uC0zRliS3qpkk/edit?usp=sharing">How to build blazing fast web apps with Ruby on Rails</a></li>
+  </ul>
+</section>
+<section>
+  <h1>Open Source Projects</h1>
+  <ul id="projects">
+    <li><a href="http://github.com/jivesoftware/tAMD">tAMD:</a> Tiny, extensible implementation of the Asynchronous Module Definition (AMD) specification from CommonJS</li>
+  </ul>
+</section>
+<section>
+  <div class="contact" style="float:left; margin:0.5em;">
+    <p>
+      Jesse Hallett<br/>
+      <a href="mailto:jesse@sitr.us">jesse@sitr.us</a>
+    </p>
+  </div>
+  <div class="contact" style="float:left; margin:0.5em;">
+    <p>
+      <a rel="me" href="https://github.com/hallettj/">github.com/hallettj</a><br />
+      <a rel="me" href="https://twitter.com/hallettj/">twitter.com/hallettj</a>
+    </p>
+  </div>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - Jesse Hallett -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'hallettj';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://sitr.us/2015/05/31/type-checking-react-with-flow.html';
+        var disqus_url = 'http://sitr.us/2015/05/31/type-checking-react-with-flow.html';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

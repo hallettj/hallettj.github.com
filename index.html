@@ -9,8 +9,9 @@
   <meta name="author" content="Jesse Hallett">
 
   
-  <meta name="description" content="I am very excited about Flow, a new JavaScript type checker from Facebook.
-I have put some thought into what a type checker for JavaScript should do &hellip;">
+  <meta name="description" content="Flow v0.11 was released recently.
+The latest set of changes really improve type checking in React apps.
+But there are some guidelines to follow to &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -83,6 +84,97 @@ I have put some thought into what a type checker for JavaScript should do &helli
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2015/05/31/type-checking-react-with-flow.html">Type checking React with Flow v0.11</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-05-31T00:00:00-07:00" pubdate data-updated="true">2015-05-31</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Flow v0.11 was <a href="https://github.com/facebook/flow/blob/master/Changelog.md">released</a> recently.
+The latest set of changes really improve type checking in React apps.
+But there are some guidelines to follow to get the full benefits.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/2015/05/31/type-checking-react-with-flow.html">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2015/05/31/advanced-features-in-flow.html">Advanced features in Flow</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-05-31T00:00:00-07:00" pubdate data-updated="true">2015-05-31</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Flow has some very interesting features that are currently not documented.
+It is likely that the reason for missing documentation is that these features
+are still experimental.
+<em>Caveat emptor</em>.</p>
+
+<p>I took a stroll through the source code for Flow v0.11.
+Here is what I found while reading <a href="https://github.com/facebook/flow/blob/master/src/typing/type_inference_js.ml#L612">type_inference_js.ml</a>
+and <a href="https://github.com/facebook/flow/blob/master/lib/react.js">react.js</a>.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/2015/05/31/advanced-features-in-flow.html">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -664,130 +756,6 @@ method.  The first callback is called on success, the second on failure:</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/2012/05/12/installing-a-custom-rom-on-the-transformer-prime.html">Installing a custom ROM on the Transformer Prime: A start-to-finish guide</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-05-12T00:00:00-07:00" pubdate data-updated="true"></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>This guide provides step-by-step instructions for installing the <a href="http://www.virtuousrom.com/p/prime.html">Virtuous Prime</a>
-community ROM on your Asus Transformer Prime TF201 tablet.  This guide will
-be useful to you if you do not have root access to your tablet.</p>
-
-<p>Be aware that following the instructions here will void your warranty and
-will wipe all of the data on your tablet.  There is also a danger that you
-might brick your tablet.  Proceed at your own risk.</p>
-
-<p>So, why would you want to install a custom ROM on your tablet?  In my case
-I wanted to gain root access, which allows one to do all sorts of nifty
-things.  Community-made ROMS are also often customized to make the Android
-experience more pleasant for power users.  And choosing your own ROM means
-that you are no longer dependent on the company that sold you your device
-to distribute firmware updates in a timely fashion.  But if you are reading
-this then you probably already know why you want to install a custom ROM
-- so let’s get on to the next step.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/2012/05/12/installing-a-custom-rom-on-the-transformer-prime.html">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/2011/08/26/cookies-are-bad-for-you.html">Cookies are bad for you: Improving web application security</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-08-26T00:00:00-07:00" pubdate data-updated="true"></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Most web applications today use browser cookies to keep a user logged in
-while she is using the application.  Cookies are a decades-old device
-and they do not stand up well to security threats that have emerged on
-the modern web.  In particular, cookies are vulnerable to <a href="http://en.wikipedia.org/wiki/Cross-site_request_forgery">cross-site
-request forgery</a>.  Web applications can by made more secure by
-using <a href="http://oauth.net/">OAuth</a> for session authentication.</p>
-
-<p>This post is based on <a href="http://opensourcebridge.org/sessions/663">a talk that I gave</a> at <a href="http://opensourcebridge.org/">Open Source
-Bridge</a> this year.  The slides for that talk are available
-<a href="/talks/cookies/">here</a>.</p>
-
-<p><img alt="cookie authentication" src="/talks/cookies/svg/cookies.svg" style="width: 100%" /></p>
-
-<p>When a user logs into a web application the application server sets
-a cookie value that is picked up by the user’s browser.  The browser
-includes the same cookie value in every request sent to the same host
-until the cookie expires.  When the application server receives
-a request it can check whether the cookies attached to it contain
-a value that identifies a specific user.  If such a cookie value exists
-then the server can consider the request to be authenticated.</p>
-
-<p><img alt="attacks that target browser authentication" src="/talks/cookies/svg/cookie-strengths.svg" style="width: 100%" /></p>
-
-<p>There are many types of attacks that can be performed against a web
-application.  Three that specifically target authentication between the
-browser and the server are <a href="http://en.wikipedia.org/wiki/Man-in-the-middle_attack">man-in-the-middle (<abbr title="man-in-the-middle">MITM</abbr>)</a>, <a href="http://en.wikipedia.org/wiki/Cross-site_request_forgery">cross-site
-request forgery (<abbr title="cross-site request forgery">CSRF</abbr>)</a>, and <a href="http://en.wikipedia.org/wiki/Cross-site_scripting">cross-site scripting (<abbr title="cross-site scripting">XSS</abbr>)</a>.
-Plain cookie authentication is vulnerable to all three.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/2011/08/26/cookies-are-bad-for-you.html">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -803,6 +771,14 @@ Plain cookie authentication is vulnerable to all three.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/2015/05/31/type-checking-react-with-flow.html">Type checking React with Flow v0.11</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/05/31/advanced-features-in-flow.html">Advanced features in Flow</a>
+      </li>
+    
+      <li class="post">
         <a href="/2014/11/21/flow-is-the-javascript-type-checker-i-have-been-waiting-for.html">Flow is the JavaScript type checker I have been waiting for</a>
       </li>
     
@@ -812,14 +788,6 @@ Plain cookie authentication is vulnerable to all three.</p>
     
       <li class="post">
         <a href="/2014/05/19/kinesis-advantage-with-dsa-keycaps.html">Kinesis Advantage with DSA keycaps</a>
-      </li>
-    
-      <li class="post">
-        <a href="/2014/05/05/category-theory-proofs-in-idris.html">Category Theory proofs in Idris</a>
-      </li>
-    
-      <li class="post">
-        <a href="/2013/11/04/functional-data-structures.html">Functional data structures in JavaScript with Mori</a>
       </li>
     
   </ul>

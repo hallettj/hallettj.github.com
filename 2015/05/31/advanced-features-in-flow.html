@@ -1,0 +1,826 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Advanced features in Flow - sitr.us</title>
+  <meta name="author" content="Jesse Hallett">
+
+  
+  <meta name="description" content="Flow has some very interesting features that are currently not documented.
+It is likely that the reason for missing documentation is that these &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- OpenID delegation -->
+  <link rel="openid2.provider" href="https://www.google.com/accounts/o8/ud">
+  <link rel="openid2.local_id" href="https://profiles.google.com/103016652009176760588">
+
+  
+  <link rel="canonical" href="http://sitr.us/2015/05/31/advanced-features-in-flow.html">
+  <link href="/favicon.ico" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="http://feeds.feedburner.com/hallettj" rel="alternate" title="sitr.us" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=Ubuntu+Mono:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-327628-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">sitr.us</a></h1>
+  
+    <h2>posts by Jesse Hallett</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="http://feeds.feedburner.com/hallettj" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:sitr.us" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Advanced features in Flow</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-05-31T00:00:00-07:00" pubdate data-updated="true">2015-05-31</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Flow has some very interesting features that are currently not documented.
+It is likely that the reason for missing documentation is that these features
+are still experimental.
+<em>Caveat emptor</em>.</p>
+
+<p>I took a stroll through the source code for Flow v0.11.
+Here is what I found while reading <a href="https://github.com/facebook/flow/blob/master/src/typing/type_inference_js.ml#L612">type_inference_js.ml</a>
+and <a href="https://github.com/facebook/flow/blob/master/lib/react.js">react.js</a>.</p>
+
+<!-- more -->
+
+<ul id="markdown-toc">
+  <li><a href="#classt"><code>Class&lt;T&gt;</code></a></li>
+  <li><a href="#diffab"><code>$Diff&lt;A,B&gt;</code></a></li>
+  <li><a href="#shapet"><code>$Shape&lt;T&gt;</code></a></li>
+  <li><a href="#recordt"><code>$Record&lt;T&gt;</code></a></li>
+  <li><a href="#supertypet"><code>$Supertype&lt;T&gt;</code></a></li>
+  <li><a href="#subtypet"><code>$Subtype&lt;T&gt;</code></a></li>
+  <li><a href="#enumt"><code>$Enum&lt;T&gt;</code></a></li>
+  <li><a href="#existential-types">Existential types</a></li>
+  <li><a href="#scoped-type-variables-in-classes">Scoped type variables in classes</a></li>
+</ul>
+
+<h2 id="classt"><code>Class&lt;T&gt;</code></h2>
+
+<p>Type of the class whose instances are of type <code>T</code>.
+This lets you pass around classes as first-class values -
+with proper type checking.</p>
+
+<p>I use this in an event dispatch system where events are class instances,
+and event handlers are invoked based on whether they accept a given event type:</p>
+
+<div class="highlight"><pre><code class="js"><span class="kd">var</span> <span class="nx">handlers</span><span class="o">:</span> <span class="nb">Array</span><span class="o">&lt;</span><span class="p">[</span><span class="nx">Class</span><span class="o">&lt;</span><span class="nx">any</span><span class="o">&gt;</span><span class="p">,</span> <span class="nb">Function</span><span class="p">]</span><span class="o">&gt;</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="kd">function</span> <span class="nx">register</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">:</span><span class="nb">Object</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">klass</span><span class="o">:</span> <span class="nx">Class</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">,</span> <span class="nx">handler</span><span class="o">:</span> <span class="p">(</span><span class="nx">event</span><span class="o">:</span> <span class="nx">T</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="k">void</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">handlers</span><span class="p">.</span><span class="nx">push</span><span class="p">([</span><span class="nx">klass</span><span class="p">,</span> <span class="nx">handler</span><span class="p">])</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">emit</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">:</span><span class="nb">Object</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">event</span><span class="o">:</span> <span class="nx">T</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">handlers</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(([</span><span class="nx">klass</span><span class="p">,</span> <span class="nx">handler</span><span class="p">])</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">event</span> <span class="k">instanceof</span> <span class="nx">klass</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">handler</span><span class="p">(</span><span class="nx">event</span><span class="p">)</span>
+    <span class="p">}</span>
+  <span class="p">})</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>This gives me a compile-time guarantee that event handlers can handle events of
+the type they are invoked with.</p>
+
+<div class="highlight"><pre><code class="js"><span class="kr">class</span> <span class="nx">ViewPost</span> <span class="p">{</span>
+  <span class="nx">id</span><span class="o">:</span> <span class="nx">number</span><span class="p">;</span>
+  <span class="nx">author</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
+  <span class="nx">constructor</span><span class="p">(</span><span class="nx">id</span><span class="o">:</span> <span class="nx">number</span><span class="p">,</span> <span class="nx">author</span><span class="o">:</span> <span class="nx">string</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">id</span> <span class="o">=</span> <span class="nx">id</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">author</span> <span class="o">=</span> <span class="nx">author</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kr">class</span> <span class="nx">ViewComment</span> <span class="p">{</span>
+  <span class="nx">id</span><span class="o">:</span> <span class="nx">number</span><span class="p">;</span>
+  <span class="nx">postId</span><span class="o">:</span> <span class="nx">number</span><span class="p">;</span>
+  <span class="nx">constructor</span><span class="p">(</span><span class="nx">id</span><span class="o">:</span> <span class="nx">number</span><span class="p">,</span> <span class="nx">postId</span><span class="o">:</span> <span class="nx">number</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">id</span> <span class="o">=</span> <span class="nx">id</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">postId</span> <span class="o">=</span> <span class="nx">postId</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// No errors!</span>
+<span class="nx">register</span><span class="p">(</span><span class="nx">ViewPost</span><span class="p">,</span> <span class="p">({</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">author</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span> <span class="cm">/* whatever */</span> <span class="p">})</span>
+
+<span class="c1">// Error: object pattern property not found in ViewComment</span>
+<span class="nx">register</span><span class="p">(</span><span class="nx">ViewComment</span><span class="p">,</span> <span class="p">({</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">author</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span> <span class="cm">/* whatever */</span> <span class="p">})</span>
+</code></pre></div>
+
+<h2 id="diffab"><code>$Diff&lt;A,B&gt;</code></h2>
+
+<p>If <code>A</code> and <code>B</code> are object types,
+<code>$Diff&lt;A,B&gt;</code> is the type of objects that have properties defined in <code>A</code>, but not in <code>B</code>.
+Properties that are defined in both <code>A</code> and <code>B</code> are allowed too.</p>
+
+<p>React uses this to throw type errors if components are not given required props,
+but to leave props with default values as optional.</p>
+
+<div class="highlight"><pre><code class="js"><span class="nx">declare</span> <span class="kd">function</span> <span class="nx">createElement</span><span class="o">&lt;</span><span class="nx">D</span><span class="p">,</span> <span class="nx">P</span><span class="p">,</span> <span class="nx">S</span><span class="p">,</span> <span class="nx">A</span><span class="o">:</span> <span class="nx">$Diff</span><span class="o">&lt;</span><span class="nx">P</span><span class="p">,</span> <span class="nx">D</span><span class="o">&gt;&gt;</span><span class="p">(</span>
+  <span class="nx">name</span><span class="o">:</span> <span class="nx">ReactClass</span><span class="o">&lt;</span><span class="nx">D</span><span class="p">,</span> <span class="nx">P</span><span class="p">,</span> <span class="nx">S</span><span class="o">&gt;</span><span class="p">,</span>
+  <span class="nx">attributes</span><span class="o">:</span> <span class="nx">A</span><span class="p">,</span>
+  <span class="nx">children</span><span class="o">?:</span> <span class="nx">any</span>
+<span class="p">)</span><span class="o">:</span> <span class="nx">ReactElement</span><span class="o">&lt;</span><span class="nx">D</span><span class="p">,</span> <span class="nx">P</span><span class="p">,</span> <span class="nx">S</span><span class="o">&gt;</span><span class="p">;</span>
+</code></pre></div>
+
+<p>Where <code>P</code> is the type for component props,
+and <code>D</code> is the type for default props.</p>
+
+<p>Here is a simplified example:</p>
+
+<div class="highlight"><pre><code class="js"><span class="nx">type</span> <span class="nx">Props</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="nx">foo</span><span class="o">:</span> <span class="nx">number</span><span class="p">,</span>
+  <span class="nx">bar</span><span class="o">:</span> <span class="nx">string</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="nx">type</span> <span class="nx">DefaultProps</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="nx">foo</span><span class="o">:</span> <span class="nx">number</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">setProps</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">:</span> <span class="nx">$Diff</span><span class="o">&lt;</span><span class="nx">Props</span><span class="p">,</span> <span class="nx">DefaultProps</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="nx">props</span><span class="o">:</span> <span class="nx">T</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// whatever</span>
+<span class="p">}</span>
+
+<span class="c1">// No errors!</span>
+<span class="nx">setProps</span><span class="p">({</span>
+  <span class="nx">bar</span><span class="o">:</span> <span class="s1">&#39;two&#39;</span><span class="p">,</span>
+<span class="p">})</span>
+
+<span class="c1">// No errors!</span>
+<span class="nx">setProps</span><span class="p">({</span>
+  <span class="nx">foo</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+  <span class="nx">bar</span><span class="o">:</span> <span class="s1">&#39;two&#39;</span><span class="p">,</span>
+<span class="p">})</span>
+
+<span class="c1">// Error, because `bar` is required</span>
+<span class="nx">setProps</span><span class="p">({</span>
+    <span class="nx">foo</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+<span class="p">})</span>
+</code></pre></div>
+
+<p>In my testing,
+this worked equally well if <code>$Diff</code> was used directly in the type of <code>P</code>
+instead of as a type bound.
+But in the React type declarations,
+it is used in a type bound.</p>
+
+<h2 id="shapet"><code>$Shape&lt;T&gt;</code></h2>
+
+<p>Matches the shape of <code>T</code>.
+React uses <code>$Shape</code> in the signatures for <code>setProps</code> and <code>setState</code>.</p>
+
+<div class="highlight"><pre><code class="js"><span class="nx">declare</span> <span class="kr">class</span> <span class="nx">ReactComponent</span><span class="o">&lt;</span><span class="nx">D</span><span class="p">,</span> <span class="nx">P</span><span class="p">,</span> <span class="nx">S</span><span class="o">&gt;</span> <span class="p">{</span>
+  <span class="c1">// ...</span>
+
+  <span class="nx">setProps</span><span class="p">(</span><span class="nx">props</span><span class="o">:</span> <span class="nx">$Shape</span><span class="o">&lt;</span><span class="nx">P</span><span class="o">&gt;</span><span class="p">,</span> <span class="nx">callback</span><span class="o">?:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="k">void</span><span class="p">)</span><span class="o">:</span> <span class="k">void</span><span class="p">;</span>
+  <span class="nx">setState</span><span class="p">(</span><span class="nx">state</span><span class="o">:</span> <span class="nx">$Shape</span><span class="o">&lt;</span><span class="nx">S</span><span class="o">&gt;</span><span class="p">,</span> <span class="nx">callback</span><span class="o">?:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="k">void</span><span class="p">)</span><span class="o">:</span> <span class="k">void</span><span class="p">;</span>
+
+  <span class="nx">replaceProps</span><span class="p">(</span><span class="nx">props</span><span class="o">:</span> <span class="nx">P</span><span class="p">,</span> <span class="nx">callback</span><span class="o">?:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="k">void</span><span class="p">)</span><span class="o">:</span> <span class="k">void</span><span class="p">;</span>
+  <span class="nx">replaceState</span><span class="p">(</span><span class="nx">state</span><span class="o">:</span> <span class="nx">S</span><span class="p">,</span> <span class="nx">callback</span><span class="o">?:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="k">void</span><span class="p">)</span><span class="o">:</span> <span class="k">void</span><span class="p">;</span>
+
+  <span class="c1">// ...</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Where <code>P</code> is the type of a component’s props,
+and <code>S</code> is the type of a component’s state.</p>
+
+<p>An object of type <code>$Shape&lt;T&gt;</code> does not have to have all of the properties that
+type <code>T</code> defines.
+But the types of the properties that it does have must match the types of the
+same properties in <code>T</code>.</p>
+
+<p>In React this means that you can use, e.g., <code>setState</code> to set some state
+properties, while leaving others unspecified.
+Note how the type of <code>state</code> in <code>replaceState</code> differs:
+when calling <code>replaceState</code> you must include a value for every property in <code>S</code>.</p>
+
+<p>Some examples:</p>
+
+<div class="highlight"><pre><code class="js"><span class="nx">type</span> <span class="nx">Props</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="nx">foo</span><span class="o">:</span> <span class="nx">number</span><span class="p">,</span>
+  <span class="nx">bar</span><span class="o">:</span> <span class="nx">string</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="c1">// No errors!</span>
+<span class="kd">var</span> <span class="nx">a</span><span class="o">:</span> <span class="nx">$Shape</span><span class="o">&lt;</span><span class="nx">Props</span><span class="o">&gt;</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="nx">foo</span><span class="o">:</span> <span class="mi">1</span>
+<span class="p">}</span>
+
+<span class="c1">// Error: string is incompatible with type number</span>
+<span class="kd">var</span> <span class="nx">b</span><span class="o">:</span> <span class="nx">$Shape</span><span class="o">&lt;</span><span class="nx">Props</span><span class="o">&gt;</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="nx">foo</span><span class="o">:</span> <span class="s1">&#39;one&#39;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>An object of type <code>$Shape&lt;T&gt;</code> is not allowed to have properties that are not
+part of <code>T</code>.</p>
+
+<div class="highlight"><pre><code class="js"><span class="c1">// Error: prop baz of Props not found in object type</span>
+<span class="kd">var</span> <span class="nx">c</span><span class="o">:</span> <span class="nx">$Shape</span><span class="o">&lt;</span><span class="nx">Props</span><span class="o">&gt;</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="nx">foo</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+  <span class="nx">baz</span><span class="o">:</span> <span class="mi">2</span><span class="p">,</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p><code>$Shape</code> is like a supertype for objects.
+Consider that a type <code>{ foo: number }</code> (when used as a type bound) represents
+all objects that have a <code>foo</code> property of type <code>number</code>.
+That includes objects that have additional properties, such as
+<code>{ foo: 1, bar: 'string' }</code>.
+So <code>{ foo: number }</code> is a supertype of, e.g., <code>{ foo: number, bar: string }</code>.
+The type <code>$Shape&lt;{ foo: number, bar: string }&gt;</code> allows values of type
+<code>{ foo: number }</code>.
+That is to say, <code>$Shape&lt;T&gt;</code> refers to types that are more general than <code>T</code> -
+i.e., supertypes.</p>
+
+<h2 id="recordt"><code>$Record&lt;T&gt;</code></h2>
+
+<p>The type of objects whose keys are those of <code>T</code>.
+This means that an object of type <code>$Record&lt;T&gt;</code> must have properties with all of
+the same names as the properties in <code>T</code> -
+but the types assigned to those properties may be different.</p>
+
+<p>React uses <code>$Record</code> to check the type of <code>propTypes</code>.
+Here is a simplified example:</p>
+
+<div class="highlight"><pre><code class="js"><span class="nx">type</span> <span class="nx">Props</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="nx">foo</span><span class="o">:</span> <span class="nx">number</span><span class="p">,</span>
+  <span class="nx">bar</span><span class="o">:</span> <span class="nx">string</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="kd">var</span> <span class="nx">propTypes1</span><span class="o">:</span> <span class="nx">$Record</span><span class="o">&lt;</span><span class="nx">Props</span><span class="o">&gt;</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="nx">foo</span><span class="o">:</span> <span class="nx">React</span><span class="p">.</span><span class="nx">PropTypes</span><span class="p">.</span><span class="nx">number</span><span class="p">,</span>
+  <span class="nx">bar</span><span class="o">:</span> <span class="nx">React</span><span class="p">.</span><span class="nx">PropTypes</span><span class="p">.</span><span class="nx">string</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="c1">// Error: string literal bar property not found in object literal</span>
+<span class="kd">var</span> <span class="nx">propTypes2</span><span class="o">:</span> <span class="nx">$Record</span><span class="o">&lt;</span><span class="nx">Props</span><span class="o">&gt;</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="nx">foo</span><span class="o">:</span> <span class="nx">React</span><span class="p">.</span><span class="nx">PropTypes</span><span class="p">.</span><span class="nx">number</span><span class="p">,</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Note that Flow does <em>not</em> verify that <code>React.PropTypes.number</code> matches the type
+<code>number</code>.
+It just checks that <code>propTypes1</code> has all of the same keys.</p>
+
+<div class="highlight"><pre><code class="js"><span class="c1">// No errors!</span>
+<span class="kd">var</span> <span class="nx">propTypes3</span><span class="o">:</span> <span class="nx">$Record</span><span class="o">&lt;</span><span class="nx">Props</span><span class="o">&gt;</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="nx">foo</span><span class="o">:</span> <span class="s1">&#39;bleah&#39;</span><span class="p">,</span>
+  <span class="nx">bar</span><span class="o">:</span> <span class="s1">&#39;blerg&#39;</span><span class="p">,</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>A <code>$Record</code> type might have additional keys that are not included in the
+original object type.</p>
+
+<div class="highlight"><pre><code class="js"><span class="c1">// No errors!</span>
+<span class="kd">var</span> <span class="nx">propTypes4</span><span class="o">:</span> <span class="nx">$Record</span><span class="o">&lt;</span><span class="nx">Props</span><span class="o">&gt;</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="nx">foo</span><span class="o">:</span> <span class="nx">React</span><span class="p">.</span><span class="nx">PropTypes</span><span class="p">.</span><span class="nx">number</span><span class="p">,</span>
+  <span class="nx">bar</span><span class="o">:</span> <span class="nx">React</span><span class="p">.</span><span class="nx">PropTypes</span><span class="p">.</span><span class="nx">string</span><span class="p">,</span>
+  <span class="nx">baz</span><span class="o">:</span> <span class="nx">React</span><span class="p">.</span><span class="nx">PropTypes</span><span class="p">.</span><span class="nx">string</span><span class="p">,</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>An important detail to note is that a <code>$Record</code> type can only use property
+names that are known statically.
+Dynamic lookups are not allowed.</p>
+
+<div class="highlight"><pre><code class="js"><span class="nx">propTypes4</span><span class="p">.</span><span class="nx">foo</span>  <span class="c1">// No errors!</span>
+
+<span class="c1">// Error: computed property/element cannot be accessed on record type</span>
+<span class="nx">propTypes4</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">]</span>
+</code></pre></div>
+
+<p>In its real definition,
+React actually uses <code>$Record</code> in combination with <code>$Supertype</code> so that you do
+not get an error if you omit some properties from <code>propTypes</code>.</p>
+
+<h2 id="supertypet"><code>$Supertype&lt;T&gt;</code></h2>
+
+<p>A type that is a supertype of <code>T</code>.
+React uses <code>$Supertype</code> in the type of <code>propTypes</code>:</p>
+
+<div class="highlight"><pre><code class="js"><span class="nx">declare</span> <span class="kr">class</span> <span class="nx">ReactComponent</span><span class="o">&lt;</span><span class="nx">D</span><span class="p">,</span> <span class="nx">P</span><span class="p">,</span> <span class="nx">S</span><span class="o">&gt;</span> <span class="p">{</span>
+  <span class="c1">// ...</span>
+
+  <span class="kr">static</span> <span class="nx">propTypes</span><span class="o">:</span> <span class="nx">$Supertype</span><span class="o">&lt;</span><span class="nx">$Record</span><span class="o">&lt;</span><span class="nx">P</span><span class="o">&gt;&gt;</span><span class="p">;</span>
+
+  <span class="c1">// ...</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Where the type variable <code>P</code> is the type of the props for a component.</p>
+
+<p>It looks like the intent is to check that if a component defines <code>propTypes</code>,
+all of the properties listed are also in the type of <code>props</code>.
+But it should not report an error if <code>propTypes</code> excludes some props.
+I could not get a type error when testing this.
+It could  be that interaction between <code>$Supertype</code> and object types is still
+a work in progress.</p>
+
+<p>If you are thinking of using <code>$Supertype</code> with an object type,
+consider <code>$Shape</code> -
+it might be a better choice.</p>
+
+<h2 id="subtypet"><code>$Subtype&lt;T&gt;</code></h2>
+
+<p>A type that is a subtype of <code>T</code>.
+This is what you get when you use a type bound.
+For example,
+these signatures are equivalent:</p>
+
+<div class="highlight"><pre><code class="js"><span class="kd">function</span> <span class="nx">doSomething1</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">:</span> <span class="nb">Object</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">obj</span><span class="o">:</span> <span class="nx">T</span><span class="p">)</span> <span class="p">{</span> <span class="cm">/* whatever */</span> <span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">doSomething2</span><span class="p">(</span><span class="nx">obj</span><span class="o">:</span> <span class="nx">$Subtype</span><span class="o">&lt;</span><span class="nb">Object</span><span class="o">&gt;</span><span class="p">)</span> <span class="p">{</span> <span class="cm">/* whatever */</span> <span class="p">}</span>
+</code></pre></div>
+
+<p>But the second version has the disadvantage that you cannot refer to the type
+that <code>obj</code> gets in the return type of the function, or in the types of other
+arguments.</p>
+
+<p>While trying to come up with example cases for <code>$Subtype</code>,
+I came across other nice improvements to Flow that render <code>$Subtype</code>
+unnecessary in a lot of cases.
+In a previous version of Flow,
+I recall (possibly incorrectly) having to use a type bound in a function that
+takes on object with
+certain required properties,
+where you don’t want to prevent the caller from including additional properties.
+But now this works without a type bound:</p>
+
+<div class="highlight"><pre><code class="js"><span class="kd">function</span> <span class="nx">getId</span><span class="p">(</span><span class="nx">obj</span><span class="o">:</span> <span class="p">{</span> <span class="nx">id</span><span class="o">:</span> <span class="nx">number</span> <span class="p">})</span><span class="o">:</span> <span class="nx">number</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">id</span>
+<span class="p">}</span>
+
+<span class="nx">getId</span><span class="p">({</span> <span class="nx">id</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;foo&#39;</span> <span class="p">})</span>  <span class="c1">// No errors!</span>
+</code></pre></div>
+
+<p>I also had a thought that <code>$Subtype</code> could be used to implement a composition
+pattern that previously did not work.</p>
+
+<div class="highlight"><pre><code class="js"><span class="nx">type</span> <span class="nx">HasId</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">id</span><span class="o">:</span> <span class="nx">number</span> <span class="p">}</span>
+<span class="nx">type</span> <span class="nx">HasName</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="nx">string</span> <span class="p">}</span>
+
+<span class="nx">type</span> <span class="nx">Widget</span> <span class="o">=</span> <span class="nx">HasId</span> <span class="o">&amp;</span> <span class="nx">HasName</span>
+
+<span class="kd">function</span> <span class="nx">makeWidget</span><span class="p">(</span><span class="nx">id</span><span class="o">:</span> <span class="nx">number</span><span class="p">,</span> <span class="nx">name</span><span class="o">:</span> <span class="nx">string</span><span class="p">)</span><span class="o">:</span> <span class="nx">Widget</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="p">{</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">name</span> <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">var</span> <span class="nx">w</span> <span class="o">=</span> <span class="nx">makeWidget</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;foo&#39;</span><span class="p">)</span>
+</code></pre></div>
+
+<p>But in Flow v0.11 this does work.
+Hooray!</p>
+
+<p><code>$Subtype</code> could be useful if you want to define an object type that can be
+assigned properties that are not declared in the type:</p>
+
+<div class="highlight"><pre><code class="js"><span class="nx">type</span> <span class="nx">Extensible</span> <span class="o">=</span> <span class="nx">$Subtype</span><span class="o">&lt;</span><span class="p">{</span><span class="nx">foo</span><span class="o">:</span> <span class="nx">number</span><span class="p">}</span><span class="o">&gt;</span>
+
+<span class="kd">var</span> <span class="nx">a</span><span class="o">:</span> <span class="nx">Extensible</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">foo</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">bar</span><span class="o">:</span> <span class="mi">2</span> <span class="p">}</span>
+
+<span class="nx">a</span><span class="p">.</span><span class="nx">baz</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c1">// No errors!</span>
+
+<span class="c1">// Error: property foo not found in object literal</span>
+<span class="kd">var</span> <span class="nx">b</span><span class="o">:</span> <span class="nx">Extensible</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">bar</span><span class="o">:</span> <span class="mi">2</span> <span class="p">}</span>
+</code></pre></div>
+
+<p>However this weakens property checking on the extensible type.
+For example,
+Flow does not infer that the type of <code>a.foo</code> must be <code>number</code>.
+(It checks the type of <code>foo</code> correctly when the object is first created,
+but not on reads or reassignment).</p>
+
+<h2 id="enumt"><code>$Enum&lt;T&gt;</code></h2>
+
+<p>The set of keys of <code>T</code>.
+One use for this is to write a lookup function,
+and have Flow check that the lookup key is valid.</p>
+
+<div class="highlight"><pre><code class="js"><span class="kd">var</span> <span class="nx">props</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="nx">foo</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+  <span class="nx">bar</span><span class="o">:</span> <span class="s1">&#39;two&#39;</span><span class="p">,</span>
+  <span class="nx">baz</span><span class="o">:</span> <span class="s1">&#39;three&#39;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">getProp</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">key</span><span class="o">:</span> <span class="nx">$Enum</span><span class="o">&lt;</span><span class="k">typeof</span> <span class="nx">props</span><span class="o">&gt;</span><span class="p">)</span><span class="o">:</span> <span class="nx">T</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">props</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span>
+<span class="p">}</span>
+
+<span class="nx">getProp</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">)</span>  <span class="c1">// No errors!</span>
+
+<span class="c1">// Error: string literal nao property not found in object literal</span>
+<span class="nx">getProp</span><span class="p">(</span><span class="s1">&#39;nao&#39;</span><span class="p">)</span>
+</code></pre></div>
+
+<p>The type <code>$Enum&lt;typeof props&gt;</code> is a lot like this type:</p>
+
+<div class="highlight"><pre><code class="js"><span class="nx">type</span> <span class="nx">EnumProps</span> <span class="o">=</span> <span class="s1">&#39;foo&#39;</span> <span class="o">|</span> <span class="s1">&#39;bar&#39;</span> <span class="o">|</span> <span class="s1">&#39;baz&#39;</span>
+</code></pre></div>
+
+<p>But with <code>$Enum</code>,
+Flow computes the type union for you.</p>
+
+<p>Flow’s tests include <a href="https://github.com/facebook/flow/blob/master/tests/enumerror/enumerror.js">more</a> <a href="https://github.com/facebook/flow/blob/master/tests/literal/enum_client.js">examples</a>.</p>
+
+<h2 id="existential-types">Existential types</h2>
+
+<p>Flow supports an “existential type”: <code>*</code>.
+When <code>*</code> is given as a type,
+it acts as a placeholder,
+leaving it to the type checker to infer the type for that position.</p>
+
+<p>Let’s generalize the <code>getProp</code> function from the section above.
+Let’s write a function that takes any object and returns a getter.
+The getter can be used to get arbitrary properties out of the object,
+without having to refer to the object itself after creating the getter.
+We would like to write this:</p>
+
+<div class="highlight"><pre><code class="js"><span class="c1">// Does not work!</span>
+<span class="kd">function</span> <span class="nx">makeGetter</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">:</span><span class="nb">Object</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">obj</span><span class="o">:</span> <span class="nx">T</span><span class="p">)</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">U</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">key</span><span class="o">:</span> <span class="nx">$Enum</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">U</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="kd">function</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">obj</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>The use of <code>$Enum&lt;T&gt;</code> ensures that a getter can only be called to get
+properties that actually exist on the given object.</p>
+
+<p>But Flow objects to the lack of type declarations in the inner function.
+It reports an error:</p>
+
+<pre><code>function type is incompatible with polymorphic type: function type
+</code></pre>
+
+<p>An obvious idea is to copy types from the return type of <code>makeGetter</code> into the
+signature of the inner function.
+But that leads to another problem.</p>
+
+<div class="highlight"><pre><code class="js"><span class="c1">// Still does not work!</span>
+<span class="kd">function</span> <span class="nx">makeGetter</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">:</span><span class="nb">Object</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">obj</span><span class="o">:</span> <span class="nx">T</span><span class="p">)</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">U</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">key</span><span class="o">:</span> <span class="nx">$Enum</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">U</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="kd">function</span><span class="o">&lt;</span><span class="nx">U</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">key</span><span class="o">:</span> <span class="nx">$Enum</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">)</span><span class="o">:</span> <span class="nx">U</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">obj</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>This time the error is:</p>
+
+<pre><code>identifier T, Could not resolve name
+</code></pre>
+
+<p>The problem is that type variables in a function signature
+(in this case, in the signature of <code>makeGetter</code>)
+are not in scope in the function body.
+So we cannot refer to the type <code>T</code> in inner function types,
+or in variable types in the body of <code>makeGetter</code>.</p>
+
+<p>On the other hand, Flow might be smart enough to figure out what the argument
+type in the inner function should be.
+So we can use <code>*</code> to kick the problem over to Flow.</p>
+
+<div class="highlight"><pre><code class="js"><span class="c1">// Finally, an version that does work.</span>
+<span class="kd">function</span> <span class="nx">makeGetter</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">:</span><span class="nb">Object</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">obj</span><span class="o">:</span> <span class="nx">T</span><span class="p">)</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">U</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">key</span><span class="o">:</span> <span class="nx">$Enum</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">U</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="kd">function</span> <span class="o">&lt;</span><span class="nx">U</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">key</span><span class="o">:</span> <span class="o">*</span><span class="p">)</span><span class="o">:</span> <span class="nx">U</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">obj</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Now we can see <code>makeGetter</code> in action.</p>
+
+<div class="highlight"><pre><code class="js"><span class="kd">var</span> <span class="nx">someObj</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">foo</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">bar</span><span class="o">:</span> <span class="mi">2</span> <span class="p">}</span>
+<span class="kd">var</span> <span class="nx">get</span> <span class="o">=</span> <span class="nx">makeGetter</span><span class="p">(</span><span class="nx">someObj</span><span class="p">)</span>
+
+<span class="nx">get</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">)</span>  <span class="c1">// No errors!</span>
+
+<span class="nx">get</span><span class="p">(</span><span class="s1">&#39;baz&#39;</span><span class="p">)</span>  <span class="c1">// string literal &#39;baz&#39; not found in object literal</span>
+</code></pre></div>
+
+<p>Another option would have been to use <code>any</code> instead of <code>*</code>.
+But that is so much less elegant!
+The important difference is that where <code>*</code> appears,
+Flow will fill in a specific type,
+which could lead to accurate type checking in other areas of the code where the
+value of type <code>*</code> appears.
+If you annotate a value with <code>any</code>,
+Flow will not attempt to type-check expressions where that value appears -
+which could lead to type errors being missed.</p>
+
+<p>In this case the choice of <code>*</code> versus <code>any</code> does not matter,
+since the outer function has the type signature that we want.</p>
+
+<p>React uses an existential type to define the <code>ReactClass</code> type:</p>
+
+<div class="highlight"><pre><code class="js"><span class="cm">/**</span>
+<span class="cm"> * Type of a React class (not to be confused with the type of instances of a</span>
+<span class="cm"> * React class, which is the React class itself). A React class is any subclass</span>
+<span class="cm"> * of ReactComponent. We make the type of a React class polymorphic over the</span>
+<span class="cm"> * same type parameters (D, P, S) as ReactComponent. The required constraints</span>
+<span class="cm"> * are set up using a &quot;helper&quot; type alias, that takes an additional type</span>
+<span class="cm"> * parameter C representing the React class, which is then abstracted with an</span>
+<span class="cm"> * existential type (*). The * can be thought of as an &quot;auto&quot; instruction to the</span>
+<span class="cm"> * typechecker, telling it to fill in the type from context.</span>
+<span class="cm"> */</span>
+<span class="nx">type</span> <span class="nx">ReactClass</span><span class="o">&lt;</span><span class="nx">D</span><span class="p">,</span> <span class="nx">P</span><span class="p">,</span> <span class="nx">S</span><span class="o">&gt;</span> <span class="o">=</span> <span class="nx">_ReactClass</span><span class="o">&lt;</span><span class="nx">D</span><span class="p">,</span> <span class="nx">P</span><span class="p">,</span> <span class="nx">S</span><span class="p">,</span> <span class="o">*&gt;</span><span class="p">;</span>
+<span class="nx">type</span> <span class="nx">_ReactClass</span><span class="o">&lt;</span><span class="nx">D</span><span class="p">,</span> <span class="nx">P</span><span class="p">,</span> <span class="nx">S</span><span class="p">,</span> <span class="nx">C</span><span class="o">:</span> <span class="nx">ReactComponent</span><span class="o">&lt;</span><span class="nx">D</span><span class="p">,</span> <span class="nx">P</span><span class="p">,</span> <span class="nx">S</span><span class="o">&gt;&gt;</span> <span class="o">=</span> <span class="nx">Class</span><span class="o">&lt;</span><span class="nx">C</span><span class="o">&gt;</span><span class="p">;</span>
+</code></pre></div>
+
+<p>This allows React to pass around a polymorphic class as a first-class value
+without losing type information.</p>
+
+<h2 id="scoped-type-variables-in-classes">Scoped type variables in classes</h2>
+
+<p>I mentioned in the last section that type variables in a function’s signature
+are not in scope in the body of that function.
+I find it interesting that classes do not have this restriction:
+type variables in a class declaration <em>are</em> in scope in the class definition.
+(They are not in scope within method bodies; but you can use these variables in method signatures and class variable types).
+Because of this,
+there are some problems that do not exactly work with functions but that do
+work with classes.</p>
+
+<p>We can reimplement <code>makeGetter</code> from the last section as a class.</p>
+
+<div class="highlight"><pre><code class="js"><span class="kr">class</span> <span class="nx">Getter</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">:</span><span class="nb">Object</span><span class="o">&gt;</span> <span class="p">{</span>
+  <span class="nx">obj</span><span class="o">:</span> <span class="nx">T</span><span class="p">;</span>
+  <span class="nx">constructor</span><span class="p">(</span><span class="nx">obj</span><span class="o">:</span> <span class="nx">T</span><span class="p">)</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="nx">obj</span> <span class="o">=</span> <span class="nx">obj</span> <span class="p">}</span>
+  <span class="nx">getProp</span><span class="o">&lt;</span><span class="nx">U</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">key</span><span class="o">:</span> <span class="nx">$Enum</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">)</span><span class="o">:</span> <span class="nx">U</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">obj</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">var</span> <span class="nx">someObj</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">foo</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">bar</span><span class="o">:</span> <span class="mi">2</span> <span class="p">}</span>
+<span class="kd">var</span> <span class="nx">getter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Getter</span><span class="p">(</span><span class="nx">someObj</span><span class="p">)</span>
+
+<span class="nx">getter</span><span class="p">.</span><span class="nx">getProp</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">)</span>  <span class="c1">// No errors!</span>
+
+<span class="c1">// Error: string literal &#39;baz&#39; not found in object literal</span>
+<span class="nx">getter</span><span class="p">.</span><span class="nx">getProp</span><span class="p">(</span><span class="s1">&#39;baz&#39;</span><span class="p">)</span>
+</code></pre></div>
+
+<p>This probably seems unremarkable -
+every object-oriented language with static type-checking scopes class-level
+type variables this way.
+But ES6 classes are mostly syntactic sugar for ES5 constructor functions -
+yet a straight translation of <code>Getter</code> to ES5 syntax does not work:</p>
+
+<div class="highlight"><pre><code class="js"><span class="c1">// Does not work</span>
+<span class="kd">function</span> <span class="nx">Getter</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">:</span><span class="nb">Object</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">obj</span><span class="o">:</span> <span class="nx">T</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">getProp</span> <span class="o">=</span> <span class="kd">function</span><span class="o">&lt;</span><span class="nx">U</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">key</span><span class="o">:</span> <span class="nx">$Enum</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">)</span><span class="o">:</span> <span class="nx">U</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">obj</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>We get the same error: <code>identifier T, could not resolve name</code>.
+This time to fix the problem we have to refer to <code>T</code> indirectly using <code>typeof obj</code>.</p>
+
+<div class="highlight"><pre><code class="js"><span class="c1">// No errors!</span>
+<span class="kd">function</span> <span class="nx">Getter</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">:</span><span class="nb">Object</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">obj</span><span class="o">:</span> <span class="nx">T</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">getProp</span> <span class="o">=</span> <span class="kd">function</span><span class="o">&lt;</span><span class="nx">U</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">key</span><span class="o">:</span> <span class="nx">$Enum</span><span class="o">&lt;</span><span class="k">typeof</span> <span class="nx">obj</span><span class="o">&gt;</span><span class="p">)</span><span class="o">:</span> <span class="nx">U</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">obj</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>The ability of classes to scope type variables over inner methods,
+and the ability to use <code>instanceof</code> for type refinement,
+lead me to use classes more often than I would if I were not using Flow.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Jesse Hallett</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-05-31T00:00:00-07:00" pubdate data-updated="true">2015-05-31</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/2014/11/21/flow-is-the-javascript-type-checker-i-have-been-waiting-for.html" title="Previous Post: Flow is the JavaScript type checker I have been waiting for">&laquo; Flow is the JavaScript type checker I have been waiting for</a>
+      
+      
+        <a class="basic-alignment right" href="/2015/05/31/type-checking-react-with-flow.html" title="Next Post: Type checking React with Flow v0.11">Type checking React with Flow v0.11 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/2015/05/31/type-checking-react-with-flow.html">Type checking React with Flow v0.11</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/05/31/advanced-features-in-flow.html">Advanced features in Flow</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2014/11/21/flow-is-the-javascript-type-checker-i-have-been-waiting-for.html">Flow is the JavaScript type checker I have been waiting for</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2014/08/02/javascript-generators-and-functional-reactive-programming.html">Javascript generators and functional reactive programming</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2014/05/19/kinesis-advantage-with-dsa-keycaps.html">Kinesis Advantage with DSA keycaps</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Talks</h1>
+  <ul id="talks">
+    <li><a href="http://opensourcebridge.org/sessions/1067">Mod your Android</a></li>
+    <li><a href="talks/intro-to-javascript/">Introduction to JavaScript</a></li>
+    <li><a href="http://lanyrd.com/2012/nodepdx/smyqm/">Object-oriented patterns in JavaScript</a></li>
+    <li><a href="talks/cookies/">Cookies are bad for you</a></li>
+    <li><a href="talks/professional-javascript/">Professional JavaScript</a></li>
+    <li><a href="http://opensourcebridge.org/2009/wiki/Clustering_Data_--_How_to_Have_Fun_in_n-Dimensions">Cluster Analysis: How to Have Fun in n Dimensions</a></li>
+    <li><a href="https://docs.google.com/presentation/d/1hx9Pzo07aAnZ2skMH4JPjH7a6IXx64uC0zRliS3qpkk/edit?usp=sharing">How to build blazing fast web apps with Ruby on Rails</a></li>
+  </ul>
+</section>
+<section>
+  <h1>Open Source Projects</h1>
+  <ul id="projects">
+    <li><a href="http://github.com/jivesoftware/tAMD">tAMD:</a> Tiny, extensible implementation of the Asynchronous Module Definition (AMD) specification from CommonJS</li>
+  </ul>
+</section>
+<section>
+  <div class="contact" style="float:left; margin:0.5em;">
+    <p>
+      Jesse Hallett<br/>
+      <a href="mailto:jesse@sitr.us">jesse@sitr.us</a>
+    </p>
+  </div>
+  <div class="contact" style="float:left; margin:0.5em;">
+    <p>
+      <a rel="me" href="https://github.com/hallettj/">github.com/hallettj</a><br />
+      <a rel="me" href="https://twitter.com/hallettj/">twitter.com/hallettj</a>
+    </p>
+  </div>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - Jesse Hallett -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'hallettj';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://sitr.us/2015/05/31/advanced-features-in-flow.html';
+        var disqus_url = 'http://sitr.us/2015/05/31/advanced-features-in-flow.html';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>
