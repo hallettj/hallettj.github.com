@@ -19,6 +19,10 @@ and [react.js][react-types].
 
 <!-- more -->
 
+*Edit*: It has been pointed out to me that Flow features prefixed with `$` are not technically public,
+and that the semantics of those features may change.
+But they are useful enough that I plan to use some of them anyway :)
+
 * Table of Contents
 {:toc}
 
@@ -585,3 +589,5 @@ function Getter<T:Object>(obj: T) {
 The ability of classes to scope type variables over inner methods,
 and the ability to use `instanceof` for type refinement,
 lead me to use classes more often than I would if I were not using Flow.
+
+*Edited 2015-06-01:* Added notice that `$` features are not public.
