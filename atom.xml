@@ -4,7 +4,7 @@
   <title><![CDATA[sitr.us]]></title>
   <link href="http://sitr.us/atom.xml" rel="self"/>
   <link href="http://sitr.us/"/>
-  <updated>2015-05-31T18:20:29-07:00</updated>
+  <updated>2015-06-01T18:59:44-07:00</updated>
   <id>http://sitr.us/</id>
   <author>
     <name><![CDATA[Jesse Hallett]]></name>
@@ -125,6 +125,10 @@ Here is what I found while reading <a href="https://github.com/facebook/flow/blo
 and <a href="https://github.com/facebook/flow/blob/master/lib/react.js">react.js</a>.</p>
 
 <!-- more -->
+
+<p><em>Edit</em>: It has been pointed out to me that Flow features prefixed with <code>$</code> are not technically public,
+and that the semantics of those features may change.
+But they are useful enough that I plan to use some of them anyway :)</p>
 
 <ul id="markdown-toc">
   <li><a href="#classt"><code>Class&lt;T&gt;</code></a></li>
@@ -673,6 +677,8 @@ This time to fix the problem we have to refer to <code>T</code> indirectly using
 <p>The ability of classes to scope type variables over inner methods,
 and the ability to use <code>instanceof</code> for type refinement,
 lead me to use classes more often than I would if I were not using Flow.</p>
+
+<p><em>Edited 2015-06-01:</em> Added notice that <code>$</code> features are not public.</p>
 ]]></content>
   </entry>
   

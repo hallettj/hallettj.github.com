@@ -120,6 +120,10 @@ and <a href="https://github.com/facebook/flow/blob/master/lib/react.js">react.js
 
 <!-- more -->
 
+<p><em>Edit</em>: It has been pointed out to me that Flow features prefixed with <code>$</code> are not technically public,
+and that the semantics of those features may change.
+But they are useful enough that I plan to use some of them anyway :)</p>
+
 <ul id="markdown-toc">
   <li><a href="#classt"><code>Class&lt;T&gt;</code></a></li>
   <li><a href="#diffab"><code>$Diff&lt;A,B&gt;</code></a></li>
@@ -667,6 +671,8 @@ This time to fix the problem we have to refer to <code>T</code> indirectly using
 <p>The ability of classes to scope type variables over inner methods,
 and the ability to use <code>instanceof</code> for type refinement,
 lead me to use classes more often than I would if I were not using Flow.</p>
+
+<p><em>Edited 2015-06-01:</em> Added notice that <code>$</code> features are not public.</p>
 </div>
 
 
