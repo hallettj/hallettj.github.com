@@ -214,6 +214,13 @@ i.e., supertypes.
 
 ## `$Record<T>`
 
+*Update:* `$Record<T>` is [gone in Flow v0.12][nuke-record].
+But instead of `$Record<T>`,
+you can use the nearly equivalent construct: `{[key: $Enum<T>]: U}`,
+where `U` is the type of values in the record.
+
+[nuke-record]: https://github.com/facebook/flow/commit/6d4447b0300494f8a235f4d0907bee438705ba19
+
 The type of objects whose keys are those of `T`.
 This means that an object of type `$Record<T>` must have properties with all of
 the same names as the properties in `T` -
@@ -591,3 +598,4 @@ and the ability to use `instanceof` for type refinement,
 lead me to use classes more often than I would if I were not using Flow.
 
 *Edited 2015-06-01:* Added notice that `$` features are not public.
+*Edited 2015-06-08:* `$Record<T>` is gone in Flow v0.12.
