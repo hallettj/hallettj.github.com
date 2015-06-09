@@ -4,7 +4,7 @@
   <title><![CDATA[sitr.us]]></title>
   <link href="http://sitr.us/atom.xml" rel="self"/>
   <link href="http://sitr.us/"/>
-  <updated>2015-06-01T18:59:44-07:00</updated>
+  <updated>2015-06-08T19:24:52-07:00</updated>
   <id>http://sitr.us/</id>
   <author>
     <name><![CDATA[Jesse Hallett]]></name>
@@ -322,6 +322,11 @@ That is to say, <code>$Shape&lt;T&gt;</code> refers to types that are more gener
 i.e., supertypes.</p>
 
 <h2 id="recordt"><code>$Record&lt;T&gt;</code></h2>
+
+<p><em>Update:</em> <code>$Record&lt;T&gt;</code> is <a href="https://github.com/facebook/flow/commit/6d4447b0300494f8a235f4d0907bee438705ba19">gone in Flow v0.12</a>.
+But instead of <code>$Record&lt;T&gt;</code>,
+you can use the nearly equivalent construct: <code>{[key: $Enum&lt;T&gt;]: U}</code>,
+where <code>U</code> is the type of values in the record.</p>
 
 <p>The type of objects whose keys are those of <code>T</code>.
 This means that an object of type <code>$Record&lt;T&gt;</code> must have properties with all of
@@ -678,7 +683,8 @@ This time to fix the problem we have to refer to <code>T</code> indirectly using
 and the ability to use <code>instanceof</code> for type refinement,
 lead me to use classes more often than I would if I were not using Flow.</p>
 
-<p><em>Edited 2015-06-01:</em> Added notice that <code>$</code> features are not public.</p>
+<p><em>Edited 2015-06-01:</em> Added notice that <code>$</code> features are not public.
+<em>Edited 2015-06-08:</em> <code>$Record&lt;T&gt;</code> is gone in Flow v0.12.</p>
 ]]></content>
   </entry>
   
