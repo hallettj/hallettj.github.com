@@ -122,4 +122,15 @@ console.log(xs)
 // [ 1, 2 ]
 ~~~~~~~~~~~~~~~~~~~~~~
 
+---
 
+- Babel
+- Node v4.x
+- Chrome 41
+- IE 11 / Edge 12
+
+---
+
+~~~~ {.javascript}
+"use strict"
+~~~~~~~~~~~~~~~~~~~~~~
