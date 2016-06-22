@@ -4,6 +4,10 @@
 
 ---
 
+http://sitr.us/talks/poodle-osbridge_2016
+
+---
+
 ![github.com/hallettj/poodle](icon.svg)
 
 ---
@@ -67,6 +71,10 @@ ActivityStrea.ms
 ---
 
 ![](private-aside-2.png)
+
+---
+
+![](strawpoll.png)
 
 ---
 
@@ -146,3 +154,5 @@ ActivityStrea.ms
 github.com/hallettj/poodle
 
 github.com/hallettj/arfe
+
+http://sitr.us/talks/poodle-osbridge_2016
