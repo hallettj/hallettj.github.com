@@ -41,9 +41,15 @@ In type-driven development the program specification is given in the form of
 types of data structures and of functions that act on those data structures.
 The programmer writes types, and then writes implementations that satisfy those
 types.
+Types-as-specification has some advantages:
+there is no need to provide fake input data; all branches of code are always
+checked; and type annotations are better-suited than tests for serving
+double-duty as documentation.
 (I don't mean to say that the two approaches are not compatible!)
-But it takes a powerful type system to make type-driven development useful and
-satisfying.
+But if a program specification takes the form of types,
+then amount of detail that the specification can express is limited by the
+expressiveness of the type system.
+It takes an expressive type system to make type-driven development useful.
 
 
 
@@ -61,8 +67,10 @@ But whether Rust, Haskell, or another language is right for your project
 depends on a variety of factors.
 
 But what makes one type system more powerful than another?
-Here is a breakdown of some features that I think are useful to have
-(explanations of each feature follow):
+Here is a breakdown of some features that I think are useful to have.
+(Explanations of each feature follow.)
+Each of these features either makes a type system more expressive,
+or improves a compiler's ability to spot problems.
 
 |--------------------------+------+---------+-------+------+----+------|
 |                          | Rust | Haskell | Scala | Java | Go | Flow |
@@ -110,8 +118,8 @@ but there are no values of type `List` because `List` is a type constructor.
 A list must be a list _of_ something - like a list of integers (`List[Int]`) or
 a list of strings (`List[String]`).
 
-One can use type variables in places where a specific type is not know ahead of
-time.
+One can use type variables in places where a specific type is not known ahead
+of time.
 A function that returns the length of a list is not concerned with what is in
 the list;
 so it should be able to operate on any list type.
@@ -146,6 +154,10 @@ or the compiler requires the programmer to fill in details with type casts.
 Type casts shift the burden of checking program correctness from the compiler
 to the programmer,
 and therefore reduce the usefulness of the compiler.
+
+Type variables make it possible to express details about program behavior that
+cannot be expressed otherwise.
+So parametric polymorphism is very helpful in type-driven development.
 
 
 ## constrained types
@@ -243,3 +255,4 @@ is better.
 [Learn Haskell]:
 [algebraic data types]:
 [type classes]:
+[rank-n types]: https://ocharles.org.uk/blog/guest-posts/2014-12-18-rank-n-types.html
