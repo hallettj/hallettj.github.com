@@ -6,9 +6,9 @@ colleague
 :We're thinking of using Language X for this project. What do you think?
 
 me
-:Language X has some nice features. But I think there are important missed
-opportunities in the language - particularly in its type system. There are
-other languages that I prefer to use.
+:Language X has some nice features. But I think there are missed opportunities
+in the language - particularly in its type system. There are other languages
+that I prefer to use.
 
 colleague
 :Ok; which better language do you recommend?
@@ -69,17 +69,16 @@ depends on a variety of factors.
 But what makes one type system more powerful than another?
 Here is a breakdown of some features that I think are useful to have.
 (Explanations of each feature follow.)
-Each of these features either makes a type system more expressive,
-or improves a compiler's ability to spot problems.
+Each of these features helps to make a type system more expressive.
 
 |--------------------------+------+---------+-------+------+----+------|
 |                          | Rust | Haskell | Scala | Java | Go | Flow |
 |--------------------------|:----:|:-------:|:-----:|:----:|---:|:----:|
-| algebraic data types     | ✓    | ✓       | ✓     |      |    |      |
-|--------------------------|:----:|:-------:|:-----:|:----:|:--:|:----:|
 | parametric polymorphism  | ✓    | ✓       | ✓     | ✓    |    | ✓    |
 |--------------------------|:----:|:-------:|:-----:|:----:|:--:|:----:|
 | constrained types        | ✓    | ✓       | ✓     |      |    |      |
+|--------------------------|:----:|:-------:|:-----:|:----:|:--:|:----:|
+| algebraic data types     | ✓    | ✓       | ✓     |      |    |      |
 |--------------------------|:----:|:-------:|:-----:|:----:|:--:|:----:|
 | no `null`                | ✓    | ✓       |       |      |    | ✓    |
 |--------------------------|:----:|:-------:|:-----:|:----:|:--:|:----:|
@@ -87,7 +86,7 @@ or improves a compiler's ability to spot problems.
 |--------------------------|:----:|:-------:|:-----:|:----:|:--:|:----:|
 | Hindley-Milner inference | ✓    | ✓       |       |      |    |      |
 |--------------------------|:----:|:-------:|:-----:|:----:|:--:|:----:|
-| higher-kinded types      |      | ✓       | ✓     |      |    |      |
+| higher-order types       |      | ✓       | ✓     |      |    |      |
 |--------------------------|:----:|:-------:|:-----:|:----:|:--:|:----:|
 | rank-n types / GADTs     |      | ✓       | ?     |      |    |      |
 |--------------------------+------+---------+-------+------+----+------|
@@ -132,7 +131,7 @@ def length[T](xs: List[T]): Int
 Type variables allow one to specify relationships between types of arguments
 and return values.
 The type of an argument might not be known;
-but it might known that two arguments must always have the same type,
+but it might be known that two arguments must always have the same type,
 or that the return type of a function must match the type of an argument.
 A function that returns the first element of a list can take any type of list
 as an argument -
@@ -143,30 +142,111 @@ the list:
 def first[T](xs: List[T]): T
 ```
 
-Parametric polymorphism is essential in a good type system.
-It allows the compiler to keep track of types as values flow into and out of
-functions,
+That is an important way in which parametric polymorphism makes a type system
+expressive.
+Type variables let types express concepts like "this thing is always the same
+type as that thing".
+Writing types without type variables is like speaking without pronouns.
+
+Furthermore, 
+parametric polymorphism allows the compiler to keep track of types as values
+flow into and out of functions,
 and into and out of data structures.
-If the compiler does not have access to that information,
-you either lose type information
+If the compiler is not able to do that then you either lose type information
 (and lose out on opportunities for the compiler to spot bugs)
 or the compiler requires the programmer to fill in details with type casts.
 Type casts shift the burden of checking program correctness from the compiler
-to the programmer,
+to the programmer -
 and therefore reduce the usefulness of the compiler.
-
-Type variables make it possible to express details about program behavior that
-cannot be expressed otherwise.
-So parametric polymorphism is very helpful in type-driven development.
 
 
 ## constrained types
 
-Constrained types work in concert with parametric polymorphism.
+"Constrained types" refers to the feature that Haskell and Scala call "[type classes][]",
+and that Rust calls "[traits][]".
+Traits in Rust are not at all like traits in Scala or Smalltalk.
+And type classes have little to do with the concept of classes in
+object-oriented languages.
+In fact type classes and Rust traits are a lot more like interfaces in Go,
+Java, or Scala - but better.
+
+Constrained types work in concert with parametric polymorphism to add another
+level of expressiveness.
+Consider the problem of writing a sum function.
+Here is a possible implementation of that function (this is Haskell code):
+
+```haskell
+sum x y = x + y
+```
+
+What should the type of this function be?
+The inputs and output are clearly numbers,
+and should all be the same type of number.
+But most type-checked languages have several numeric types built in,
+and might allow program authors to define more.
+
+A tempting answer is to indicate that the function is fully polymorphic:
+
+```haskell
+sum :: a -> a -> a
+```
+
+(In Haskell a lowercase letter in a type expression is a type variable.
+This line indicates that the type of `sum` is a function that takes two
+arguments of any type `a`,
+and returns a value of the same type.)
+
+This will not work!
+The compiler will rightly point out that the unqualified type variable `a`
+implies that `sum` will accept a value of _any_ type,
+but that there are lots of types that are not compatible with the `+` operator.
+What we need is a way to indicate that only types that satisfy some
+*constraint* are allowed.
+In Haskell that looks like this:
+
+```haskell
+sum :: Num a => a -> a -> a
+```
+
+Now `a` may be any type that implements the `Num` type class.
+It happens that `+` is defined by the `Num` type class.
+`Num` looks roughly like this:
+
+```haskell
+class Num a where
+    (+), (-), (*)       :: a -> a -> a
+    -- | Unary negation.
+    negate              :: a -> a
+    -- | Absolute value.
+    abs                 :: a -> a
+    -- | Sign of a number.
+    signum              :: a -> a
+    -- | Conversion from an 'Integer'.
+    fromInteger         :: Integer -> a
+
+    -- default implementations
+    x - y               = x + negate y
+    negate x            = 0 - x
+```
+
+That means that any type `a` qualifies as an instance of `Num` if it provides
+implementations of the functions listed in the `Num` type class definition.
+Conversely, any type that is an instance of `Num` can be safely used with all
+of those functions.
+That includes implementations for arithmetic operations (`+`, `-`, `*`) with
+the type `a -> a -> a`.
+In this block of code the variable `a` is bound in the first line (`Num a`);
+so it is implied that the `a` in the type of each function is some instance of
+`Num`.
+
+
+
 
 Provide a form of *ad-hoc polymorphism*.
 
 
+[type classes]: http://learnyouahaskell.com/types-and-typeclasses#typeclasses-101
+[traits]: https://doc.rust-lang.org/book/traits.html
 
 ### Rust
 
@@ -188,7 +268,6 @@ If you do not need a fast systems language,
 Rust might not be your best option.
 (But maybe try it anyway. Rust is a fantastic language.)
 
-[Traits]: https://doc.rust-lang.org/book/traits.html
 [Enums]: https://doc.rust-lang.org/book/enums.html
 [ADTs in Rust]: http://datamelon.io/blog/2015/understanding-and-using-adts-in-rust.html
 
