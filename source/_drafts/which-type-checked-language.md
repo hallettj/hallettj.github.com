@@ -148,7 +148,7 @@ Type variables let types express concepts like "this thing is always the same
 type as that thing".
 Writing types without type variables is like speaking without pronouns.
 
-Furthermore, 
+Furthermore,
 parametric polymorphism allows the compiler to keep track of types as values
 flow into and out of functions,
 and into and out of data structures.
@@ -172,81 +172,129 @@ Java, or Scala - but better.
 
 Constrained types work in concert with parametric polymorphism to add another
 level of expressiveness.
-Consider the problem of writing a sum function.
+Consider the problem of writing a function that checks whether all elements in
+a list are equal.
 Here is a possible implementation of that function (this is Haskell code):
 
 ```haskell
-sum x y = x + y
+allEqual xs = let firstElem = head xs
+              in all (== firstElem) xs
 ```
 
 What should the type of this function be?
-The inputs and output are clearly numbers,
-and should all be the same type of number.
-But most type-checked languages have several numeric types built in,
-and might allow program authors to define more.
-
-A tempting answer is to indicate that the function is fully polymorphic:
+It takes a list of values that can be compared for equality;
+but there are lots of types that can be compared with `(==)`.
+Ideally this function would accept any of those types in the input list.
+A tempting answer is to indicate that the function is fully polymorphic on the
+type of values in the input list:
 
 ```haskell
-sum :: a -> a -> a
+allEqual :: [a] -> Bool
 ```
 
 (In Haskell a lowercase letter in a type expression is a type variable.
-This line indicates that the type of `sum` is a function that takes two
-arguments of any type `a`,
-and returns a value of the same type.)
+This line indicates that the type of `allEqual` is a function that takes a list
+of values of any type `a` as an argument,
+and returns a boolean value.)
 
 This will not work!
 The compiler will rightly point out that the unqualified type variable `a`
-implies that `sum` will accept a value of _any_ type,
-but that there are lots of types that are not compatible with the `+` operator.
+implies that `allEqual` will accept a values of _any_ type in the input list,
+but that there are lots of types that cannot be compared with the `(==)` operator.
 What we need is a way to indicate that only types that satisfy some
 *constraint* are allowed.
 In Haskell that looks like this:
 
 ```haskell
-sum :: Num a => a -> a -> a
+allEqual :: Eq a => [a] -> Bool
 ```
 
-Now `a` may be any type that implements the `Num` type class.
-It happens that `+` is defined by the `Num` type class.
-`Num` looks roughly like this:
+This version expresses that `a` may be any type that implements the `Eq` type
+class.
+It happens that `(==)` is defined as part of the `Eq` type class:
 
 ```haskell
-class Num a where
-    (+), (-), (*)       :: a -> a -> a
-    -- | Unary negation.
-    negate              :: a -> a
-    -- | Absolute value.
-    abs                 :: a -> a
-    -- | Sign of a number.
-    signum              :: a -> a
-    -- | Conversion from an 'Integer'.
-    fromInteger         :: Integer -> a
+class Eq a where
+  (==) :: a -> a -> Bool
+  (/=) :: a -> a -> Bool
 
-    -- default implementations
-    x - y               = x + negate y
-    negate x            = 0 - x
+  -- default implementations
+  x == y = not (x /= y)
+  x /= y = not (x == y)
 ```
 
-That means that any type `a` qualifies as an instance of `Num` if it provides
-implementations of the functions listed in the `Num` type class definition.
-Conversely, any type that is an instance of `Num` can be safely used with all
-of those functions.
-That includes implementations for arithmetic operations (`+`, `-`, `*`) with
-the type `a -> a -> a`.
-In this block of code the variable `a` is bound in the first line (`Num a`);
-so it is implied that the `a` in the type of each function is some instance of
-`Num`.
+That means that any type `a` qualifies as an instance of `Eq` if it provides
+an implementation of ether the equality `(==)` or inequality `(/=)` operator.
+(Only one must be implemented, because each has a default implementation that calls the other.)
+Conversely, any type that is an instance of `Eq` can be safely used with both
+operators.
+
+Again, this is similar to interfaces in other languages.
+Go and Java do not have special interfaces for types that can be compared for equality -
+but if the did the signature of the `allEqual` function in Go might look like this:
+
+```go
+// Hypothetical interface for types that be compared for equality
+type Eq interface {
+    eq(other Eq) bool
+    ne(other Eq) bool
+}
+
+func allEqual(xs ...Eq) bool
+```
+
+Constrained types have some particular advantages over interfaces:
+
+- Type classes can express that multiple arguments have the same type.
+- The implementation of an interface method is selected based on the type of
+  the receiver - but the implementation of a type class function can be selected
+  based on the type of the second argument, the third argument, the types of two
+  arguments together, or even the return type.
+- Interfaces can lead to name conflicts if a type implements two interfaces
+  with methods that have the same name.
+  Type class functions are namespaced by module, not by implementing type;
+  so a type can implement type class functions with the same name, as long as
+  those functions are qualified if more than one of them is imported in the
+  same module.
+
+Rust traits have all of the same advantages.
+
+In the hypothetical Go `Eq` interface,
+note that there is no guarantee in the type signature that the receiver and
+argument of `eq` are of the same type.
+Both types must implement `Eq`; but that interface allows `eq` to be called
+with, e.g., a `string` value and an `int64` value.
+It is obvious to programmers that the both operands should be of the same type -
+but that is lost on the compiler.
+This is a lack of expressiveness in the type system.
+The results are that it is not possible to write specifications-as-types that
+express concepts like "these types should match",
+and implementations of `eq` need to have runtime checks to make sure that their
+operands are really the same type.
+
+In the Haskell implementation of `Eq` the variable `a` is bound in the first line (`Eq a`);
+so it is implied that the `a` in the type of each function is an instance of `Eq`.
+And since the same variable, `a`, appears twice in each type signature,
+both arguments must have the same type.
 
 
+```haskell
+data User = User { userName :: String, userAge :: Int }
 
+instance Eq User where
+  x == y = userName x == userName y && userAge x == userAge y
+```
 
-Provide a form of *ad-hoc polymorphism*.
+Haskell has a convenient shorthand:
 
+```haskell
+data User = User { userName :: String, userAge :: Int }
+  deriving Eq
+```
 
 [type classes]: http://learnyouahaskell.com/types-and-typeclasses#typeclasses-101
 [traits]: https://doc.rust-lang.org/book/traits.html
+
 
 ### Rust
 
