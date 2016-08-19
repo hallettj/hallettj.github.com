@@ -4,7 +4,7 @@
   <title><![CDATA[sitr.us]]></title>
   <link href="http://sitr.us/atom.xml" rel="self"/>
   <link href="http://sitr.us/"/>
-  <updated>2016-06-22T10:38:09-07:00</updated>
+  <updated>2016-08-19T14:41:19-04:00</updated>
   <id>http://sitr.us/</id>
   <author>
     <name><![CDATA[Jesse Hallett]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[Type checking React with Flow v0.11]]></title>
     <link href="http://sitr.us/2015/05/31/type-checking-react-with-flow.html"/>
-    <updated>2015-05-31T00:00:00-07:00</updated>
+    <updated>2015-05-31T00:00:00-04:00</updated>
     <id>http://sitr.us/2015/05/31/type-checking-react-with-flow</id>
     <content type="html"><![CDATA[<p>Flow v0.11 was <a href="https://github.com/facebook/flow/blob/master/Changelog.md">released</a> recently.
 The latest set of changes really improve type checking in React apps.
@@ -113,7 +113,7 @@ see my post on <a href="http://sitr.us/2015/05/31/advanced-features-in-flow.html
   <entry>
     <title type="html"><![CDATA[Advanced features in Flow]]></title>
     <link href="http://sitr.us/2015/05/31/advanced-features-in-flow.html"/>
-    <updated>2015-05-31T00:00:00-07:00</updated>
+    <updated>2015-05-31T00:00:00-04:00</updated>
     <id>http://sitr.us/2015/05/31/advanced-features-in-flow</id>
     <content type="html"><![CDATA[<p>Flow has some very interesting features that are currently not documented.
 It is likely that the reason for missing documentation is that these features
@@ -691,7 +691,7 @@ lead me to use classes more often than I would if I were not using Flow.</p>
   <entry>
     <title type="html"><![CDATA[Flow is the JavaScript type checker I have been waiting for]]></title>
     <link href="http://sitr.us/2014/11/21/flow-is-the-javascript-type-checker-i-have-been-waiting-for.html"/>
-    <updated>2014-11-21T00:00:00-08:00</updated>
+    <updated>2014-11-21T00:00:00-04:00</updated>
     <id>http://sitr.us/2014/11/21/flow-is-the-javascript-type-checker-i-have-been-waiting-for</id>
     <content type="html"><![CDATA[<p>I am very excited about <a href="http://flowtype.org/">Flow</a>, a new JavaScript type checker from Facebook.
 I have put some thought into what a type checker for JavaScript should do -
@@ -837,10 +837,18 @@ For example, optional arguments are not allowed unless you use either
 I am optimistic that over time it will only get better at operating on code that
 was not written with Flow in mind.</p>
 
-<p>There is a side benefit to using the Flow language:
+<p><del>There is a side benefit to using the Flow language:
 it supports <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/New_in_JavaScript/ECMAScript_6_support_in_Mozilla">ECMAScript 6</a>,
 but <a href="http://flowtype.org/docs/running.html#_">compiling Flow programs</a> produces ECMAScript 5 code that can run in most
-browsers.</p>
+browsers.</del></p>
+
+<p><em>Edit 2016-08-19:</em> Early in Flow’s development, Facebook recommended using
+their own jsx compiler to process code that used Flow.
+That is what produced ECMAScript 5 code, as mentioned in the previous paragraph.
+Currently the best practice is to use Babel with the <a href="https://babeljs.io/docs/plugins/preset-react/">React preset</a> to
+process Flow code.
+You still get the benefit of transpiling ECMAScript 6 code to ECMAScript 5,
+if you have Babel configured to do that.</p>
 
 <p>One of my favorite features of Flow is that <code>null</code> and <code>undefined</code> are <em>not</em>
 treated as bottom types.
@@ -938,7 +946,7 @@ Flow is a type checker that I actually plan to use.</p>
   <entry>
     <title type="html"><![CDATA[Javascript generators and functional reactive programming]]></title>
     <link href="http://sitr.us/2014/08/02/javascript-generators-and-functional-reactive-programming.html"/>
-    <updated>2014-08-02T00:00:00-07:00</updated>
+    <updated>2014-08-02T00:00:00-04:00</updated>
     <id>http://sitr.us/2014/08/02/javascript-generators-and-functional-reactive-programming</id>
     <content type="html"><![CDATA[<p>tl;dr: ECMAScript 6 introduces a language feature called <a href="http://tobyho.com/2013/06/16/what-are-generators/">generators</a>, which
 are really great for working with asynchronous code that uses promises.  But
@@ -1185,7 +1193,7 @@ not stateless.  Thanks to Blixt for pointing out the distinction.</p>
   <entry>
     <title type="html"><![CDATA[Kinesis Advantage with DSA keycaps]]></title>
     <link href="http://sitr.us/2014/05/19/kinesis-advantage-with-dsa-keycaps.html"/>
-    <updated>2014-05-19T00:00:00-07:00</updated>
+    <updated>2014-05-19T00:00:00-04:00</updated>
     <id>http://sitr.us/2014/05/19/kinesis-advantage-with-dsa-keycaps</id>
     <content type="html"><![CDATA[<p><img src="https://lh4.googleusercontent.com/MPfjOyaNmMKZRL36XEekqRiaeoHcUFLQLN-Kx62XKbgN=w1024-h576-no" /></p>
 
@@ -1379,7 +1387,7 @@ And they make a more pleasant sound than the thinner ABS caps that came with the
   <entry>
     <title type="html"><![CDATA[Category Theory proofs in Idris]]></title>
     <link href="http://sitr.us/2014/05/05/category-theory-proofs-in-idris.html"/>
-    <updated>2014-05-05T00:00:00-07:00</updated>
+    <updated>2014-05-05T00:00:00-04:00</updated>
     <id>http://sitr.us/2014/05/05/category-theory-proofs-in-idris</id>
     <content type="html"><![CDATA[<p><a href="http://www.idris-lang.org/">Idris</a> is a programming language with dependent types.
 It is similar to <a href="http://wiki.portal.chalmers.se/agda/pmwiki.php">Agda</a>, but hews more closely to <a href="http://www.haskell.org/haskellwiki/Haskell">Haskell</a>.
@@ -2187,7 +2195,7 @@ as I continue to explore Category theory.</p>
   <entry>
     <title type="html"><![CDATA[Functional data structures in JavaScript with Mori]]></title>
     <link href="http://sitr.us/2013/11/04/functional-data-structures.html"/>
-    <updated>2013-11-04T00:00:00-08:00</updated>
+    <updated>2013-11-04T00:00:00-04:00</updated>
     <id>http://sitr.us/2013/11/04/functional-data-structures</id>
     <content type="html"><![CDATA[<p>I have a long-standing desire for a JavaScript library that provides
 good implementations of functional data structures.  Recently I found
@@ -3281,7 +3289,7 @@ to minimize the actual work that is done.</p>
   <entry>
     <title type="html"><![CDATA[Functional Reactive Programming in JavaScript]]></title>
     <link href="http://sitr.us/2013/05/22/functional-reactive-programming-in-javascript.html"/>
-    <updated>2013-05-22T00:00:00-07:00</updated>
+    <updated>2013-05-22T00:00:00-04:00</updated>
     <id>http://sitr.us/2013/05/22/functional-reactive-programming-in-javascript</id>
     <content type="html"><![CDATA[<p>I had a great time at <a href="http://nodepdx.org/">NodePDX</a> last week.  There were many talks
 packed into a short span of time and I saw many exciting ideas
@@ -3425,7 +3433,7 @@ documentation and more examples.</p>
   <entry>
     <title type="html"><![CDATA[Monkey patching document.write()]]></title>
     <link href="http://sitr.us/2012/09/04/monkey-patching-document-write.html"/>
-    <updated>2012-09-04T00:00:00-07:00</updated>
+    <updated>2012-09-04T00:00:00-04:00</updated>
     <id>http://sitr.us/2012/09/04/monkey-patching-document-write</id>
     <content type="html"><![CDATA[<p>This is one of the crazier workarounds that I have implemented.  I was
 working on a web page that embeds third-party widgets.  The widgets are
@@ -3525,7 +3533,7 @@ far it is working nicely.</p>
   <entry>
     <title type="html"><![CDATA[Promise Pipelines in JavaScript]]></title>
     <link href="http://sitr.us/2012/07/31/promise-pipelines-in-javascript.html"/>
-    <updated>2012-07-31T00:00:00-07:00</updated>
+    <updated>2012-07-31T00:00:00-04:00</updated>
     <id>http://sitr.us/2012/07/31/promise-pipelines-in-javascript</id>
     <content type="html"><![CDATA[<aside class="translations"><p>This page has been translated into <a href="http://www.webhostinghub.com/support/es/misc/las-bases-de">Spanish</a>
 language by Maria Ramos  from <a href="http://www.webhostinghub.com/">Webhostinghub.com</a>.</p></aside>
@@ -3957,7 +3965,7 @@ inner and outer promises before the result is passed to <code>$.join()</code>.</
   <entry>
     <title type="html"><![CDATA[Installing a custom ROM on the Transformer Prime: A start-to-finish guide]]></title>
     <link href="http://sitr.us/2012/05/12/installing-a-custom-rom-on-the-transformer-prime.html"/>
-    <updated>2012-05-12T00:00:00-07:00</updated>
+    <updated>2012-05-12T00:00:00-04:00</updated>
     <id>http://sitr.us/2012/05/12/installing-a-custom-rom-on-the-transformer-prime</id>
     <content type="html"><![CDATA[<p>This guide provides step-by-step instructions for installing the <a href="http://www.virtuousrom.com/p/prime.html">Virtuous Prime</a>
 community ROM on your Asus Transformer Prime TF201 tablet.  This guide will
@@ -4359,7 +4367,7 @@ I could not fix.  Also, having root access to my tablet is excellent.</p>
   <entry>
     <title type="html"><![CDATA[Cookies are bad for you: Improving web application security]]></title>
     <link href="http://sitr.us/2011/08/26/cookies-are-bad-for-you.html"/>
-    <updated>2011-08-26T00:00:00-07:00</updated>
+    <updated>2011-08-26T00:00:00-04:00</updated>
     <id>http://sitr.us/2011/08/26/cookies-are-bad-for-you</id>
     <content type="html"><![CDATA[<p>Most web applications today use browser cookies to keep a user logged in
 while she is using the application.  Cookies are a decades-old device
@@ -4807,7 +4815,7 @@ are in the public domain.</p>
   <entry>
     <title type="html"><![CDATA[How Mobile Safari emulates mouse events]]></title>
     <link href="http://sitr.us/2011/07/28/how-mobile-safari-emulates-mouse-events.html"/>
-    <updated>2011-07-28T00:00:00-07:00</updated>
+    <updated>2011-07-28T00:00:00-04:00</updated>
     <id>http://sitr.us/2011/07/28/how-mobile-safari-emulates-mouse-events</id>
     <content type="html"><![CDATA[<p>When you are adapting web apps to touchscreen devices particular
 challenges come up around events like <code>mouseover</code> and <code>mouseout</code>.
@@ -4886,7 +4894,7 @@ and <a href="http://jsfiddle.net/hallettj/m5EXk/">a third that makes no changes 
   <entry>
     <title type="html"><![CDATA[CouchDB Notes]]></title>
     <link href="http://sitr.us/2009/09/13/couchdb-notes.html"/>
-    <updated>2009-09-13T00:00:00-07:00</updated>
+    <updated>2009-09-13T00:00:00-04:00</updated>
     <id>http://sitr.us/2009/09/13/couchdb-notes</id>
     <content type="html"><![CDATA[<p>Recently I gave a talk at <a href="http://pdxruby.org/" title="Portland Ruby Brigade">Portland Ruby Brigade</a> meeting on
 <a href="http://couchdb.apache.org/" title="CouchDB">CouchDB</a>, a document-oriented database.  I thought I would share my notes
@@ -5053,7 +5061,7 @@ updated accordingly.</p>
   <entry>
     <title type="html"><![CDATA[How to install Haskell "Batteries Included" Platform on Ubuntu Jaunty]]></title>
     <link href="http://sitr.us/2009/07/02/how-to-install-haskell-platform-on-ubuntu-jaunty.html"/>
-    <updated>2009-07-02T00:00:00-07:00</updated>
+    <updated>2009-07-02T00:00:00-04:00</updated>
     <id>http://sitr.us/2009/07/02/how-to-install-haskell-platform-on-ubuntu-jaunty</id>
     <content type="html"><![CDATA[<p>Just for kicks I thought I would take another shot at some Haskell programming.
 To get all of the common libraries and the automated package installer, cabal,
@@ -5127,7 +5135,7 @@ you can install Haskell libraries with <code>cabal</code>.</p>
   <entry>
     <title type="html"><![CDATA[Database Queries the CouchDB Way]]></title>
     <link href="http://sitr.us/2009/06/30/database-queries-the-couchdb-way.html"/>
-    <updated>2009-06-30T00:00:00-07:00</updated>
+    <updated>2009-06-30T00:00:00-04:00</updated>
     <id>http://sitr.us/2009/06/30/database-queries-the-couchdb-way</id>
     <content type="html"><![CDATA[<p><a href="http://couchdb.apache.org/">CouchDB</a> is a document-oriented database. It has no rows or tables. Instead
 CouchDB is a collection of JSON documents. It uses a map-reduce pattern to
@@ -5493,7 +5501,7 @@ from the original array removed.</p>
   <entry>
     <title type="html"><![CDATA[How to use RSpec to describe a Sinatra application]]></title>
     <link href="http://sitr.us/2008/07/29/how-to-use-rspec-to-describe-a-sinatra-application.html"/>
-    <updated>2008-07-29T00:00:00-07:00</updated>
+    <updated>2008-07-29T00:00:00-04:00</updated>
     <id>http://sitr.us/2008/07/29/how-to-use-rspec-to-describe-a-sinatra-application</id>
     <content type="html"><![CDATA[<p>This information was written a long time ago and has become pretty outdated.</p>
 
@@ -5653,7 +5661,7 @@ The Sinatra application that led to this article is now open source and is avail
   <entry>
     <title type="html"><![CDATA[International Phonetic Alphabet]]></title>
     <link href="http://sitr.us/2007/10/02/international-phonetic-alphabet.html"/>
-    <updated>2007-10-02T00:00:00-07:00</updated>
+    <updated>2007-10-02T00:00:00-04:00</updated>
     <id>http://sitr.us/2007/10/02/international-phonetic-alphabet</id>
     <content type="html"><![CDATA[<p>In <a href="http://sitr.us/ling/2007/09/24/anatomy-of-a-syllable/">last week’s post</a> I provided phonetic
 transcriptions of some example words using the International Phonetic
@@ -5787,7 +5795,7 @@ transcriptions above. I will talk about that in a future article too.</p>
   <entry>
     <title type="html"><![CDATA[Anatomy of a Syllable]]></title>
     <link href="http://sitr.us/2007/09/24/anatomy-of-a-syllable.html"/>
-    <updated>2007-09-24T00:00:00-07:00</updated>
+    <updated>2007-09-24T00:00:00-04:00</updated>
     <id>http://sitr.us/2007/09/24/anatomy-of-a-syllable</id>
     <content type="html"><![CDATA[<p>The syllable is a constant feature in every spoken language in the
 world. Each language has its own rules about what kinds of syllables
@@ -5907,7 +5915,7 @@ syllable?</a> and <a href="http://en.wikipedia.org/wiki/Syllable">the Wikipedia 
   <entry>
     <title type="html"><![CDATA[Deixis]]></title>
     <link href="http://sitr.us/2007/09/17/deixis.html"/>
-    <updated>2007-09-17T00:00:00-07:00</updated>
+    <updated>2007-09-17T00:00:00-04:00</updated>
     <id>http://sitr.us/2007/09/17/deixis</id>
     <content type="html"><![CDATA[<p>When someone says to you, “here” or “now”, you probably know what he
 means. “Here” might the room that you are both sitting in. “Now” would

@@ -102,7 +102,7 @@ I have put some thought into what a type checker for JavaScript should do &helli
   
 
 
-<time datetime="2014-11-21T00:00:00-08:00" pubdate data-updated="true">2014-11-21</time>
+<time datetime="2014-11-21T00:00:00-04:00" pubdate data-updated="true">2014-11-21</time>
         
       </p>
     
@@ -253,10 +253,18 @@ For example, optional arguments are not allowed unless you use either
 I am optimistic that over time it will only get better at operating on code that
 was not written with Flow in mind.</p>
 
-<p>There is a side benefit to using the Flow language:
+<p><del>There is a side benefit to using the Flow language:
 it supports <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/New_in_JavaScript/ECMAScript_6_support_in_Mozilla">ECMAScript 6</a>,
 but <a href="http://flowtype.org/docs/running.html#_">compiling Flow programs</a> produces ECMAScript 5 code that can run in most
-browsers.</p>
+browsers.</del></p>
+
+<p><em>Edit 2016-08-19:</em> Early in Flow’s development, Facebook recommended using
+their own jsx compiler to process code that used Flow.
+That is what produced ECMAScript 5 code, as mentioned in the previous paragraph.
+Currently the best practice is to use Babel with the <a href="https://babeljs.io/docs/plugins/preset-react/">React preset</a> to
+process Flow code.
+You still get the benefit of transpiling ECMAScript 6 code to ECMAScript 5,
+if you have Babel configured to do that.</p>
 
 <p>One of my favorite features of Flow is that <code>null</code> and <code>undefined</code> are <em>not</em>
 treated as bottom types.
@@ -370,7 +378,7 @@ Flow is a type checker that I actually plan to use.</p>
   
 
 
-<time datetime="2014-11-21T00:00:00-08:00" pubdate data-updated="true">2014-11-21</time>
+<time datetime="2014-11-21T00:00:00-04:00" pubdate data-updated="true">2014-11-21</time>
       
 
 
