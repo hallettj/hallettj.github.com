@@ -158,13 +158,22 @@ These are early days for Flow.
 I am optimistic that over time it will only get better at operating on code that
 was not written with Flow in mind.
 
-There is a side benefit to using the Flow language:
+<del>There is a side benefit to using the Flow language:
 it supports [ECMAScript 6][],
 but [compiling Flow programs][] produces ECMAScript 5 code that can run in most
-browsers.
+browsers.</del>
+
+*Edit 2016-08-19:* Early in Flow's development, Facebook recommended using
+their own jsx compiler to process code that used Flow.
+That is what produced ECMAScript 5 code, as mentioned in the previous paragraph.
+Currently the best practice is to use Babel with the [React preset][] to
+process Flow code.
+You still get the benefit of transpiling ECMAScript 6 code to ECMAScript 5,
+if you have Babel configured to do that.
 
 [ECMAScript 6]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/New_in_JavaScript/ECMAScript_6_support_in_Mozilla
 [compiling Flow programs]: http://flowtype.org/docs/running.html#_
+[React preset]: https://babeljs.io/docs/plugins/preset-react/
 
 One of my favorite features of Flow is that `null` and `undefined` are *not*
 treated as bottom types.
