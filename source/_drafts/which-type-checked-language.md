@@ -84,6 +84,8 @@ Each of these features helps to make a type system more expressive.
 |--------------------------|:----:|:-------:|:-----:|:----:|:--:|:----:|
 | no subtyping             | ✓    | ✓       |       |      | ✓  |      |
 |--------------------------|:----:|:-------:|:-----:|:----:|:--:|:----:|
+| structural types         |      |         | ✓     |      | ✓  | ✓    |
+|--------------------------|:----:|:-------:|:-----:|:----:|:--:|:----:|
 | Hindley-Milner inference | ✓    | ✓       |       |      |    |      |
 |--------------------------|:----:|:-------:|:-----:|:----:|:--:|:----:|
 | higher-order types       |      | ✓       | ✓     |      |    |      |
@@ -167,8 +169,29 @@ and that Rust calls "[traits][]".
 Traits in Rust are not at all like traits in Scala or Smalltalk.
 And type classes have little to do with the concept of classes in
 object-oriented languages.
-In fact type classes and Rust traits are a lot more like interfaces in Go,
-Java, or Scala - but better.
+In fact type classes / traits are a lot more like interfaces in Go,
+Java, or Scala - but with some advantages:
+
+- Type classes can express that multiple arguments to a method have the same type.
+- Type class methods may select an implementation based on the expected return
+  type of a method invocation, or on the type of an arbitrary argument position.
+  (Interface methods are selected based on the type of the receiver)
+- Interfaces can lead to name conflicts if a type implements two interfaces
+  with methods that have the same name.
+  Type class functions are namespaced by module, not by implementing type;
+  so a type can implement type class functions with the same name, as long as
+  those functions are qualified if more than one of them is imported in the
+  same module.
+- One can add new behavior to an existing type by defining a trait (even if the
+  type was defined in another module or another library).
+- Rust developers (who care a lot about performance) point out that
+  [methods on traits are dispatched statically][static dispatch].
+  Static dispatch is faster than dynamic, since dynamic dispatch requires extra
+  lookup steps.
+
+[type classes]: http://learnyouahaskell.com/types-and-typeclasses#typeclasses-101
+[traits]: https://doc.rust-lang.org/book/traits.html
+[static dispatch]: https://blog.rust-lang.org/2015/05/11/traits.html
 
 Constrained types work in concert with parametric polymorphism to add another
 level of expressiveness.
@@ -292,8 +315,6 @@ data User = User { userName :: String, userAge :: Int }
   deriving Eq
 ```
 
-[type classes]: http://learnyouahaskell.com/types-and-typeclasses#typeclasses-101
-[traits]: https://doc.rust-lang.org/book/traits.html
 
 
 ### Rust
