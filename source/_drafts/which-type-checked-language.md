@@ -100,6 +100,104 @@ Each of these features helps to make a type system more expressive.
 ## parametric polymorphism
 
 Parametric polymorphism is also known as *generics*.
+This feature permits polymorphic functions and data structures,
+while allowing the compiler to keep track of the types flowing into and out of
+those functions and data structures.
+Type parameter annotations act as specifications for type-driven development -
+this provides a language for describing specific details of program behavior.
+
+For example, a function that returns the first element in a list can specify
+that the type of the return value is the same as the types of values in the
+input list
+(this is Scala code):
+
+```scala
+def first[T](xs: List[T]): T
+```
+
+Without parametric polymorphism, it would be necessary to type-cast the result
+of `first` into the appropriate type on every invocation,
+which would be a source of potential errors.
+Type casts shift the burden of checking program correctness from the compiler
+to the programmer -
+and therefore reduce the usefulness of the compiler.
+
+Furthermore, without the ability to use the type variable `T` in the signature
+of `first`,
+the type-signature-as-specification for `first` would lack a crucial detail
+about how `first` is expected to behave.
+
+That is an important way in which parametric polymorphism makes a type system
+expressive.
+Type variables let types express concepts like "this thing is always the same
+type as that thing".
+Writing types without type variables is like speaking without pronouns.
+
+Parametric polymorphism provides flexibility for describing abstractions that
+are particular to your code.
+Consider a function that hides boilerplate involved in updating a database record;
+this function accepts a callback that applies updates to a record, and returns
+the updated record on success:
+
+```scala
+def updateRecord[T](fetch:  (Database, Int)    => Try[T],
+                    insert: (Database, Int, T) => Try[Unit]
+                   )
+                   (id: Int)(callback: T => T): Try[T] {
+  val tx = db.beginTransaction()
+  try {
+    result = for {
+      userRecord <- fetch(db, id)
+      updatedRecord = callback(userRecord)
+      _ <- insert(db, id, updatedRecord)
+    } yield updatedRecord
+
+    if (result.isSuccess) {
+      tx.commit()
+    }
+    else {
+      tx.rollback()
+    }
+
+    result
+  }
+  catch {
+    case err: Throwable => {
+      tx.rollback()
+      Failure(err)
+    }
+  }
+}
+```
+
+The general-purpose `updateRecord` function can be specialized for specific
+record types, without loss of type-safety or duplication of boilerplate:
+
+```scala
+val updateUserRecord = updatedRecord((db: Database, id: Int) => db.findUserById(id)
+                                     (db: Database, id: Int, user: User) => db.insertUser(id, user))
+
+updateUserRecord(16) { user => user.age += 1 } match {
+  Success(user) => println(s"The user is ${user.age} years old.")
+  Failure(err)  -> println(s"There was a problem updating the users age: $err")
+}
+```
+
+The fact that `updateUserRecord` updates a user record and also possibly
+returns a user record is now part of the program's machine-checkable specification,
+because that relationship was specified in the polymorphic type of
+`updateRecord`.
+
+Some languages (e.g. Go) effectively have polymorphic parametricity for
+built-in methods and data structures,
+but lack expressiveness in the type system required to describe _new_
+abstractions.
+
+Parametric polymorphism becomes much more powerful when augmented with
+*constrained types*.
+
+
+
 
 Some types are actually *type constructors*, which take types as arguments to
 produce new types.
@@ -160,6 +258,8 @@ or the compiler requires the programmer to fill in details with type casts.
 Type casts shift the burden of checking program correctness from the compiler
 to the programmer -
 and therefore reduce the usefulness of the compiler.
+
+
 
 
 ## constrained types
