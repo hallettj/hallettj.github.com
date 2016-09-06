@@ -416,6 +416,52 @@ data User = User { userName :: String, userAge :: Int }
 ```
 
 
+## Hindley-Milner Type Inference
+
+Before talking about HM inference, let's first talk about lenses.
+Idiomatic functional code uses immutable data structures,
+which are valuable for making code easy to reason about.
+But updating nested immutable data structures can be painful without a specialized library
+(e.g. `lens`),
+since a new data value has to be created at each level of nesting.
+Consider this Haskell code written without lenses:
+
+```haskell
+data Group  = Group  { _groupName  :: String, _groupMembers :: Map PersonID Person }
+data Person = Person { _personName :: String, _personTags   :: Set Tag }
+
+type PersonID = Int
+type Tag      = String
+
+addTagToMember :: Tag -> PersonID -> Group -> Group
+addTagToMember tag id group =
+  let members = Map.adjust (addTagToPerson tag) id (_groupMembers group)
+  in group { _groupMembers = members }
+
+addTagToPerson :: Tag -> Person -> Person
+addTagToPerson tag person = person { _personTags = Set.insert tag (_personTags person) }
+```
+
+The same functions can be written much more clearly and concisely with lenses
+(for details on lenses see the [tutorial][lens]):
+
+[lens]: https://hackage.haskell.org/package/lens-tutorial-1.0.1/docs/Control-Lens-Tutorial.html
+
+```haskell
+makeLenses ''Group
+makeLenses ''Person
+
+addTagToMember' :: Tag -> PersonID -> Group -> Group
+addTagToMember' tag id = groupMembers . ix id . personTags %~ Set.insert tag
+```
+
+The version with lenses is shorter (essentially just an access path and a reference to the set insert function), and eliminates a helper function.
+
+
+TODO: HM helps dispatch based on expected return type at call site
+TODO: lenses are hard without HM
+
+
 
 ### Rust
 
@@ -464,7 +510,7 @@ Scala, including [algebraic data types][] and [type classes][].
 (Rust calls type classes "traits".)
 Of course there are downsides to Scala too.
 
-Rust, Haskell, (TODO: and Go?) use Hindley-Milner type inference.
+Rust and Haskell use Hindley-Milner type inference.
 That means that the compilers are really good at figuring out what the type of
 a term is.
 You end up needing fewer type annotations; and you can ask the compiler to fill
