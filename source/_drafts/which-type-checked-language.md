@@ -148,9 +148,15 @@ def fold[T, R](f: (T, R) => R, zero: R, xs: List[T]): R
 
 `fold` has [tremendous expressive power (PDF link)][fold].
 There are many abstractions that can be built using `fold` as a building block.
+Code that is concise-but-abstract can become confusing -
+a particular advantage of type-checking is that it helps to keep the programmer
+on the right track when working with such code.
 Any language that does not have the expressive power to describe the type of the
 `fold` function will lack the capability to express entire classes of
-boilerplate-reducing abstractions.
+boilerplate-reducing abstractions at the type level,
+and will lack crucial type-safety at the value level.
+
+TODO: ^ reword that to make more sense
 
 [fold]: https://docs.google.com/viewer?url=http%3A%2F%2Fwww.cs.nott.ac.uk%2F%7Egmh%2Ffold.pdf
 
