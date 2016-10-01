@@ -93,8 +93,15 @@ Each of these features helps to make a type system more expressive.
 | rank-n types / GADTs     |      | ✓       | ?     |      |    |      |
 |--------------------------+------+---------+-------+------+----+------|
 
+Of course a language is more than the sum of its parts, and a feature checklist
+cannot do a language justice.
+However, these features are, IMO, important building blocks.
 
-## algebraic data types (ADTs)
+# Type system features
+
+Each of the features listed above is a deep topic.
+What follows is a whirlwind summary of each feature
+with links for further reading.
 
 
 ## parametric polymorphism
@@ -103,18 +110,18 @@ Parametric polymorphism is also known as *generics*.
 This feature permits polymorphic functions and data structures,
 while allowing the compiler to keep track of the types flowing into and out of
 those functions and data structures.
-Type parameter annotations act as specifications for type-driven development -
-this provides a language for describing specific details of program behavior.
 
 For example, a function that returns the first element in a list can specify
 that the type of the return value is the same as the types of values in the
 input list
-(this is Scala code):
+(this is a Scala function type signature):
 
 ```scala
 def first[T](xs: List[T]): T
 ```
 
+Type parameter annotations act as specifications for type-driven development -
+this provides a language for describing specific details of program behavior.
 Without parametric polymorphism, it would be necessary to type-cast the result
 of `first` into the appropriate type on every invocation,
 which would be a source of potential errors.
@@ -133,132 +140,87 @@ Type variables let types express concepts like "this thing is always the same
 type as that thing".
 Writing types without type variables is like speaking without pronouns.
 
-Parametric polymorphism provides flexibility for describing abstractions that
-are particular to your code.
-Consider a function that hides boilerplate involved in updating a database record;
-this function accepts a callback that applies updates to a record, and returns
-the updated record on success:
+An example that is a bit more sophisticated is `fold`:
 
 ```scala
-def updateRecord[T](fetch:  (Database, Int)    => Try[T],
-                    insert: (Database, Int, T) => Try[Unit]
-                   )
-                   (id: Int)(callback: T => T): Try[T] {
-  val tx = db.beginTransaction()
-  try {
-    result = for {
-      userRecord <- fetch(db, id)
-      updatedRecord = callback(userRecord)
-      _ <- insert(db, id, updatedRecord)
-    } yield updatedRecord
-
-    if (result.isSuccess) {
-      tx.commit()
-    }
-    else {
-      tx.rollback()
-    }
-
-    result
-  }
-  catch {
-    case err: Throwable => {
-      tx.rollback()
-      Failure(err)
-    }
-  }
-}
+def fold[T, R](f: (T, R) => R, zero: R, xs: List[T]): R
 ```
 
-The general-purpose `updateRecord` function can be specialized for specific
-record types, without loss of type-safety or duplication of boilerplate:
+`fold` has [tremendous expressive power (PDF link)][fold].
+There are many abstractions that can be built using `fold` as a building block.
+Any language that does not have the expressive power to describe the type of the
+`fold` function will lack the capability to express entire classes of
+boilerplate-reducing abstractions.
 
-```scala
-val updateUserRecord = updatedRecord((db: Database, id: Int) => db.findUserById(id)
-                                     (db: Database, id: Int, user: User) => db.insertUser(id, user))
+[fold]: https://docs.google.com/viewer?url=http%3A%2F%2Fwww.cs.nott.ac.uk%2F%7Egmh%2Ffold.pdf
 
-updateUserRecord(16) { user => user.age += 1 } match {
-  Success(user) => println(s"The user is ${user.age} years old.")
-  Failure(err)  -> println(s"There was a problem updating the users age: $err")
-}
-```
-
-The fact that `updateUserRecord` updates a user record and also possibly
-returns a user record is now part of the program's machine-checkable specification,
-because that relationship was specified in the polymorphic type of
-`updateRecord`.
-
-Some languages (e.g. Go) effectively have polymorphic parametricity for
-built-in methods and data structures,
-but lack expressiveness in the type system required to describe _new_
-abstractions.
-
-Parametric polymorphism becomes much more powerful when augmented with
-*constrained types*.
+The input data structure to `fold` does not have to be a `List`.
+Any type that can represent multiple values is a candidate for a folding.
+Instead of reimplementing `fold` for `List`, `Set`, `Tree`, etc., it should be
+possible to write one type that represents the common abstraction over all of
+those types.
+That can be done my combining parametric polymorphism with higher-order types.
+More on that in the next section.
 
 
+## higher-order types
 
+Here I am referring to the concept that is often called *higher-kinded types*.
 
-Some types are actually *type constructors*, which take types as arguments to
-produce new types.
+Some types are actually *type constructors*:
+they are not do not represent possible values by themselves, 
+but when applied to argument types they produce usable, concrete types.
+An example is `List`.
+There is no value has the type `List`.
+(Or at least there shouldn't be.)
+But there are values with types like `List[Int]` or `List[String]`.
+
 This is a lot like how functions are values that take values as arguments to
-produce new new values.
-We could say that a function is a value constructor,
+produce new values.
+Type constructors are types that take types as arguments to produce new types.
+We could say that a function is a value constructor;
 or we could say that a type constructor is a type-level function.
 
-For example (this is Scala code):
+In the latter view, `List[Int]` is a type-level expression that applies `List`
+to `Int` to produce a type that does not have its own name,
+but that is usable and useful.
+
+Higher-order types are expressions that let us refer to a type constructor
+(e.g. `List`) without having to specify what its type argument(s) will be.
+In other words, higher-order types let us abstract over type constructor
+arguments.
+This is useful for capturing abstractions that are common to many types.
+In the last section I pointed out that while `List` values can be folded,
+the concept of folding is not limited to `List`s -
+lots of other types are "foldable".
+Here is a Scala type signature for a more-generalized version of `fold`:
 
 ```scala
-val xs: List[Int] = List(1, 2, 3)
+def fold[F[_], T, R](f: (T, R) => R, zero: R, xs: F[T]): R
 ```
 
-There is a type `List` -
-but there are no values of type `List` because `List` is a type constructor.
-A list must be a list _of_ something - like a list of integers (`List[Int]`) or
-a list of strings (`List[String]`).
+In this signature, `F[_]` declares a type variable `F`,
+which may be any type that takes one type parameter.
+(I.e., `F` can be any single-argument type constructor.)
+`F` could be `List`, `Tree`, `Promise`, some user-defined type, or one of many
+other types.
+This finally gives as a signature that accurately represents the universality
+of `fold`.
 
-One can use type variables in places where a specific type is not known ahead
-of time.
-A function that returns the length of a list is not concerned with what is in
-the list;
-so it should be able to operate on any list type.
-A length function could have a type like this:
+To actually implement such an abstract signature requires language support for
+some form of *ad-hoc polymorphism*.
+That could be interfaces,
+or *constrained types*, which we will get to in the next section.
 
-```scala
-def length[T](xs: List[T]): Int
-```
+TODO: higher-order types vs object-oriented interfaces
 
-Type variables allow one to specify relationships between types of arguments
-and return values.
-The type of an argument might not be known;
-but it might be known that two arguments must always have the same type,
-or that the return type of a function must match the type of an argument.
-A function that returns the first element of a list can take any type of list
-as an argument -
-but the type of the returned value is always the same as the type parameter of
-the list:
+You may have heard about [monads][], applicatives, and functors.
+Those concepts are tremendously useful, even if they are not easy to explain.
+Each of those concepts requires higher-order types to unlock its full
+expressive power.
 
-```scala
-def first[T](xs: List[T]): T
-```
 
-That is an important way in which parametric polymorphism makes a type system
-expressive.
-Type variables let types express concepts like "this thing is always the same
-type as that thing".
-Writing types without type variables is like speaking without pronouns.
-
-Furthermore,
-parametric polymorphism allows the compiler to keep track of types as values
-flow into and out of functions,
-and into and out of data structures.
-If the compiler is not able to do that then you either lose type information
-(and lose out on opportunities for the compiler to spot bugs)
-or the compiler requires the programmer to fill in details with type casts.
-Type casts shift the burden of checking program correctness from the compiler
-to the programmer -
-and therefore reduce the usefulness of the compiler.
-
+[monads]: http://james-iry.blogspot.com/2007/09/monads-are-elephants-part-1.html
 
 
 
@@ -415,6 +377,8 @@ data User = User { userName :: String, userAge :: Int }
   deriving Eq
 ```
 
+## algebraic data types (ADTs)
+
 
 ## Hindley-Milner Type Inference
 
@@ -550,3 +514,6 @@ is better.
 [algebraic data types]:
 [type classes]:
 [rank-n types]: https://ocharles.org.uk/blog/guest-posts/2014-12-18-rank-n-types.html
+
+
+TODO: link to book on type-driven development
