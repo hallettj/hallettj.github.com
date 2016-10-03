@@ -174,7 +174,7 @@ More on that in the next section.
 Here I am referring to the concept that is often called *higher-kinded types*.
 
 Some types are actually *type constructors*:
-they are not do not represent possible values by themselves, 
+they are not do not represent possible values by themselves,
 but when applied to argument types they produce usable, concrete types.
 An example is `List`.
 There is no value has the type `List`.
@@ -384,6 +384,133 @@ data User = User { userName :: String, userAge :: Int }
 ```
 
 ## algebraic data types (ADTs)
+
+The biggest obstacle to type-safety is *partial* functions.
+By "partial" I mean functions that can throw exceptions or panic in some
+circumstance.
+A common partial function is one that returns an element from a given index in
+a list, but that throws an exception if that index is out-of-bounds.
+
+A more delicate class of partial partial functions are those that operate on
+a type that might take on different "shapes" depending on runtime conditions.
+Algebraic data types are a means of defining such types in a safer way -
+ADTs encourage the programmer to make sure that every function is *total*
+(the opposite of partial).
+More importantly,
+ADTs provide a vocabulary for accurate type-level descriptions of whatever
+shapes values may take.
+
+A simple case where ADTs shine is the [option pattern][TODO].
+Rust has a built-in type that looks like this:
+
+
+```rust
+enum Result<T,E> {
+  Ok(T),
+  Err(E),
+}
+```
+
+`Result` is most often used as a return type in functions might need to return
+an error.
+`Ok` and `Err` are *value constructors* -
+One can create a value of type `Result` using these constructors.
+For example,
+
+```rust
+let: Result<&str,Error> = Ok("hello there")
+```
+
+A `Result` value can be inspected at runtime to determine whether it was
+constructed using `Ok` (in which case it represents a success value) or was
+constructed with `Err` (in which case it represents an error).
+This example uses [pattern matching][TODO]:
+
+```rust
+// Function to show message-of-the-day
+fn show_MOTD() {
+  let motd_result = fetch_MOTD(); // Might fail due to, e.g., network error
+  match motd_result {
+    Ok(msg) => println!(msg)
+    Err(_)  => println!("Sorry, the message-of-the-day is not available today.")
+  }
+}
+```
+
+So `Result` values have two possible shapes (`Ok` or `Err`).
+And the two shapes have no overlap:
+they represent opposite outcomes;
+they each come with a wrapped value,
+but the wrapped value in each shape has a different type.
+
+Other approaches to error cases might be to:
+
+- return `null` on failure
+- throw an exception
+- return multiple values (one for success, another for failure)
+
+Returning a `Result` value has three advantages over those other approaches:
+
+The type signature for functions that may fail can use `Result` as a return
+type,
+which makes those types an accurate specification for possible failure cases.
+Type signatures in many languages do not express that a function might return
+null or might throw an exception.
+
+To use a successful result, a caller must unwrap a `Result` value somehow.
+(The example above uses pattern matching for that purpose.)
+This makes it possible for the compiler to apply static analysis to ensure that
+every error case is handled somehow -
+even if that is just passing the error up the call stack.
+This means that runtime exceptions due to unhandled error cases are rare in
+Rust and Haskell.
+(Haskell also provides a built-in option-pattern type.)
+This means that the compiler can verify that the type-level specification of
+a program matches the implementation -
+if a function type does not indicate a possible errors, then it must do
+something about errors that might be returned by functions that it calls.
+Any case where the compiler can verify that types accurately describe
+implementation is an asset to type-driven development.
+
+Languages that use exception handling typically do not check at compile time to
+make sure that errors are caught.
+(A notable exception is Java; but Java lacks the third advantage.)
+Languages that return multiple values to indicate errors (e.g. Go)
+also tend not to have compile-time checking to ensure that errors are handled.
+
+Finally, `Result` is a first-class value that abstracts over success and
+failure.
+This makes it possible to apply abstractions to reduce boilerplate when dealing
+with multiple possible errors.
+Rust has a very helpful [`and_then`][TODO] method that uses a callback to
+operate on a success value,
+but returns error results as-is:
+
+```rust
+fn show_personalized_MOTD() {
+  let user_result = fetch_current_user(); // Might fail
+  let motd_result = user_result.and_then(|user| {
+    fetch_MOTD_for_user(&user) // Might fail
+  });
+  match motd_result {
+    Ok(msg) => println!(msg)
+    Err(_)  => println!("Sorry, the message-of-the-day is not available today.")
+  }
+}
+```
+
+This time when we get to the `Err(_)` pattern match we might have gotten there
+because `fetch_current_user()` failed,
+or because `fetch_MOTD_for_user` failed.
+
+This kind of abstraction does not work with multiple return values or with
+caught exceptions because in those cases there is no single, first-class value
+that abstracts over both success and error results.
+
+Haskell further generalizes the `and_then` pattern:
+Haskell's option type, `Maybe`, is a [monad][Maybe Monad]
+
+TODO: example of domain-specific ADT
 
 
 ## Hindley-Milner Type Inference
