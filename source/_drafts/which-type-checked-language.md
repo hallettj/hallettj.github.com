@@ -515,6 +515,53 @@ Haskell's option type, `Maybe`, is a [monad][Maybe Monad]
 TODO: example of domain-specific ADT
 
 
+## no `null`
+
+`null` is the [billion-dollar mistake][].
+In most languages that include a `null` value it is an instance of a bottom
+type -
+meaning that `null` may be given in expressions where nearly any type is
+expected.
+This bypasses the type system,
+making type-level specifications weaker.
+In every type signature in languages with `null` there is ambiguity over
+whether arguments or return values might be `null`.
+Languages such as Java, Go, and Scala do not have the type-level vocabulary to
+specify that a given value will not be `null`.
+This is a case where removing a feature (removing the `null` bottom type)
+makes the language _more_ expressive.
+
+[billion-dollar mistake]: https://www.infoq.com/presentations/Null-References-The-Billion-Dollar-Mistake-Tony-Hoare
+
+Many languages restrict `null` (or `nil`) values to non-primitive types, or to
+pointer types.
+That reduces the scope of the problem - but not by enough.
+
+In the feature table above Flow has a "no `null`" check mark -
+even though it is just a type checker for Javascript,
+which does have both `null` and `undefined` values.
+This is because Flow does not treat `null` as a bottom type.
+Flow interprets `null` as the sole value of a `null` type,
+which is not a subtype of any other type.
+Flow treats `undefined` the same way:
+as a distinct type with only one possible value.
+This makes Flow's versions of `null` and `undefined` behave like the `Unit`
+type in Haskell, Rust, and Scala.
+
+In Flow type signatures,
+values may only be `null` if the type a value is a type union that includes the
+`null` type.
+E.g. `ResultType | void` or `?ResultType`.
+This makes Flow's type system sufficiently expressive to indicate where `null`
+values may or may not appear,
+and allows Flow to check to verify at type-checking time that possible `null`
+values are accounted for.
+TODO: citation needed
+
+
+## no subtyping
+
+
 ## Hindley-Milner Type Inference
 
 Before talking about HM inference, let's first talk about lenses.
