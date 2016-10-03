@@ -561,6 +561,29 @@ TODO: citation needed
 
 ## no subtyping
 
+Subtypes - and in particular subclasses - can lead to unnecessary ambiguity.
+In my opinion type classes are a better way to achieve ad-hoc polymorphism -
+at least with respect to type-driven development.
+
+TODO: expand on how type classes are better for TDD
+
+references:
+http://languagengine.co/blog/making-sense-of-subtypes/
+http://okmij.org/ftp/Computation/Subtyping/
+
+TODO: move following paragraph to section on constrained types?
+
+In Haskell the `Int` type is an instance of the `Num` type class.
+This means that `Int` can be used in any context where instances of `Num` are
+expected.
+What distinguishes this from subtyping in other languages is that `Num` is _not_
+a type.
+In the sense of a type as a set of possible values,
+it is arguable that `Num` is a type -
+but Haskell does not permit `Num` to be used as a type.
+Instead `Num` is a set (or class) of possible types that have common behavior.
+`Num`, and other type classes, are used as *constraints* on type variables.
+
 
 ## Hindley-Milner Type Inference
 
