@@ -1,20 +1,25 @@
-# Which type-checked language should you use?
+---
+layout: post
+title: "Which type-checked language should you use?"
+date: 2016-10-04
+comments: true
+---
 
 I sometimes have a conversation that goes like this:
 
 colleague
-:We're thinking of using Language X for this project. What do you think?
+: We're thinking of using Language X for this project. What do you think?
 
 me
-:Language X has some nice features. But I think there are missed opportunities
+: Language X has some nice features. But I think there are missed opportunities
 in the language - particularly in its type system. There are other languages
 that I prefer to use.
 
 colleague
-:Ok; which better language do you recommend?
+: Ok; which better language do you recommend?
 
 me
-:Well...
+: Well...
 
 It is hard to give one recommendation for the best language to use in a project.
 Every language comes with some caveats.
@@ -40,6 +45,7 @@ Types can improve productivity through type-driven development.
 A good type system magnifies these advantages.
 A mediocre type system might feel like more of a chore than a help.
 
+<!-- more -->
 
 # Type-driven development
 
