@@ -20,51 +20,71 @@ It is hard to give one recommendation for the best language to use in a project.
 Every language comes with some caveats.
 I would like to take a look at the merits of a few different languages as a way
 to continue the above conversation.
-For this post I will focus on how the type systems of statically type-checked
-languages can aid development.
+To make this post manageable I will focus on type systems of statically
+type-checked languages.
+In particular I want to look at a few different languages from the perspective
+of type-driven development.
+Examining how language features benefit type-driven development will serve as
+a reference point for comparing languages.
+
 In my opinion a good type system can be a great asset,
 and I view it as one of the most important considerations when choosing
 a programming language.
-
 A compiler with good type-checking is like a colleague sitting next to you
-writing tests for you, pointing out potential bugs, and giving you a subtle nod
-when you fix all the problems.
-A compiler with mediocre type-checking is like a less-experienced colleague who
-is distracted by something.
+checking that your code is correct,
+pointing out potential bugs,
+and giving you a subtle nod when you have fixed any problems.
+Static type-checking can reduce your test burden,
+and type annotations provide a layer of documentation that is always up-to-date.
+Types can improve productivity through type-driven development.
+A good type system magnifies these advantages.
+A mediocre type system might feel like more of a chore than a help.
 
-Another perspective comes from [type-driven development][].
-Type-driven development is not so unlike test-driven development.
-In test-driven development tests serve as an executable specification of what
+
+# Type-driven development
+
+In type-driven development,
+type signatures serve as a machine-verifiable specification of what a program
+should do.
+From the book [Type-Driven Development with Idris][]:
+
+> Traditionally, types are seen as a tool for checking for errors,
+> with the programmer writing a complete program first and using either the
+> compiler or run-time system to detect type errors.
+> In type-driven development,
+> we use types as a tool for constructing programs.
+> We put the _type_ first, treating it as a _plan_ for a program,
+> and use the compiler and type checker as our assistant,
+> guiding us to a complete and working program which satisfies the type.
+> The more expressive a type we give up front,
+> the more confidence we have that the resulting program will be correct.
+
+[Type-Driven Development with Idris]: https://www.manning.com/books/type-driven-development-with-idris
+
+Type-driven development is not so unlike test-driven development:
+in test-driven development tests serve as an executable specification of what
 the program should do.
 The programmer writes tests, and then writes code that makes those tests pass.
 In type-driven development the program specification is given in the form of
 types of data structures and of functions that act on those data structures.
 The programmer writes types, and then writes implementations that satisfy those
 types.
-Types-as-specification has some advantages:
-there is no need to provide fake input data; all branches of code are always
-checked; and type annotations are better-suited than tests for serving
-double-duty as documentation.
+
+Types-as-specification have some advantages over tests-as-specification:
+
+- there is no need to provide fake input data
+- all branches of code are always checked
+- type annotations are better-suited than tests for serving double-duty as documentation
+
 (I don't mean to say that the two approaches are not compatible!)
-But if a program specification takes the form of types,
+
+If a program specification takes the form of types,
 then amount of detail that the specification can express is limited by the
 expressiveness of the type system.
 It takes an expressive type system to make type-driven development useful.
 
 
-
-Static type-checking can reduce your test burden,
-and type annotations provide self-documentation that is always up-to-date.
-Types can improve productivity through [type-driven development][].
-A good type system magnifies these advantages.
-A mediocre type system might feel like more of a chore than a help.
-In the best case a mediocre type system requires more programmer discipline and
-experience to get its full benefits.
-My top choices of languages with good type systems are Rust and Haskell.
-If either of those seems like a good fit for your project,
-then I think that you are in for a pleasant development experience.
-But whether Rust, Haskell, or another language is right for your project
-depends on a variety of factors.
+# Type system features
 
 But what makes one type system more powerful than another?
 Here is a breakdown of some features that I think are useful to have.
@@ -76,7 +96,9 @@ Each of these features helps to make a type system more expressive.
 |--------------------------|:----:|:-------:|:-----:|:----:|---:|:----:|:-----:|
 | parametric polymorphism  | ✓    | ✓       | ✓     | ✓    |    | ✓    | ✓     |
 |--------------------------|:----:|:-------:|:-----:|:----:|:--:|:----:|:-----:|
-| constrained types        | ✓    | ✓       | ✓     |      |    |      | ✓     |
+| higher-order types       |      | ✓       | ✓     |      |    |      | ✓     |
+|--------------------------|:----:|:-------:|:-----:|:----:|:--:|:----:|:-----:|
+| type classes             | ✓    | ✓       | ✓     |      |    |      | ✓     |
 |--------------------------|:----:|:-------:|:-----:|:----:|:--:|:----:|:-----:|
 | algebraic data types     | ✓    | ✓       | ✓     |      |    |      | ✓     |
 |--------------------------|:----:|:-------:|:-----:|:----:|:--:|:----:|:-----:|
@@ -88,18 +110,15 @@ Each of these features helps to make a type system more expressive.
 |--------------------------|:----:|:-------:|:-----:|:----:|:--:|:----:|:-----:|
 | Hindley-Milner inference | ✓    | ✓       |       |      |    |      |       |
 |--------------------------|:----:|:-------:|:-----:|:----:|:--:|:----:|:-----:|
-| higher-order types       |      | ✓       | ✓     |      |    |      | ✓     |
-|--------------------------|:----:|:-------:|:-----:|:----:|:--:|:----:|:-----:|
 | rank-n types / GADTs     |      | ✓       | ?     |      |    |      | ✓     |
 |--------------------------|:----:|:-------:|:-----:|:----:|:--:|:----:|:-----:|
 | dependent types          | ?    |         |       |      |    |      | ✓     |
 |--------------------------+------+---------+-------+------+----+------+-------|
 
-Of course a language is more than the sum of its parts, and a feature checklist
+A language is more than the sum of its parts, and a feature checklist
 cannot do a language justice.
-However, these features are, IMO, important building blocks.
-
-# Type system features
+But these features are important building blocks that I do believe are
+representative of what a language is capable of.
 
 Each of the features listed above is a deep topic.
 What follows is a whirlwind summary of each feature
@@ -232,7 +251,11 @@ expressive power.
 
 
 
-## constrained types
+## type classes
+
+Haskell, Scala, Idris, and Rust implement type type classes.
+Rust calls this feature "[traits][]",
+even though Rust traits are unlike traits in Scala or other languages.
 
 "Constrained types" refers to the feature that Haskell and Scala call "[type classes][]",
 and that Rust calls "[traits][]".
