@@ -27,10 +27,10 @@ I would like to take a look at the merits of a few different languages as a way
 to continue the above conversation.
 To make this post manageable I will focus on type systems of statically
 type-checked languages.
-In particular I want to look at a few different languages from the perspective
-of type-driven development.
-Examining how language features benefit type-driven development will serve as
-a reference point for comparing languages.
+I will use *type-driven development* as a frame-of-reference for comparing type
+systems.
+
+tl;dr: see [table][]
 
 In my opinion a good type system can be a great asset,
 and I view it as one of the most important considerations when choosing
@@ -41,18 +41,30 @@ pointing out potential bugs,
 and giving you a subtle nod when you have fixed any problems.
 Static type-checking can reduce your test burden,
 and type annotations provide a layer of documentation that is always up-to-date.
-Types can improve productivity through type-driven development.
+What is even better,
+type-checking let's you iterate and refactor with increased confidence that
+existing code will continue to function correctly.
 A good type system magnifies these advantages.
-A mediocre type system might feel like more of a chore than a help.
 
 <!-- more -->
 
 # Type-driven development
 
-In type-driven development,
-type signatures serve as a machine-verifiable specification of what a program
+Type-driven development follows a cycle that is similar to test-driven development:
+
+- write a machine-verifiable program specification
+  (in the form of types and type signatures in test-driven development,
+  or as tests in test-driven development)
+- write code that matches the specification
+- refactor, and repeat
+
+In type-driven development type signatures serve as a machine-verifiable specification of what a program
 should do.
-From the book [Type-Driven Development with Idris][]:
+
+In type-driven development the program specification is given in the form of
+types of data structures and types of functions that act on those data
+structures.
+From the book, [Type-Driven Development with Idris][]:
 
 > Traditionally, types are seen as a tool for checking for errors,
 > with the programmer writing a complete program first and using either the
@@ -67,22 +79,22 @@ From the book [Type-Driven Development with Idris][]:
 
 [Type-Driven Development with Idris]: https://www.manning.com/books/type-driven-development-with-idris
 
-Type-driven development is not so unlike test-driven development:
-in test-driven development tests serve as an executable specification of what
-the program should do.
-The programmer writes tests, and then writes code that makes those tests pass.
-In type-driven development the program specification is given in the form of
-types of data structures and of functions that act on those data structures.
-The programmer writes types, and then writes implementations that satisfy those
-types.
-
 Types-as-specification have some advantages over tests-as-specification:
 
 - there is no need to provide fake input data
 - all branches of code are always checked
 - type annotations are better-suited than tests for serving double-duty as documentation
 
-(I don't mean to say that the two approaches are not compatible!)
+Of course types and tests are not incompatible!
+Using type-driven development should reduce, but not eliminate,
+the need for tests.
+If test-driven development is combined with type-driven development tests can
+fill in the more complicated details of the specification that are difficult to
+express in types.
+That is opposed to a strategy of representing the program specification
+entirely in tests.
+But the more expressive a language's type system is,
+the more tricky details can be captured by types.
 
 If a program specification takes the form of types,
 then amount of detail that the specification can express is limited by the
