@@ -142,6 +142,12 @@ Each of the features listed above is a deep topic.
 What follows is a whirlwind summary of each feature
 with links for further reading.
 
+TODO: Short primer on Haskell syntax: 
+https://prajitr.github.io/quick-haskell-syntax/
+
+TODO: Longer primer:
+http://yannesposito.com/Scratch/en/blog/Haskell-the-Hard-Way/
+
 
 ## parametric polymorphism
 
@@ -252,10 +258,12 @@ other types.
 This finally gives as a signature that accurately represents the universality
 of `fold`.
 
-To actually implement such an abstract signature requires language support for
-some form of *ad-hoc polymorphism*.
-That could be interfaces,
-or *constrained types*, which we will get to in the next section.
+The problem now is that the signature for `fold` is too general.
+There are type constructors that do not produce to foldable types.
+To fix this problem,
+it is necessary to *constrain* `F[_]` to the class of type constructors that
+_do_ produce foldable types.
+More on that in the next section on *type classes*.
 
 TODO: higher-order types vs object-oriented interfaces
 
@@ -264,7 +272,6 @@ Those concepts are tremendously useful, even if they are not easy to explain.
 Each of those concepts requires higher-order types to unlock its full
 expressive power.
 
-
 [monads]: http://james-iry.blogspot.com/2007/09/monads-are-elephants-part-1.html
 
 
@@ -272,16 +279,70 @@ expressive power.
 ## type classes
 
 Haskell, Scala, Idris, and Rust implement type type classes.
-Rust calls this feature "[traits][]",
-even though Rust traits are unlike traits in Scala or other languages.
-
-"Constrained types" refers to the feature that Haskell and Scala call "[type classes][]",
-and that Rust calls "[traits][]".
-Traits in Rust are not at all like traits in Scala or Smalltalk.
-And type classes have little to do with the concept of classes in
+Rust calls this feature "[traits][]".
+But Rust traits are unlike traits in Scala or other languages.
+Be aware that type classes have little to do with the concept of classes in
 object-oriented languages.
 In fact type classes / traits are a lot more like interfaces in Go,
-Java, or Scala - but with some advantages:
+Java, or Scala - but with some advantages.
+(More on that later.)
+
+In the previous section I argued that `fold` is a very general function,
+but that to accurately describe it without overgeneralizing it is necessary to
+specify which types are "foldable".
+A type class defines behavior that can be shared by a "class" of types.
+For example, this is an abbreviated version of a type class in the Haskell
+standard library:
+
+```haskell
+class Foldable t where
+    foldr :: (a -> b -> b) -> b -> t a -> b
+```
+
+The type class `Foldable` lists a function, `foldr`, that is identical to the
+`fold` function described in the previous section.
+(The definition of `Foldable` includes other functions,
+but I have excluded them for brevity.)
+The class definition states that any type, `t`, that is a member of the type
+class can be used with the `foldr` function.
+That fact can be exploited to express concepts that generalize to any foldable
+type.
+An example is the idea that given any value of a foldable type that in some
+sense contains numbers,
+it is possible to compute the sum of the contained numbers.
+The Haskell standard library provides a `sum` function that implements this
+idea;
+and its type signature describes the concept succinctly:
+
+```haskell
+sum :: (Num a, Foldable t) => t a -> a
+```
+
+The type signature of `sum` is constrained:
+it indicates that type `t` must be foldable, and type `a` must be an instance
+of `Num`, a type class that defines behavior that is common to numeric types.
+If those constraints are satisfied,
+`sum` will add the numbers in the input data structure:
+
+```haskell
+sum [1, 2, 3] == 6
+```
+
+The type of `sum` states that the input must in some sense contain values of
+a numeric type, `a`,
+and that `sum` returns a value with a numeric type.
+But it goes further to state that whatever type that is,
+it must be the _same_ numeric type in both cases.
+
+The concept of certain types being "foldable" could be expressed in an
+object-oriented language using interfaces instead of type classes.
+
+```scala
+TODO: Foldable interface
+```
+
+
+
 
 - Type classes can express that multiple arguments to a method have the same type.
 - Type class methods may select an implementation based on the expected return
@@ -303,6 +364,8 @@ Java, or Scala - but with some advantages:
 [type classes]: http://learnyouahaskell.com/types-and-typeclasses#typeclasses-101
 [traits]: https://doc.rust-lang.org/book/traits.html
 [static dispatch]: https://blog.rust-lang.org/2015/05/11/traits.html
+
+[Type classes in Scala]: http://danielwestheide.com/blog/2013/02/06/the-neophytes-guide-to-scala-part-12-type-classes.html
 
 Constrained types work in concert with parametric polymorphism to add another
 level of expressiveness.
