@@ -208,12 +208,37 @@ a `title` property.
 But if a `case` body did something not compatible with all of the different
 item types that could fall-through into it, then Flow would report an error.
 
+Next up are functions to fetch the latest items from Hacker news:
+
+```js
+// Fetches the largest ID, which should be the ID of the most recently-created
+// item.
+function fetchMaxItemId(): Promise<ID> {
+  return nodeFetch(`https://hacker-news.firebaseio.com/v0/maxitem.json`)
+    .then(res => res.json())
+}
+
+async function fetchLatestItems(n: number): Promise<Item[]> {
+  const maxId = await fetchMaxItemId()
+  const fetches = []
+  for (let i = 0; i < n; i++) {
+    fetches.push(fetchItem(maxId - i))
+  }
+  return Promise.all(fetches)
+}
+```
+
+And finally, some code to set everything running:
+
+```js
+(async function main() {
+  const latestItems = await fetchLatestItems(15)
+  latestItems.forEach(item => console.log(formatItem(item)))
+}())
+```
+
 
 TODO: link to code
-
-
-
-
 
 
 [HN API]: https://github.com/HackerNews/API
