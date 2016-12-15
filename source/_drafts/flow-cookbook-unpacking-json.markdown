@@ -151,8 +151,65 @@ function getTitle(item: Item): ?string {
 }
 ```
 
-TODO: `formatItem`
+Hacker News does provide endpoints for fetching recent submissions of
+a specific item type.
+(E.g., the latest stories.)
+But to demonstrate the flexibility of the `Item` type,
+let's write some code that fetches and displays the latest items of any type.
+We will need to switch on the `type` property of each item to display it
+properly:
 
+```js
+function formatItem(item: Item): string {
+  switch (item.type) {
+    case 'story':
+      return `${item.title} submitted by ${item.by}`
+    case 'ask':
+      return `${item.by} asked: ${item.title}`
+    case 'job':
+      return `job posting: ${item.title}`
+    case 'poll':
+      return `poll: ${item.title} - choose one of ${item.kids.length} options`
+    case 'pollopt':
+      return `poll option: ${item.text}`
+    case 'comment':
+      return `${item.by} commented: ${item.text.slice(0,60)}...`
+    default:
+      throw new Error(`unknown item type: ${item.type}`)
+  }
+}
+```
+
+Flow is able to infer which item type is given in each `case` body.
+This is just like how type-narrowing worked in the `if` body in the `getTitle`
+function.
+
+Flow's checking has an added bonus:
+if you have a `case` body with no `return` or `break` statement,
+execution falls through into the next `case` body.
+When switching on `item.type`, a fall-through would result in a situation
+where a `case` body might be executed with any of several different item types.
+For example:
+
+```js
+function getTitleCowboyStyle(item: Item): ?string {
+  switch (item.type) {
+    case 'story':
+    case 'ask':
+    case 'job':
+    case 'poll':
+      return item.title
+  }
+}
+```
+
+Flow allows this, because all of the types listed in that example have
+a `title` property.
+But if a `case` body did something not compatible with all of the different
+item types that could fall-through into it, then Flow would report an error.
+
+
+TODO: link to code
 
 
 
