@@ -17,8 +17,25 @@ One of the endpoints of that API accepts an ID and responds with an item:
 fetch(`https://hacker-news.firebaseio.com/v0/item/${id}.json`)
 ```
 
+Here is an example of a response:
+
+```js
+{
+  "by" : "todd8",
+  "dead" : true,
+  "id" : 13225417,
+  "score" : 1,
+  "time" : 1482277147,
+  "title" : "U.S. Department of Energy Misconduct [pdf]",
+  "type" : "story",
+  "url" : "http://freebeacon.com/wp-content/uploads/2016/12/2016-12-19-Final-Staff-Report-LDRR.pdf"
+}
+```
+
 An "item" might be a story, a comment, a question, a job posting, a poll, or
 a voting option in a poll.
+Each item type has different properties -
+for example stories have a `title`, but comments do not.
 If you don't have context for the ID,
 the only way to know what you have fetched is to check the `type` property of
 the response at runtime.
