@@ -27,6 +27,8 @@ it is necessary to describe a type that encompasses all of the possible shapes
 that the returned data might take.
 That is going to be a [union type][], which will look something like this:
 
+<!-- more -->
+
 ```js
 type Item =
   | { type: 'story',   /* story properties */ }
