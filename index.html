@@ -121,8 +121,34 @@ One of the endpoints of that API accepts an ID and responds with an item:</p>
 </pre></td><td class="code"><pre><code class="js"><span class="line"><span class="nx">fetch</span><span class="p">(</span><span class="err">`</span><span class="nx">https</span><span class="o">:</span><span class="c1">//hacker-news.firebaseio.com/v0/item/${id}.json`)</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
+<p>Here is an example of a response:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="p">{</span>
+</span><span class="line">  <span class="s2">&quot;by&quot;</span> <span class="o">:</span> <span class="s2">&quot;todd8&quot;</span><span class="p">,</span>
+</span><span class="line">  <span class="s2">&quot;dead&quot;</span> <span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+</span><span class="line">  <span class="s2">&quot;id&quot;</span> <span class="o">:</span> <span class="mi">13225417</span><span class="p">,</span>
+</span><span class="line">  <span class="s2">&quot;score&quot;</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+</span><span class="line">  <span class="s2">&quot;time&quot;</span> <span class="o">:</span> <span class="mi">1482277147</span><span class="p">,</span>
+</span><span class="line">  <span class="s2">&quot;title&quot;</span> <span class="o">:</span> <span class="s2">&quot;U.S. Department of Energy Misconduct [pdf]&quot;</span><span class="p">,</span>
+</span><span class="line">  <span class="s2">&quot;type&quot;</span> <span class="o">:</span> <span class="s2">&quot;story&quot;</span><span class="p">,</span>
+</span><span class="line">  <span class="s2">&quot;url&quot;</span> <span class="o">:</span> <span class="s2">&quot;http://freebeacon.com/wp-content/uploads/2016/12/2016-12-19-Final-Staff-Report-LDRR.pdf&quot;</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
 <p>An “item” might be a story, a comment, a question, a job posting, a poll, or
 a voting option in a poll.
+Each item type has different properties -
+for example stories have a <code>title</code>, but comments do not.
 If you don’t have context for the ID,
 the only way to know what you have fetched is to check the <code>type</code> property of
 the response at runtime.
