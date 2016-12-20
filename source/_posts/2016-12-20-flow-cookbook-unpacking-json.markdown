@@ -174,13 +174,13 @@ properly:
 function formatItem(item: Item): string {
   switch (item.type) {
     case 'story':
-      return `${item.title} submitted by ${item.by}`
+      return `"${item.title}" submitted by ${item.by}`
     case 'ask':
       return `${item.by} asked: ${item.title}`
     case 'job':
       return `job posting: ${item.title}`
     case 'poll':
-      return `poll: ${item.title} - choose one of ${item.kids.length} options`
+      return `poll: "${item.title}" - choose one of ${item.kids.length} options`
     case 'pollopt':
       return `poll option: ${item.text}`
     case 'comment':
@@ -245,7 +245,9 @@ And finally, some code to set everything running:
 ```js
 (async function main() {
   const latestItems = await fetchLatestItems(15)
-  latestItems.forEach(item => console.log(formatItem(item)))
+  latestItems.forEach(item => {
+    console.log(formatItem(item) + "\n")
+  })
 }())
 ```
 
