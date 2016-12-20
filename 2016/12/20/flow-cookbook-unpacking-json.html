@@ -1,0 +1,596 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Flow Cookbook: Unpacking JSON API data - sitr.us</title>
+  <meta name="author" content="Jesse Hallett">
+
+  
+  <meta name="description" content="This recipe is part of the Flow Cookbook series. Hacker News provides a public API.
+One of the endpoints of that API accepts an ID and responds with &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- OpenID delegation -->
+  <link rel="openid.delegate" href="http://sitr.us/" />
+  <link rel="openid.server" href="https://indieauth.com/openid" />
+
+  
+  <link rel="canonical" href="http://sitr.us/2016/12/20/flow-cookbook-unpacking-json.html">
+  <link href="/favicon.ico" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="http://feeds.feedburner.com/hallettj" rel="alternate" title="sitr.us" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=Ubuntu+Mono:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-327628-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">sitr.us</a></h1>
+  
+    <h2>posts by Jesse Hallett</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="http://feeds.feedburner.com/hallettj" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:sitr.us" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Flow Cookbook: Unpacking JSON API data</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-12-20T00:00:00-08:00" pubdate data-updated="true">2016-12-20</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p><em>This recipe is part of the <a href="/2016/12/20/flow-cookbook.html">Flow Cookbook</a> series.</em></p>
+
+<p>Hacker News provides <a href="https://github.com/HackerNews/API">a public API</a>.
+One of the endpoints of that API accepts an ID and responds with an item:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="nx">fetch</span><span class="p">(</span><span class="err">`</span><span class="nx">https</span><span class="o">:</span><span class="c1">//hacker-news.firebaseio.com/v0/item/${id}.json`)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>An “item” might be a story, a comment, a question, a job posting, a poll, or
+a voting option in a poll.
+If you don’t have context for the ID,
+the only way to know what you have fetched is to check the <code>type</code> property of
+the response at runtime.
+To add type safety to a call to this API,
+it is necessary to describe a type that encompasses all of the possible shapes
+that the returned data might take.
+That is going to be a <a href="https://flowtype.org/docs/union-intersection-types.html">union type</a>, which will look something like this:</p>
+
+<!-- more -->
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="nx">type</span> <span class="nx">Item</span> <span class="o">=</span>
+</span><span class="line">  <span class="o">|</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;story&#39;</span><span class="p">,</span>   <span class="cm">/* story properties */</span> <span class="p">}</span>
+</span><span class="line">  <span class="o">|</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;ask&#39;</span><span class="p">,</span>     <span class="cm">/* ask properties */</span> <span class="p">}</span>
+</span><span class="line">  <span class="o">|</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;job&#39;</span><span class="p">,</span>     <span class="cm">/* job properties */</span> <span class="p">}</span>
+</span><span class="line">  <span class="o">|</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;poll&#39;</span><span class="p">,</span>    <span class="cm">/* poll properties */</span> <span class="p">}</span>
+</span><span class="line">  <span class="o">|</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;pollopt&#39;</span><span class="p">,</span> <span class="cm">/* pollopt properties */</span> <span class="p">}</span>
+</span><span class="line">  <span class="o">|</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;comment&#39;</span><span class="p">,</span> <span class="cm">/* comment properties */</span> <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>There are not a huge number of properties in the API responses -
+but if we list out all of the properties in every branch the result will be too
+big and dense for light reading.
+So let’s start by factoring out common properties into helper types.</p>
+
+<p>All of the different item types have <code>by</code>, <code>id</code>, and <code>time</code> properties.
+So we can put those all into one type:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="c1">// Properties common to all item types</span>
+</span><span class="line"><span class="nx">type</span> <span class="nx">ItemCommon</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class="line">  <span class="nx">by</span><span class="o">:</span>   <span class="nx">Username</span><span class="p">,</span>
+</span><span class="line">  <span class="nx">id</span><span class="o">:</span>   <span class="nx">ID</span><span class="p">,</span>
+</span><span class="line">  <span class="nx">time</span><span class="o">:</span> <span class="nx">number</span><span class="p">,</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Those <code>Username</code> and <code>ID</code> types are just aliases that I defined for primitive
+types:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="c1">// These type aliases just help to illustrate the purpose of certain properties</span>
+</span><span class="line"><span class="nx">type</span> <span class="nx">Username</span> <span class="o">=</span> <span class="nx">string</span>
+</span><span class="line"><span class="nx">type</span> <span class="nx">ID</span> <span class="o">=</span> <span class="nx">number</span>
+</span><span class="line"><span class="nx">type</span> <span class="nx">URL</span> <span class="o">=</span> <span class="nx">string</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>I think that using aliases like these helps to provide clarity on the purpose
+of each property.
+If we had a property with the type <code>by: string</code> it would not be obvious whether
+the value of that property is an ID that happens to be a string,
+or a human-readable value.
+Using the <code>Username</code> type alias makes it obvious that the property will contain
+a value that might be suitable for display to users.
+Otherwise the types <code>string</code> and <code>Username</code> are interchangeable.</p>
+
+<p>There is more common structure in Hacker News item types:
+the story, ask, job, and poll response types all represent top-level submissions,
+which have several properties in common:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="c1">// Properties common to top-level item types</span>
+</span><span class="line"><span class="nx">type</span> <span class="nx">TopLevel</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class="line">  <span class="nx">descendents</span><span class="o">:</span> <span class="nx">number</span><span class="p">,</span>
+</span><span class="line">  <span class="nx">score</span><span class="o">:</span> <span class="nx">number</span><span class="p">,</span>
+</span><span class="line">  <span class="nx">title</span><span class="o">:</span> <span class="nx">string</span><span class="p">,</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>With those helper types in place,
+we can produce a type that describes all possible items:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="nx">type</span> <span class="nx">Item</span> <span class="o">=</span>
+</span><span class="line">  <span class="o">|</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;story&#39;</span><span class="p">,</span> <span class="nx">kids</span><span class="o">:</span> <span class="nx">ID</span><span class="p">[],</span> <span class="nx">url</span><span class="o">:</span> <span class="nx">URL</span> <span class="p">}</span>                 <span class="o">&amp;</span> <span class="nx">ItemCommon</span> <span class="o">&amp;</span> <span class="nx">TopLevel</span>
+</span><span class="line">  <span class="o">|</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;ask&#39;</span><span class="p">,</span>  <span class="nx">kids</span><span class="o">:</span> <span class="nx">ID</span><span class="p">[],</span> <span class="nx">text</span><span class="o">:</span> <span class="nx">string</span><span class="p">,</span> <span class="nx">url</span><span class="o">:</span> <span class="nx">URL</span> <span class="p">}</span>    <span class="o">&amp;</span> <span class="nx">ItemCommon</span> <span class="o">&amp;</span> <span class="nx">TopLevel</span>
+</span><span class="line">  <span class="o">|</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;job&#39;</span><span class="p">,</span> <span class="nx">text</span><span class="o">:</span> <span class="nx">string</span><span class="p">,</span> <span class="nx">url</span><span class="o">:</span> <span class="nx">URL</span> <span class="p">}</span>                 <span class="o">&amp;</span> <span class="nx">ItemCommon</span> <span class="o">&amp;</span> <span class="nx">TopLevel</span>
+</span><span class="line">  <span class="o">|</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;poll&#39;</span><span class="p">,</span> <span class="nx">kids</span><span class="o">:</span> <span class="nx">ID</span><span class="p">[],</span> <span class="nx">parts</span><span class="o">:</span> <span class="nx">ID</span><span class="p">[],</span> <span class="nx">text</span><span class="o">:</span> <span class="nx">string</span> <span class="p">}</span> <span class="o">&amp;</span> <span class="nx">ItemCommon</span> <span class="o">&amp;</span> <span class="nx">TopLevel</span>
+</span><span class="line">  <span class="o">|</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;pollopt&#39;</span><span class="p">,</span> <span class="nx">parent</span><span class="o">:</span> <span class="nx">ID</span><span class="p">,</span> <span class="nx">score</span><span class="o">:</span> <span class="nx">number</span><span class="p">,</span> <span class="nx">text</span><span class="o">:</span> <span class="nx">string</span> <span class="p">}</span> <span class="o">&amp;</span> <span class="nx">ItemCommon</span>
+</span><span class="line">  <span class="o">|</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;comment&#39;</span><span class="p">,</span> <span class="nx">kids</span><span class="o">:</span> <span class="nx">ID</span><span class="p">[],</span> <span class="nx">parent</span><span class="o">:</span> <span class="nx">ID</span><span class="p">,</span> <span class="nx">text</span><span class="o">:</span> <span class="nx">string</span> <span class="p">}</span>    <span class="o">&amp;</span> <span class="nx">ItemCommon</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>An <a href="https://flowtype.org/docs/union-intersection-types.html">intersection type</a> like
+<code>{ type: 'story', kids: ID[], url: URL } &amp; ItemCommon &amp; TopLevel</code>
+is essentially a shorthand for an object type with a <code>type</code> property that is
+always equal to <code>'story'</code>, combined with all of the properties listed in the
+<code>ItemCommon</code> and <code>TopLevel</code> types.
+Each branch of the union type contains a type intersection that combines common
+properties with the properties that are particular to each item
+type.[^top-level union]</p>
+
+<p><code>type Item = ItemCommon &amp; (/* union type */)</code>.
+That would put the union type inside of the intersection type.
+But due to a quirk in Flow as of version 0.36 the union type must be the
+outermost layer of of composition for type narrowing to work.</p>
+
+<p>We don’t have to do anything special to parse incoming data into that type.
+<a href="TODO">Flow types are duck types</a> -
+<code>Item</code> is just an alias for plain Javascript objects with a certain structure.
+We just need to declare that API responses have the <code>Item</code> type.
+That is done with with the return type in this function signature:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="kd">function</span> <span class="nx">fetchItem</span><span class="p">(</span><span class="nx">id</span><span class="o">:</span> <span class="nx">ID</span><span class="p">)</span><span class="o">:</span> <span class="nx">Promise</span><span class="o">&lt;</span><span class="nx">Item</span><span class="o">&gt;</span> <span class="p">{</span>
+</span><span class="line">  <span class="k">return</span> <span class="nx">fetch</span><span class="p">(</span><span class="err">`</span><span class="nx">https</span><span class="o">:</span><span class="c1">//hacker-news.firebaseio.com/v0/item/${id}.json`)</span>
+</span><span class="line">    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">res</span> <span class="o">=&gt;</span> <span class="nx">res</span><span class="p">.</span><span class="nx">json</span><span class="p">())</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>You might have noticed something a little strange about the types of the <code>type</code>
+properties in <code>Item</code>.
+We used string literals where there should have been type expressions!
+For example, we gave <code>'story'</code> as a type in the first branch of the union type.
+In fact string literals <em>are</em> types.
+In a type expression, the literal <code>'story'</code> is a type with exactly one possible
+value: the string <code>'story'</code>.
+(<code>'story'</code> is a subtype of the more general type, <code>string</code>.)
+This is useful because it signals to Flow which branch of the union type is
+applicable inside the body of a <code>case</code> or <code>if</code> statement.</p>
+
+<p>Consider this function, which does not type-check:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="kd">function</span> <span class="nx">getTitle</span><span class="p">(</span><span class="nx">item</span><span class="o">:</span> <span class="nx">Item</span><span class="p">)</span><span class="o">:</span> <span class="nx">string</span> <span class="p">{</span>
+</span><span class="line">  <span class="c1">// Fails because not every branch of the union type has a `title` property.</span>
+</span><span class="line">  <span class="k">return</span> <span class="nx">item</span><span class="p">.</span><span class="nx">title</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Flow can narrow the type of a variable in certain contexts.
+A runtime comparison with a static string literal does the trick:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="kd">function</span> <span class="nx">getTitle</span><span class="p">(</span><span class="nx">item</span><span class="o">:</span> <span class="nx">Item</span><span class="p">)</span><span class="o">:</span> <span class="o">?</span><span class="nx">string</span> <span class="p">{</span>
+</span><span class="line">  <span class="k">if</span> <span class="p">(</span><span class="nx">item</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="s1">&#39;story&#39;</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">    <span class="c1">// This works because this line is only reachable if the type of</span>
+</span><span class="line">    <span class="c1">// `item.type` is `&#39;story&#39;`, which means that `item` can be expected to</span>
+</span><span class="line">    <span class="c1">// have a `title` property.</span>
+</span><span class="line">    <span class="k">return</span> <span class="nx">item</span><span class="p">.</span><span class="nx">title</span>
+</span><span class="line">  <span class="p">}</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Hacker News does provide endpoints for fetching recent submissions of
+a specific item type (e.g., the latest stories).
+But to demonstrate the flexibility of the <code>Item</code> type,
+let’s write some code that fetches and displays the latest items of any type.
+We will need to switch on the <code>type</code> property of each item to display it
+properly:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="kd">function</span> <span class="nx">formatItem</span><span class="p">(</span><span class="nx">item</span><span class="o">:</span> <span class="nx">Item</span><span class="p">)</span><span class="o">:</span> <span class="nx">string</span> <span class="p">{</span>
+</span><span class="line">  <span class="k">switch</span> <span class="p">(</span><span class="nx">item</span><span class="p">.</span><span class="nx">type</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">    <span class="k">case</span> <span class="s1">&#39;story&#39;</span><span class="o">:</span>
+</span><span class="line">      <span class="k">return</span> <span class="err">`</span><span class="s2">&quot;${item.title}&quot;</span> <span class="nx">submitted</span> <span class="nx">by</span> <span class="nx">$</span><span class="p">{</span><span class="nx">item</span><span class="p">.</span><span class="nx">by</span><span class="p">}</span><span class="err">`</span>
+</span><span class="line">    <span class="k">case</span> <span class="s1">&#39;ask&#39;</span><span class="o">:</span>
+</span><span class="line">      <span class="k">return</span> <span class="err">`</span><span class="nx">$</span><span class="p">{</span><span class="nx">item</span><span class="p">.</span><span class="nx">by</span><span class="p">}</span> <span class="nx">asked</span><span class="o">:</span> <span class="nx">$</span><span class="p">{</span><span class="nx">item</span><span class="p">.</span><span class="nx">title</span><span class="p">}</span><span class="err">`</span>
+</span><span class="line">    <span class="k">case</span> <span class="s1">&#39;job&#39;</span><span class="o">:</span>
+</span><span class="line">      <span class="k">return</span> <span class="err">`</span><span class="nx">job</span> <span class="nx">posting</span><span class="o">:</span> <span class="nx">$</span><span class="p">{</span><span class="nx">item</span><span class="p">.</span><span class="nx">title</span><span class="p">}</span><span class="err">`</span>
+</span><span class="line">    <span class="k">case</span> <span class="s1">&#39;poll&#39;</span><span class="o">:</span>
+</span><span class="line">      <span class="k">return</span> <span class="err">`</span><span class="nx">poll</span><span class="o">:</span> <span class="s2">&quot;${item.title}&quot;</span> <span class="o">-</span> <span class="nx">choose</span> <span class="nx">one</span> <span class="nx">of</span> <span class="nx">$</span><span class="p">{</span><span class="nx">item</span><span class="p">.</span><span class="nx">kids</span><span class="p">.</span><span class="nx">length</span><span class="p">}</span> <span class="nx">options</span><span class="err">`</span>
+</span><span class="line">    <span class="k">case</span> <span class="s1">&#39;pollopt&#39;</span><span class="o">:</span>
+</span><span class="line">      <span class="k">return</span> <span class="err">`</span><span class="nx">poll</span> <span class="nx">option</span><span class="o">:</span> <span class="nx">$</span><span class="p">{</span><span class="nx">item</span><span class="p">.</span><span class="nx">text</span><span class="p">}</span><span class="err">`</span>
+</span><span class="line">    <span class="k">case</span> <span class="s1">&#39;comment&#39;</span><span class="o">:</span>
+</span><span class="line">      <span class="k">return</span> <span class="err">`</span><span class="nx">$</span><span class="p">{</span><span class="nx">item</span><span class="p">.</span><span class="nx">by</span><span class="p">}</span> <span class="nx">commented</span><span class="o">:</span> <span class="nx">$</span><span class="p">{</span><span class="nx">item</span><span class="p">.</span><span class="nx">text</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">60</span><span class="p">)}...</span><span class="err">`</span>
+</span><span class="line">    <span class="k">default</span><span class="o">:</span>
+</span><span class="line">      <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="err">`</span><span class="nx">unknown</span> <span class="nx">item</span> <span class="nx">type</span><span class="o">:</span> <span class="nx">$</span><span class="p">{</span><span class="nx">item</span><span class="p">.</span><span class="nx">type</span><span class="p">}</span><span class="err">`</span><span class="p">)</span>
+</span><span class="line">  <span class="p">}</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Flow is able to infer which item type is given in each <code>case</code> body.
+This is just like how type-narrowing worked in the <code>if</code> body in the <code>getTitle</code>
+function.</p>
+
+<p>Flow’s checking has an added bonus:
+if you have a <code>case</code> body with no <code>return</code> or <code>break</code> statement,
+execution falls through into the next <code>case</code> body.
+When switching on <code>item.type</code>, a fall-through would result in a situation
+where a <code>case</code> body might be executed with any of several different item types.
+For example:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="kd">function</span> <span class="nx">getTitleCowboyStyle</span><span class="p">(</span><span class="nx">item</span><span class="o">:</span> <span class="nx">Item</span><span class="p">)</span><span class="o">:</span> <span class="o">?</span><span class="nx">string</span> <span class="p">{</span>
+</span><span class="line">  <span class="k">switch</span> <span class="p">(</span><span class="nx">item</span><span class="p">.</span><span class="nx">type</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">    <span class="k">case</span> <span class="s1">&#39;story&#39;</span><span class="o">:</span>
+</span><span class="line">    <span class="k">case</span> <span class="s1">&#39;ask&#39;</span><span class="o">:</span>
+</span><span class="line">    <span class="k">case</span> <span class="s1">&#39;job&#39;</span><span class="o">:</span>
+</span><span class="line">    <span class="k">case</span> <span class="s1">&#39;poll&#39;</span><span class="o">:</span>
+</span><span class="line">      <span class="k">return</span> <span class="nx">item</span><span class="p">.</span><span class="nx">title</span>
+</span><span class="line">  <span class="p">}</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Flow allows this, because all of the types listed in that example have
+a <code>title</code> property.
+But if a <code>case</code> body did something not compatible with all of the different
+item types that could fall-through into it, then Flow would report an error.</p>
+
+<p>Next up are functions to determine which items to fetch, and to make the
+necessary requests:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="c1">// Fetches the largest ID, which should be the ID of the most recently-created</span>
+</span><span class="line"><span class="c1">// item.</span>
+</span><span class="line"><span class="kd">function</span> <span class="nx">fetchMaxItemId</span><span class="p">()</span><span class="o">:</span> <span class="nx">Promise</span><span class="o">&lt;</span><span class="nx">ID</span><span class="o">&gt;</span> <span class="p">{</span>
+</span><span class="line">  <span class="k">return</span> <span class="nx">nodeFetch</span><span class="p">(</span><span class="err">`</span><span class="nx">https</span><span class="o">:</span><span class="c1">//hacker-news.firebaseio.com/v0/maxitem.json`)</span>
+</span><span class="line">    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">res</span> <span class="o">=&gt;</span> <span class="nx">res</span><span class="p">.</span><span class="nx">json</span><span class="p">())</span>
+</span><span class="line"><span class="p">}</span>
+</span><span class="line">
+</span><span class="line"><span class="nx">async</span> <span class="kd">function</span> <span class="nx">fetchLatestItems</span><span class="p">(</span><span class="nx">n</span><span class="o">:</span> <span class="nx">number</span><span class="p">)</span><span class="o">:</span> <span class="nx">Promise</span><span class="o">&lt;</span><span class="nx">Item</span><span class="p">[]</span><span class="o">&gt;</span> <span class="p">{</span>
+</span><span class="line">  <span class="kr">const</span> <span class="nx">maxId</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">fetchMaxItemId</span><span class="p">()</span>
+</span><span class="line">  <span class="kr">const</span> <span class="nx">fetches</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span class="line">  <span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">n</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">    <span class="nx">fetches</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">fetchItem</span><span class="p">(</span><span class="nx">maxId</span> <span class="o">-</span> <span class="nx">i</span><span class="p">))</span>
+</span><span class="line">  <span class="p">}</span>
+</span><span class="line">  <span class="k">return</span> <span class="nx">Promise</span><span class="p">.</span><span class="nx">all</span><span class="p">(</span><span class="nx">fetches</span><span class="p">)</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>And finally, some code to set everything running:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="p">(</span><span class="nx">async</span> <span class="kd">function</span> <span class="nx">main</span><span class="p">()</span> <span class="p">{</span>
+</span><span class="line">  <span class="kr">const</span> <span class="nx">latestItems</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">fetchLatestItems</span><span class="p">(</span><span class="mi">15</span><span class="p">)</span>
+</span><span class="line">  <span class="nx">latestItems</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="nx">item</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class="line">    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">formatItem</span><span class="p">(</span><span class="nx">item</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;\n&quot;</span><span class="p">)</span>
+</span><span class="line">  <span class="p">})</span>
+</span><span class="line"><span class="p">}())</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The code from this article is available at
+https://github.com/hallettj/hacker-news-example.
+I encourage you to check out the code to tinker with it.
+Try building more functionality,
+and see how type-checking affects the way you write code.</p>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Jesse Hallett</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-12-20T00:00:00-08:00" pubdate data-updated="true">2016-12-20</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/2016/12/20/flow-cookbook.html" title="Previous Post: Flow Cookbook">&laquo; Flow Cookbook</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/2016/12/20/flow-cookbook-unpacking-json.html">Flow Cookbook: Unpacking JSON API data</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2016/12/20/flow-cookbook.html">Flow Cookbook</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/05/31/type-checking-react-with-flow.html">Type checking React with Flow v0.11</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/05/31/advanced-features-in-flow.html">Advanced features in Flow</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2014/11/21/flow-is-the-javascript-type-checker-i-have-been-waiting-for.html">Flow is the JavaScript type checker I have been waiting for</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Talks</h1>
+  <ul id="talks">
+    <li><a href="http://opensourcebridge.org/sessions/1067">Mod your Android</a></li>
+    <li><a href="talks/intro-to-javascript/">Introduction to JavaScript</a></li>
+    <li><a href="http://lanyrd.com/2012/nodepdx/smyqm/">Object-oriented patterns in JavaScript</a></li>
+    <li><a href="talks/cookies/">Cookies are bad for you</a></li>
+    <li><a href="talks/professional-javascript/">Professional JavaScript</a></li>
+    <li><a href="http://opensourcebridge.org/2009/wiki/Clustering_Data_--_How_to_Have_Fun_in_n-Dimensions">Cluster Analysis: How to Have Fun in n Dimensions</a></li>
+    <li><a href="https://docs.google.com/presentation/d/1hx9Pzo07aAnZ2skMH4JPjH7a6IXx64uC0zRliS3qpkk/edit?usp=sharing">How to build blazing fast web apps with Ruby on Rails</a></li>
+  </ul>
+</section>
+<section>
+  <h1>Open Source Projects</h1>
+  <ul id="projects">
+    <li><a href="http://github.com/jivesoftware/tAMD">tAMD:</a> Tiny, extensible implementation of the Asynchronous Module Definition (AMD) specification from CommonJS</li>
+  </ul>
+</section>
+<section>
+  <div class="contact" style="float:left; margin:0.5em;">
+    <p>
+      Jesse Hallett<br/>
+      <a href="mailto:jesse@sitr.us">jesse@sitr.us</a>
+    </p>
+  </div>
+  <div class="contact" style="float:left; margin:0.5em;">
+    <p>
+      <a rel="me" href="https://github.com/hallettj/">github.com/hallettj</a><br />
+      <a rel="me" href="https://twitter.com/hallettj/">twitter.com/hallettj</a>
+    </p>
+  </div>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2016 - Jesse Hallett -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'hallettj';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://sitr.us/2016/12/20/flow-cookbook-unpacking-json.html';
+        var disqus_url = 'http://sitr.us/2016/12/20/flow-cookbook-unpacking-json.html';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

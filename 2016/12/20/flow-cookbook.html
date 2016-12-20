@@ -5,13 +5,12 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Deixis - sitr.us</title>
+  <title>Flow Cookbook - sitr.us</title>
   <meta name="author" content="Jesse Hallett">
 
   
-  <meta name="description" content="When someone says to you, “here” or “now”, you probably know what he
-means. “Here” might the room that you are both sitting in. “Now” would
-be the &hellip;">
+  <meta name="description" content="Type-checking can be a useful asset in a Javascript project.
+A type checker can catch problems that are introduced when adding features or &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -24,7 +23,7 @@ be the &hellip;">
   <link rel="openid.server" href="https://indieauth.com/openid" />
 
   
-  <link rel="canonical" href="http://sitr.us/2007/09/17/deixis.html">
+  <link rel="canonical" href="http://sitr.us/2016/12/20/flow-cookbook.html">
   <link href="/favicon.ico" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="http://feeds.feedburner.com/hallettj" rel="alternate" title="sitr.us" type="application/atom+xml">
@@ -87,7 +86,7 @@ be the &hellip;">
   
   <header>
     
-      <h1 class="entry-title">Deixis</h1>
+      <h1 class="entry-title">Flow Cookbook</h1>
     
     
       <p class="meta">
@@ -103,85 +102,96 @@ be the &hellip;">
   
 
 
-<time datetime="2007-09-17T00:00:00-07:00" pubdate data-updated="true"></time>
+<time datetime="2016-12-20T00:00:00-08:00" pubdate data-updated="true">2016-12-20</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p>When someone says to you, “here” or “now”, you probably know what he
-means. “Here” might the room that you are both sitting in. “Now” would
-be the span of time you spent sitting together. But if either word
-were uttered under different circumstances, it could mean something
-very different. For example, if I called you from the Andes and I used
-the word, “here”, it would mean a mountainside somewhere - possibly
-thousands of miles away from the aforementioned room. The same word
-can mean both the room and the mountainside because of <a href="http://en.wikipedia.org/wiki/Deixis">deixis</a>.</p>
+<div class="entry-content"><p>Type-checking can be a useful asset in a Javascript project.
+A type checker can catch problems that are introduced when adding features or
+refactoring, which can reduce the amount of time spent debugging and testing.
+Type annotations provide a form of always-up-to-date documentation that makes
+it easier for developers to understand an unfamiliar code base.
+But it is important to use type-checking effectively to get its full benefit.</p>
 
-<p>Deixis is a form of <a href="http://en.wikipedia.org/wiki/Exophora">exophora</a>, which is an utterance that is given
-meaning by the context it is uttered in. Specifically, deixis
-represents the speech event itself: deictic expressions reference the
-speaker, the speaker’s utterances, the speaker’s location, and the
-time at which the speech event occurs. There are different types of
-deictic expressions that refer to each particular aspect.</p>
-
-<p><a href="http://en.wikipedia.org/wiki/Personal_pronoun">Personal pronouns</a>, such as “I”, “you”, “he”, and “she”, are deictic
-expressions. “I” refers simply to the speaker. The other pronouns are
-defined by the relation the referenced person has to the speaker in
-the discourse. As the role of speaker switches from person to person,
-the context represented by deixis in understood by participants of the
-discourse to change too.</p>
+<p>The Javascript community is fortunate to have a choice of two great type
+checkers.
+These recipes focus on <a href="https://flowtype.org/">Flow</a>, and introduce patterns for using Flow
+effectively.</p>
 
 <!-- more -->
 
-<p>Location and time are a little more complicated. Whenever someone
-speaks - or writes, or is quoted, etc. - there is an implicit deictic
-center that is formed in the minds of the speaker and any listeners. A
-deictic center is the point in space and time that spatial and
-temporal deictic expressions refer to. “Here” and “now” are the
-simplest examples. The verbs “to come” and to “to go” are also spatial
-deictic expressions: “to come” means motion towards the deictic
-center, and “to go” means motion away.</p>
+<p>To get updates when new recipes or extras are posted,
+subscribe to the <a href="http://feeds.feedburner.com/hallettj">Atom feed</a>,
+or follow <a href="https://twitter.com/FlowCookbook">@FlowCookbook</a>.
+I appreciate your requests, questions, and suggestions!
+Please send feedback by leaving comments here, or on recipes or extras;
+or send messages to <a href="https://twitter.com/FlowCookbook">@FlowCookbook</a>.</p>
 
-<p>Based on this analysis, the phrase “come here” seems redundant at
-first. But actually the addition of “here” can be important, due to a
-phenomenon called <em>sympathetic deixis</em>. It is not uncommon, especially
-in phone conversations, to hear an utterance like, “I will come by
-later”. For the speaker to move toward the deictic center is almost
-nonsensical when the speaker is the deictic center. But in this case
-sympathetic deixis causes the deictic center to shift from the
-speaker’s location to the listener’s location. So motion towards the
-deictic center actually translates to motion toward the listener.</p>
+<h2 id="recipes">Recipes</h2>
 
-<p>Note that the shift caused by sympathetic deixis does not necessarily
-affect all the aspects of deixis. In the example above the meanings of
-personal pronouns do not change after the deictic center has shifted;
-in a similar sentence, “I will come to see you”, “I” refers to the
-speaker, and “you” refers to the listener - as would be expected with
-or without a shifted deictic center.</p>
+<p>These are primers on practical patterns for Flow.
+I recommend using these patterns in any project that uses Flow.</p>
 
-<p>An especially fun deictic puzzle is often heard in answering machine
-messages like, “I’m not here right now”. It isn’t possible that the
-deictic center is fixed upon the speaker during this message, because
-it is not possible for the speaker to not occupy his own location. So
-there must be sympathetic deixis in effect to shift the deictic center
-either spatially or temporally. As someone who has been on the
-receiving end of this message, I expect “here” to mean the location
-where the message was recorded, and “now” to be the time when I am
-calling. By that analysis the spatial location of the deictic center
-remains fixed on the location of the speech event, while the temporal
-aspect shifts to the listening event via sympathetic deixis. There is
-another possible analysis where both spatial and temporal sympathetic
-deictic shifts occur. In that case the spatial shift does not move the
-location of the deictic center to the listener, but instead moves it
-to the place where the listener expects it to be: in this case
-wherever the speaker’s phone is. Under either analysis, the answering
-machine example demonstrates that deictic shifts can be temporal as
-well as spatial.</p>
+<p>(Coming soon) <em>Flow types are duck types</em> -
+Flow is not a new, strait-jacketed OOP language.
+Flow is not Java or C#.
+Flow is a codification of previously-unwritten Javascript idioms.</p>
 
-<p>There are other forms of deictic expressions. There is a more complete
-list in <a href="http://en.wikipedia.org/wiki/Deixis">the Wikipedia article on deixis</a>.</p>
+<p>(Coming soon) <em>Uses for union types</em>
+introduces a pattern for managing data that comes in different shapes.
+Union types are helpful for describing Redux actions,
+for unpacking incoming JSON data,
+and for passing messages over a channel.
+If you have been tempted to use subclasses,
+take a look at union types to see if they might be a better fit. </p>
+
+<p><a href="/2016/12/20/flow-cookbook-unpacking-json.html">Unpacking JSON API data</a> -
+Javascript’s flexibility is useful for handling incoming data in whatever form
+it may take.
+Flow is designed to be just as flexible when type-checking functions that
+process data.
+This is a case study that uses the Hacker News API as an example for type-safe
+data processing.</p>
+
+<p>(Coming soon) <em>React</em> -
+This recipe demonstrates how to use Flow effectively when creating React
+components.
+Including type parameters in <a href="https://facebook.github.io/react/docs/components-and-props.html#functional-and-class-components">functional and class components</a> provides an
+alternative to <code>propTypes</code> that can provide better safety and modularity.</p>
+
+<p>(Coming soon) <em>Redux</em> -
+Flow and Redux could have been made for each other.
+This recipe demonstrates several patterns that are useful for building Redux
+action creators and reducers.
+This is a companion to the post on React.</p>
+
+<h2 id="extras">Extras</h2>
+
+<p>Extras are not about practical patterns.
+In these articles we explore ideas just because they are interesting.
+Read these if you want to dig deeper into type theory,
+or to learn about Flow’s lesser-known capabilities.</p>
+
+<p>(Coming soon) <em>What are types?</em>
+The short answer is, types are sets of possible values.
+This post gets into what that means,
+and shows that Flow takes more of a purist approach to types compared to most
+object-oriented languages.</p>
+
+<p>(Coming soon) <em>The “algebra” in “algebraic data types”</em> -
+In the recipe <em>Uses for union types</em> I mentioned that union types are also
+called “sum types” or “algebraic data types”.
+This post gives a brief background on type algebra so that you can understand
+where those terms come from.</p>
+
+<p>(Coming soon) <em>Advanced algebraic data types</em> -
+Union types are great, but not perfect.
+This post introduces an alternative formulation for sum types that allows Flow
+to check for missing pattern matches.
+It also shows that GADTs are <em>almost</em> possible in Flow.</p>
 </div>
 
 
@@ -204,7 +214,7 @@ list in <a href="http://en.wikipedia.org/wiki/Deixis">the Wikipedia article on d
   
 
 
-<time datetime="2007-09-17T00:00:00-07:00" pubdate data-updated="true"></time>
+<time datetime="2016-12-20T00:00:00-08:00" pubdate data-updated="true">2016-12-20</time>
       
 
 
@@ -219,8 +229,10 @@ list in <a href="http://en.wikipedia.org/wiki/Deixis">the Wikipedia article on d
     
     <p class="meta">
       
+        <a class="basic-alignment left" href="/2015/05/31/type-checking-react-with-flow.html" title="Previous Post: Type checking React with Flow v0.11">&laquo; Type checking React with Flow v0.11</a>
       
-        <a class="basic-alignment right" href="/2007/09/24/anatomy-of-a-syllable.html" title="Next Post: Anatomy of a Syllable">Anatomy of a Syllable &raquo;</a>
+      
+        <a class="basic-alignment right" href="/2016/12/20/flow-cookbook-unpacking-json.html" title="Next Post: Flow Cookbook: Unpacking JSON API data">Flow Cookbook: Unpacking JSON API data &raquo;</a>
       
     </p>
   </footer>
@@ -314,8 +326,8 @@ list in <a href="http://en.wikipedia.org/wiki/Deixis">the Wikipedia article on d
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://sitr.us/2007/09/17/deixis.html';
-        var disqus_url = 'http://sitr.us/2007/09/17/deixis.html';
+        var disqus_identifier = 'http://sitr.us/2016/12/20/flow-cookbook.html';
+        var disqus_url = 'http://sitr.us/2016/12/20/flow-cookbook.html';
         var disqus_script = 'embed.js';
       
     (function () {

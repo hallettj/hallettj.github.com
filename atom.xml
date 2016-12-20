@@ -4,7 +4,7 @@
   <title><![CDATA[sitr.us]]></title>
   <link href="http://sitr.us/atom.xml" rel="self"/>
   <link href="http://sitr.us/"/>
-  <updated>2016-08-19T14:41:19-04:00</updated>
+  <updated>2016-12-20T15:28:31-08:00</updated>
   <id>http://sitr.us/</id>
   <author>
     <name><![CDATA[Jesse Hallett]]></name>
@@ -14,9 +14,438 @@
 
   
   <entry>
+    <title type="html"><![CDATA[Flow Cookbook: Unpacking JSON API data]]></title>
+    <link href="http://sitr.us/2016/12/20/flow-cookbook-unpacking-json.html"/>
+    <updated>2016-12-20T00:00:00-08:00</updated>
+    <id>http://sitr.us/2016/12/20/flow-cookbook-unpacking-json</id>
+    <content type="html"><![CDATA[<p><em>This recipe is part of the <a href="http://sitr.us/2016/12/20/flow-cookbook.html">Flow Cookbook</a> series.</em></p>
+
+<p>Hacker News provides <a href="https://github.com/HackerNews/API">a public API</a>.
+One of the endpoints of that API accepts an ID and responds with an item:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="nx">fetch</span><span class="p">(</span><span class="err">`</span><span class="nx">https</span><span class="o">:</span><span class="c1">//hacker-news.firebaseio.com/v0/item/${id}.json`)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>An “item” might be a story, a comment, a question, a job posting, a poll, or
+a voting option in a poll.
+If you don’t have context for the ID,
+the only way to know what you have fetched is to check the <code>type</code> property of
+the response at runtime.
+To add type safety to a call to this API,
+it is necessary to describe a type that encompasses all of the possible shapes
+that the returned data might take.
+That is going to be a <a href="https://flowtype.org/docs/union-intersection-types.html">union type</a>, which will look something like this:</p>
+
+<!-- more -->
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="nx">type</span> <span class="nx">Item</span> <span class="o">=</span>
+</span><span class="line">  <span class="o">|</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;story&#39;</span><span class="p">,</span>   <span class="cm">/* story properties */</span> <span class="p">}</span>
+</span><span class="line">  <span class="o">|</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;ask&#39;</span><span class="p">,</span>     <span class="cm">/* ask properties */</span> <span class="p">}</span>
+</span><span class="line">  <span class="o">|</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;job&#39;</span><span class="p">,</span>     <span class="cm">/* job properties */</span> <span class="p">}</span>
+</span><span class="line">  <span class="o">|</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;poll&#39;</span><span class="p">,</span>    <span class="cm">/* poll properties */</span> <span class="p">}</span>
+</span><span class="line">  <span class="o">|</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;pollopt&#39;</span><span class="p">,</span> <span class="cm">/* pollopt properties */</span> <span class="p">}</span>
+</span><span class="line">  <span class="o">|</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;comment&#39;</span><span class="p">,</span> <span class="cm">/* comment properties */</span> <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>There are not a huge number of properties in the API responses -
+but if we list out all of the properties in every branch the result will be too
+big and dense for light reading.
+So let’s start by factoring out common properties into helper types.</p>
+
+<p>All of the different item types have <code>by</code>, <code>id</code>, and <code>time</code> properties.
+So we can put those all into one type:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="c1">// Properties common to all item types</span>
+</span><span class="line"><span class="nx">type</span> <span class="nx">ItemCommon</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class="line">  <span class="nx">by</span><span class="o">:</span>   <span class="nx">Username</span><span class="p">,</span>
+</span><span class="line">  <span class="nx">id</span><span class="o">:</span>   <span class="nx">ID</span><span class="p">,</span>
+</span><span class="line">  <span class="nx">time</span><span class="o">:</span> <span class="nx">number</span><span class="p">,</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Those <code>Username</code> and <code>ID</code> types are just aliases that I defined for primitive
+types:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="c1">// These type aliases just help to illustrate the purpose of certain properties</span>
+</span><span class="line"><span class="nx">type</span> <span class="nx">Username</span> <span class="o">=</span> <span class="nx">string</span>
+</span><span class="line"><span class="nx">type</span> <span class="nx">ID</span> <span class="o">=</span> <span class="nx">number</span>
+</span><span class="line"><span class="nx">type</span> <span class="nx">URL</span> <span class="o">=</span> <span class="nx">string</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>I think that using aliases like these helps to provide clarity on the purpose
+of each property.
+If we had a property with the type <code>by: string</code> it would not be obvious whether
+the value of that property is an ID that happens to be a string,
+or a human-readable value.
+Using the <code>Username</code> type alias makes it obvious that the property will contain
+a value that might be suitable for display to users.
+Otherwise the types <code>string</code> and <code>Username</code> are interchangeable.</p>
+
+<p>There is more common structure in Hacker News item types:
+the story, ask, job, and poll response types all represent top-level submissions,
+which have several properties in common:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="c1">// Properties common to top-level item types</span>
+</span><span class="line"><span class="nx">type</span> <span class="nx">TopLevel</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class="line">  <span class="nx">descendents</span><span class="o">:</span> <span class="nx">number</span><span class="p">,</span>
+</span><span class="line">  <span class="nx">score</span><span class="o">:</span> <span class="nx">number</span><span class="p">,</span>
+</span><span class="line">  <span class="nx">title</span><span class="o">:</span> <span class="nx">string</span><span class="p">,</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>With those helper types in place,
+we can produce a type that describes all possible items:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="nx">type</span> <span class="nx">Item</span> <span class="o">=</span>
+</span><span class="line">  <span class="o">|</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;story&#39;</span><span class="p">,</span> <span class="nx">kids</span><span class="o">:</span> <span class="nx">ID</span><span class="p">[],</span> <span class="nx">url</span><span class="o">:</span> <span class="nx">URL</span> <span class="p">}</span>                 <span class="o">&amp;</span> <span class="nx">ItemCommon</span> <span class="o">&amp;</span> <span class="nx">TopLevel</span>
+</span><span class="line">  <span class="o">|</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;ask&#39;</span><span class="p">,</span>  <span class="nx">kids</span><span class="o">:</span> <span class="nx">ID</span><span class="p">[],</span> <span class="nx">text</span><span class="o">:</span> <span class="nx">string</span><span class="p">,</span> <span class="nx">url</span><span class="o">:</span> <span class="nx">URL</span> <span class="p">}</span>    <span class="o">&amp;</span> <span class="nx">ItemCommon</span> <span class="o">&amp;</span> <span class="nx">TopLevel</span>
+</span><span class="line">  <span class="o">|</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;job&#39;</span><span class="p">,</span> <span class="nx">text</span><span class="o">:</span> <span class="nx">string</span><span class="p">,</span> <span class="nx">url</span><span class="o">:</span> <span class="nx">URL</span> <span class="p">}</span>                 <span class="o">&amp;</span> <span class="nx">ItemCommon</span> <span class="o">&amp;</span> <span class="nx">TopLevel</span>
+</span><span class="line">  <span class="o">|</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;poll&#39;</span><span class="p">,</span> <span class="nx">kids</span><span class="o">:</span> <span class="nx">ID</span><span class="p">[],</span> <span class="nx">parts</span><span class="o">:</span> <span class="nx">ID</span><span class="p">[],</span> <span class="nx">text</span><span class="o">:</span> <span class="nx">string</span> <span class="p">}</span> <span class="o">&amp;</span> <span class="nx">ItemCommon</span> <span class="o">&amp;</span> <span class="nx">TopLevel</span>
+</span><span class="line">  <span class="o">|</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;pollopt&#39;</span><span class="p">,</span> <span class="nx">parent</span><span class="o">:</span> <span class="nx">ID</span><span class="p">,</span> <span class="nx">score</span><span class="o">:</span> <span class="nx">number</span><span class="p">,</span> <span class="nx">text</span><span class="o">:</span> <span class="nx">string</span> <span class="p">}</span> <span class="o">&amp;</span> <span class="nx">ItemCommon</span>
+</span><span class="line">  <span class="o">|</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;comment&#39;</span><span class="p">,</span> <span class="nx">kids</span><span class="o">:</span> <span class="nx">ID</span><span class="p">[],</span> <span class="nx">parent</span><span class="o">:</span> <span class="nx">ID</span><span class="p">,</span> <span class="nx">text</span><span class="o">:</span> <span class="nx">string</span> <span class="p">}</span>    <span class="o">&amp;</span> <span class="nx">ItemCommon</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>An <a href="https://flowtype.org/docs/union-intersection-types.html">intersection type</a> like
+<code>{ type: 'story', kids: ID[], url: URL } &amp; ItemCommon &amp; TopLevel</code>
+is essentially a shorthand for an object type with a <code>type</code> property that is
+always equal to <code>'story'</code>, combined with all of the properties listed in the
+<code>ItemCommon</code> and <code>TopLevel</code> types.
+Each branch of the union type contains a type intersection that combines common
+properties with the properties that are particular to each item
+type.[^top-level union]</p>
+
+<p><code>type Item = ItemCommon &amp; (/* union type */)</code>.
+That would put the union type inside of the intersection type.
+But due to a quirk in Flow as of version 0.36 the union type must be the
+outermost layer of of composition for type narrowing to work.</p>
+
+<p>We don’t have to do anything special to parse incoming data into that type.
+<a href="TODO">Flow types are duck types</a> -
+<code>Item</code> is just an alias for plain Javascript objects with a certain structure.
+We just need to declare that API responses have the <code>Item</code> type.
+That is done with with the return type in this function signature:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="kd">function</span> <span class="nx">fetchItem</span><span class="p">(</span><span class="nx">id</span><span class="o">:</span> <span class="nx">ID</span><span class="p">)</span><span class="o">:</span> <span class="nx">Promise</span><span class="o">&lt;</span><span class="nx">Item</span><span class="o">&gt;</span> <span class="p">{</span>
+</span><span class="line">  <span class="k">return</span> <span class="nx">fetch</span><span class="p">(</span><span class="err">`</span><span class="nx">https</span><span class="o">:</span><span class="c1">//hacker-news.firebaseio.com/v0/item/${id}.json`)</span>
+</span><span class="line">    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">res</span> <span class="o">=&gt;</span> <span class="nx">res</span><span class="p">.</span><span class="nx">json</span><span class="p">())</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>You might have noticed something a little strange about the types of the <code>type</code>
+properties in <code>Item</code>.
+We used string literals where there should have been type expressions!
+For example, we gave <code>'story'</code> as a type in the first branch of the union type.
+In fact string literals <em>are</em> types.
+In a type expression, the literal <code>'story'</code> is a type with exactly one possible
+value: the string <code>'story'</code>.
+(<code>'story'</code> is a subtype of the more general type, <code>string</code>.)
+This is useful because it signals to Flow which branch of the union type is
+applicable inside the body of a <code>case</code> or <code>if</code> statement.</p>
+
+<p>Consider this function, which does not type-check:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="kd">function</span> <span class="nx">getTitle</span><span class="p">(</span><span class="nx">item</span><span class="o">:</span> <span class="nx">Item</span><span class="p">)</span><span class="o">:</span> <span class="nx">string</span> <span class="p">{</span>
+</span><span class="line">  <span class="c1">// Fails because not every branch of the union type has a `title` property.</span>
+</span><span class="line">  <span class="k">return</span> <span class="nx">item</span><span class="p">.</span><span class="nx">title</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Flow can narrow the type of a variable in certain contexts.
+A runtime comparison with a static string literal does the trick:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="kd">function</span> <span class="nx">getTitle</span><span class="p">(</span><span class="nx">item</span><span class="o">:</span> <span class="nx">Item</span><span class="p">)</span><span class="o">:</span> <span class="o">?</span><span class="nx">string</span> <span class="p">{</span>
+</span><span class="line">  <span class="k">if</span> <span class="p">(</span><span class="nx">item</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="s1">&#39;story&#39;</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">    <span class="c1">// This works because this line is only reachable if the type of</span>
+</span><span class="line">    <span class="c1">// `item.type` is `&#39;story&#39;`, which means that `item` can be expected to</span>
+</span><span class="line">    <span class="c1">// have a `title` property.</span>
+</span><span class="line">    <span class="k">return</span> <span class="nx">item</span><span class="p">.</span><span class="nx">title</span>
+</span><span class="line">  <span class="p">}</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Hacker News does provide endpoints for fetching recent submissions of
+a specific item type (e.g., the latest stories).
+But to demonstrate the flexibility of the <code>Item</code> type,
+let’s write some code that fetches and displays the latest items of any type.
+We will need to switch on the <code>type</code> property of each item to display it
+properly:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="kd">function</span> <span class="nx">formatItem</span><span class="p">(</span><span class="nx">item</span><span class="o">:</span> <span class="nx">Item</span><span class="p">)</span><span class="o">:</span> <span class="nx">string</span> <span class="p">{</span>
+</span><span class="line">  <span class="k">switch</span> <span class="p">(</span><span class="nx">item</span><span class="p">.</span><span class="nx">type</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">    <span class="k">case</span> <span class="s1">&#39;story&#39;</span><span class="o">:</span>
+</span><span class="line">      <span class="k">return</span> <span class="err">`</span><span class="s2">&quot;${item.title}&quot;</span> <span class="nx">submitted</span> <span class="nx">by</span> <span class="nx">$</span><span class="p">{</span><span class="nx">item</span><span class="p">.</span><span class="nx">by</span><span class="p">}</span><span class="err">`</span>
+</span><span class="line">    <span class="k">case</span> <span class="s1">&#39;ask&#39;</span><span class="o">:</span>
+</span><span class="line">      <span class="k">return</span> <span class="err">`</span><span class="nx">$</span><span class="p">{</span><span class="nx">item</span><span class="p">.</span><span class="nx">by</span><span class="p">}</span> <span class="nx">asked</span><span class="o">:</span> <span class="nx">$</span><span class="p">{</span><span class="nx">item</span><span class="p">.</span><span class="nx">title</span><span class="p">}</span><span class="err">`</span>
+</span><span class="line">    <span class="k">case</span> <span class="s1">&#39;job&#39;</span><span class="o">:</span>
+</span><span class="line">      <span class="k">return</span> <span class="err">`</span><span class="nx">job</span> <span class="nx">posting</span><span class="o">:</span> <span class="nx">$</span><span class="p">{</span><span class="nx">item</span><span class="p">.</span><span class="nx">title</span><span class="p">}</span><span class="err">`</span>
+</span><span class="line">    <span class="k">case</span> <span class="s1">&#39;poll&#39;</span><span class="o">:</span>
+</span><span class="line">      <span class="k">return</span> <span class="err">`</span><span class="nx">poll</span><span class="o">:</span> <span class="s2">&quot;${item.title}&quot;</span> <span class="o">-</span> <span class="nx">choose</span> <span class="nx">one</span> <span class="nx">of</span> <span class="nx">$</span><span class="p">{</span><span class="nx">item</span><span class="p">.</span><span class="nx">kids</span><span class="p">.</span><span class="nx">length</span><span class="p">}</span> <span class="nx">options</span><span class="err">`</span>
+</span><span class="line">    <span class="k">case</span> <span class="s1">&#39;pollopt&#39;</span><span class="o">:</span>
+</span><span class="line">      <span class="k">return</span> <span class="err">`</span><span class="nx">poll</span> <span class="nx">option</span><span class="o">:</span> <span class="nx">$</span><span class="p">{</span><span class="nx">item</span><span class="p">.</span><span class="nx">text</span><span class="p">}</span><span class="err">`</span>
+</span><span class="line">    <span class="k">case</span> <span class="s1">&#39;comment&#39;</span><span class="o">:</span>
+</span><span class="line">      <span class="k">return</span> <span class="err">`</span><span class="nx">$</span><span class="p">{</span><span class="nx">item</span><span class="p">.</span><span class="nx">by</span><span class="p">}</span> <span class="nx">commented</span><span class="o">:</span> <span class="nx">$</span><span class="p">{</span><span class="nx">item</span><span class="p">.</span><span class="nx">text</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">60</span><span class="p">)}...</span><span class="err">`</span>
+</span><span class="line">    <span class="k">default</span><span class="o">:</span>
+</span><span class="line">      <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="err">`</span><span class="nx">unknown</span> <span class="nx">item</span> <span class="nx">type</span><span class="o">:</span> <span class="nx">$</span><span class="p">{</span><span class="nx">item</span><span class="p">.</span><span class="nx">type</span><span class="p">}</span><span class="err">`</span><span class="p">)</span>
+</span><span class="line">  <span class="p">}</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Flow is able to infer which item type is given in each <code>case</code> body.
+This is just like how type-narrowing worked in the <code>if</code> body in the <code>getTitle</code>
+function.</p>
+
+<p>Flow’s checking has an added bonus:
+if you have a <code>case</code> body with no <code>return</code> or <code>break</code> statement,
+execution falls through into the next <code>case</code> body.
+When switching on <code>item.type</code>, a fall-through would result in a situation
+where a <code>case</code> body might be executed with any of several different item types.
+For example:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="kd">function</span> <span class="nx">getTitleCowboyStyle</span><span class="p">(</span><span class="nx">item</span><span class="o">:</span> <span class="nx">Item</span><span class="p">)</span><span class="o">:</span> <span class="o">?</span><span class="nx">string</span> <span class="p">{</span>
+</span><span class="line">  <span class="k">switch</span> <span class="p">(</span><span class="nx">item</span><span class="p">.</span><span class="nx">type</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">    <span class="k">case</span> <span class="s1">&#39;story&#39;</span><span class="o">:</span>
+</span><span class="line">    <span class="k">case</span> <span class="s1">&#39;ask&#39;</span><span class="o">:</span>
+</span><span class="line">    <span class="k">case</span> <span class="s1">&#39;job&#39;</span><span class="o">:</span>
+</span><span class="line">    <span class="k">case</span> <span class="s1">&#39;poll&#39;</span><span class="o">:</span>
+</span><span class="line">      <span class="k">return</span> <span class="nx">item</span><span class="p">.</span><span class="nx">title</span>
+</span><span class="line">  <span class="p">}</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Flow allows this, because all of the types listed in that example have
+a <code>title</code> property.
+But if a <code>case</code> body did something not compatible with all of the different
+item types that could fall-through into it, then Flow would report an error.</p>
+
+<p>Next up are functions to determine which items to fetch, and to make the
+necessary requests:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="c1">// Fetches the largest ID, which should be the ID of the most recently-created</span>
+</span><span class="line"><span class="c1">// item.</span>
+</span><span class="line"><span class="kd">function</span> <span class="nx">fetchMaxItemId</span><span class="p">()</span><span class="o">:</span> <span class="nx">Promise</span><span class="o">&lt;</span><span class="nx">ID</span><span class="o">&gt;</span> <span class="p">{</span>
+</span><span class="line">  <span class="k">return</span> <span class="nx">nodeFetch</span><span class="p">(</span><span class="err">`</span><span class="nx">https</span><span class="o">:</span><span class="c1">//hacker-news.firebaseio.com/v0/maxitem.json`)</span>
+</span><span class="line">    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">res</span> <span class="o">=&gt;</span> <span class="nx">res</span><span class="p">.</span><span class="nx">json</span><span class="p">())</span>
+</span><span class="line"><span class="p">}</span>
+</span><span class="line">
+</span><span class="line"><span class="nx">async</span> <span class="kd">function</span> <span class="nx">fetchLatestItems</span><span class="p">(</span><span class="nx">n</span><span class="o">:</span> <span class="nx">number</span><span class="p">)</span><span class="o">:</span> <span class="nx">Promise</span><span class="o">&lt;</span><span class="nx">Item</span><span class="p">[]</span><span class="o">&gt;</span> <span class="p">{</span>
+</span><span class="line">  <span class="kr">const</span> <span class="nx">maxId</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">fetchMaxItemId</span><span class="p">()</span>
+</span><span class="line">  <span class="kr">const</span> <span class="nx">fetches</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span class="line">  <span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">n</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">    <span class="nx">fetches</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">fetchItem</span><span class="p">(</span><span class="nx">maxId</span> <span class="o">-</span> <span class="nx">i</span><span class="p">))</span>
+</span><span class="line">  <span class="p">}</span>
+</span><span class="line">  <span class="k">return</span> <span class="nx">Promise</span><span class="p">.</span><span class="nx">all</span><span class="p">(</span><span class="nx">fetches</span><span class="p">)</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>And finally, some code to set everything running:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="p">(</span><span class="nx">async</span> <span class="kd">function</span> <span class="nx">main</span><span class="p">()</span> <span class="p">{</span>
+</span><span class="line">  <span class="kr">const</span> <span class="nx">latestItems</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">fetchLatestItems</span><span class="p">(</span><span class="mi">15</span><span class="p">)</span>
+</span><span class="line">  <span class="nx">latestItems</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="nx">item</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class="line">    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">formatItem</span><span class="p">(</span><span class="nx">item</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;\n&quot;</span><span class="p">)</span>
+</span><span class="line">  <span class="p">})</span>
+</span><span class="line"><span class="p">}())</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The code from this article is available at
+https://github.com/hallettj/hacker-news-example.
+I encourage you to check out the code to tinker with it.
+Try building more functionality,
+and see how type-checking affects the way you write code.</p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Flow Cookbook]]></title>
+    <link href="http://sitr.us/2016/12/20/flow-cookbook.html"/>
+    <updated>2016-12-20T00:00:00-08:00</updated>
+    <id>http://sitr.us/2016/12/20/flow-cookbook</id>
+    <content type="html"><![CDATA[<p>Type-checking can be a useful asset in a Javascript project.
+A type checker can catch problems that are introduced when adding features or
+refactoring, which can reduce the amount of time spent debugging and testing.
+Type annotations provide a form of always-up-to-date documentation that makes
+it easier for developers to understand an unfamiliar code base.
+But it is important to use type-checking effectively to get its full benefit.</p>
+
+<p>The Javascript community is fortunate to have a choice of two great type
+checkers.
+These recipes focus on <a href="https://flowtype.org/">Flow</a>, and introduce patterns for using Flow
+effectively.</p>
+
+<!-- more -->
+
+<p>To get updates when new recipes or extras are posted,
+subscribe to the <a href="http://feeds.feedburner.com/hallettj">Atom feed</a>,
+or follow <a href="https://twitter.com/FlowCookbook">@FlowCookbook</a>.
+I appreciate your requests, questions, and suggestions!
+Please send feedback by leaving comments here, or on recipes or extras;
+or send messages to <a href="https://twitter.com/FlowCookbook">@FlowCookbook</a>.</p>
+
+<h2 id="recipes">Recipes</h2>
+
+<p>These are primers on practical patterns for Flow.
+I recommend using these patterns in any project that uses Flow.</p>
+
+<p>(Coming soon) <em>Flow types are duck types</em> -
+Flow is not a new, strait-jacketed OOP language.
+Flow is not Java or C#.
+Flow is a codification of previously-unwritten Javascript idioms.</p>
+
+<p>(Coming soon) <em>Uses for union types</em>
+introduces a pattern for managing data that comes in different shapes.
+Union types are helpful for describing Redux actions,
+for unpacking incoming JSON data,
+and for passing messages over a channel.
+If you have been tempted to use subclasses,
+take a look at union types to see if they might be a better fit. </p>
+
+<p><a href="http://sitr.us/2016/12/20/flow-cookbook-unpacking-json.html">Unpacking JSON API data</a> -
+Javascript’s flexibility is useful for handling incoming data in whatever form
+it may take.
+Flow is designed to be just as flexible when type-checking functions that
+process data.
+This is a case study that uses the Hacker News API as an example for type-safe
+data processing.</p>
+
+<p>(Coming soon) <em>React</em> -
+This recipe demonstrates how to use Flow effectively when creating React
+components.
+Including type parameters in <a href="https://facebook.github.io/react/docs/components-and-props.html#functional-and-class-components">functional and class components</a> provides an
+alternative to <code>propTypes</code> that can provide better safety and modularity.</p>
+
+<p>(Coming soon) <em>Redux</em> -
+Flow and Redux could have been made for each other.
+This recipe demonstrates several patterns that are useful for building Redux
+action creators and reducers.
+This is a companion to the post on React.</p>
+
+<h2 id="extras">Extras</h2>
+
+<p>Extras are not about practical patterns.
+In these articles we explore ideas just because they are interesting.
+Read these if you want to dig deeper into type theory,
+or to learn about Flow’s lesser-known capabilities.</p>
+
+<p>(Coming soon) <em>What are types?</em>
+The short answer is, types are sets of possible values.
+This post gets into what that means,
+and shows that Flow takes more of a purist approach to types compared to most
+object-oriented languages.</p>
+
+<p>(Coming soon) <em>The “algebra” in “algebraic data types”</em> -
+In the recipe <em>Uses for union types</em> I mentioned that union types are also
+called “sum types” or “algebraic data types”.
+This post gives a brief background on type algebra so that you can understand
+where those terms come from.</p>
+
+<p>(Coming soon) <em>Advanced algebraic data types</em> -
+Union types are great, but not perfect.
+This post introduces an alternative formulation for sum types that allows Flow
+to check for missing pattern matches.
+It also shows that GADTs are <em>almost</em> possible in Flow.</p>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[Type checking React with Flow v0.11]]></title>
     <link href="http://sitr.us/2015/05/31/type-checking-react-with-flow.html"/>
-    <updated>2015-05-31T00:00:00-04:00</updated>
+    <updated>2015-05-31T00:00:00-07:00</updated>
     <id>http://sitr.us/2015/05/31/type-checking-react-with-flow</id>
     <content type="html"><![CDATA[<p>Flow v0.11 was <a href="https://github.com/facebook/flow/blob/master/Changelog.md">released</a> recently.
 The latest set of changes really improve type checking in React apps.
@@ -113,7 +542,7 @@ see my post on <a href="http://sitr.us/2015/05/31/advanced-features-in-flow.html
   <entry>
     <title type="html"><![CDATA[Advanced features in Flow]]></title>
     <link href="http://sitr.us/2015/05/31/advanced-features-in-flow.html"/>
-    <updated>2015-05-31T00:00:00-04:00</updated>
+    <updated>2015-05-31T00:00:00-07:00</updated>
     <id>http://sitr.us/2015/05/31/advanced-features-in-flow</id>
     <content type="html"><![CDATA[<p>Flow has some very interesting features that are currently not documented.
 It is likely that the reason for missing documentation is that these features
@@ -691,7 +1120,7 @@ lead me to use classes more often than I would if I were not using Flow.</p>
   <entry>
     <title type="html"><![CDATA[Flow is the JavaScript type checker I have been waiting for]]></title>
     <link href="http://sitr.us/2014/11/21/flow-is-the-javascript-type-checker-i-have-been-waiting-for.html"/>
-    <updated>2014-11-21T00:00:00-04:00</updated>
+    <updated>2014-11-21T00:00:00-08:00</updated>
     <id>http://sitr.us/2014/11/21/flow-is-the-javascript-type-checker-i-have-been-waiting-for</id>
     <content type="html"><![CDATA[<p>I am very excited about <a href="http://flowtype.org/">Flow</a>, a new JavaScript type checker from Facebook.
 I have put some thought into what a type checker for JavaScript should do -
@@ -946,7 +1375,7 @@ Flow is a type checker that I actually plan to use.</p>
   <entry>
     <title type="html"><![CDATA[Javascript generators and functional reactive programming]]></title>
     <link href="http://sitr.us/2014/08/02/javascript-generators-and-functional-reactive-programming.html"/>
-    <updated>2014-08-02T00:00:00-04:00</updated>
+    <updated>2014-08-02T00:00:00-07:00</updated>
     <id>http://sitr.us/2014/08/02/javascript-generators-and-functional-reactive-programming</id>
     <content type="html"><![CDATA[<p>tl;dr: ECMAScript 6 introduces a language feature called <a href="http://tobyho.com/2013/06/16/what-are-generators/">generators</a>, which
 are really great for working with asynchronous code that uses promises.  But
@@ -1193,7 +1622,7 @@ not stateless.  Thanks to Blixt for pointing out the distinction.</p>
   <entry>
     <title type="html"><![CDATA[Kinesis Advantage with DSA keycaps]]></title>
     <link href="http://sitr.us/2014/05/19/kinesis-advantage-with-dsa-keycaps.html"/>
-    <updated>2014-05-19T00:00:00-04:00</updated>
+    <updated>2014-05-19T00:00:00-07:00</updated>
     <id>http://sitr.us/2014/05/19/kinesis-advantage-with-dsa-keycaps</id>
     <content type="html"><![CDATA[<p><img src="https://lh4.googleusercontent.com/MPfjOyaNmMKZRL36XEekqRiaeoHcUFLQLN-Kx62XKbgN=w1024-h576-no" /></p>
 
@@ -1387,7 +1816,7 @@ And they make a more pleasant sound than the thinner ABS caps that came with the
   <entry>
     <title type="html"><![CDATA[Category Theory proofs in Idris]]></title>
     <link href="http://sitr.us/2014/05/05/category-theory-proofs-in-idris.html"/>
-    <updated>2014-05-05T00:00:00-04:00</updated>
+    <updated>2014-05-05T00:00:00-07:00</updated>
     <id>http://sitr.us/2014/05/05/category-theory-proofs-in-idris</id>
     <content type="html"><![CDATA[<p><a href="http://www.idris-lang.org/">Idris</a> is a programming language with dependent types.
 It is similar to <a href="http://wiki.portal.chalmers.se/agda/pmwiki.php">Agda</a>, but hews more closely to <a href="http://www.haskell.org/haskellwiki/Haskell">Haskell</a>.
@@ -2195,7 +2624,7 @@ as I continue to explore Category theory.</p>
   <entry>
     <title type="html"><![CDATA[Functional data structures in JavaScript with Mori]]></title>
     <link href="http://sitr.us/2013/11/04/functional-data-structures.html"/>
-    <updated>2013-11-04T00:00:00-04:00</updated>
+    <updated>2013-11-04T00:00:00-08:00</updated>
     <id>http://sitr.us/2013/11/04/functional-data-structures</id>
     <content type="html"><![CDATA[<p>I have a long-standing desire for a JavaScript library that provides
 good implementations of functional data structures.  Recently I found
@@ -3289,7 +3718,7 @@ to minimize the actual work that is done.</p>
   <entry>
     <title type="html"><![CDATA[Functional Reactive Programming in JavaScript]]></title>
     <link href="http://sitr.us/2013/05/22/functional-reactive-programming-in-javascript.html"/>
-    <updated>2013-05-22T00:00:00-04:00</updated>
+    <updated>2013-05-22T00:00:00-07:00</updated>
     <id>http://sitr.us/2013/05/22/functional-reactive-programming-in-javascript</id>
     <content type="html"><![CDATA[<p>I had a great time at <a href="http://nodepdx.org/">NodePDX</a> last week.  There were many talks
 packed into a short span of time and I saw many exciting ideas
@@ -3433,7 +3862,7 @@ documentation and more examples.</p>
   <entry>
     <title type="html"><![CDATA[Monkey patching document.write()]]></title>
     <link href="http://sitr.us/2012/09/04/monkey-patching-document-write.html"/>
-    <updated>2012-09-04T00:00:00-04:00</updated>
+    <updated>2012-09-04T00:00:00-07:00</updated>
     <id>http://sitr.us/2012/09/04/monkey-patching-document-write</id>
     <content type="html"><![CDATA[<p>This is one of the crazier workarounds that I have implemented.  I was
 working on a web page that embeds third-party widgets.  The widgets are
@@ -3533,7 +3962,7 @@ far it is working nicely.</p>
   <entry>
     <title type="html"><![CDATA[Promise Pipelines in JavaScript]]></title>
     <link href="http://sitr.us/2012/07/31/promise-pipelines-in-javascript.html"/>
-    <updated>2012-07-31T00:00:00-04:00</updated>
+    <updated>2012-07-31T00:00:00-07:00</updated>
     <id>http://sitr.us/2012/07/31/promise-pipelines-in-javascript</id>
     <content type="html"><![CDATA[<aside class="translations"><p>This page has been translated into <a href="http://www.webhostinghub.com/support/es/misc/las-bases-de">Spanish</a>
 language by Maria Ramos  from <a href="http://www.webhostinghub.com/">Webhostinghub.com</a>.</p></aside>
@@ -3965,7 +4394,7 @@ inner and outer promises before the result is passed to <code>$.join()</code>.</
   <entry>
     <title type="html"><![CDATA[Installing a custom ROM on the Transformer Prime: A start-to-finish guide]]></title>
     <link href="http://sitr.us/2012/05/12/installing-a-custom-rom-on-the-transformer-prime.html"/>
-    <updated>2012-05-12T00:00:00-04:00</updated>
+    <updated>2012-05-12T00:00:00-07:00</updated>
     <id>http://sitr.us/2012/05/12/installing-a-custom-rom-on-the-transformer-prime</id>
     <content type="html"><![CDATA[<p>This guide provides step-by-step instructions for installing the <a href="http://www.virtuousrom.com/p/prime.html">Virtuous Prime</a>
 community ROM on your Asus Transformer Prime TF201 tablet.  This guide will
@@ -4367,7 +4796,7 @@ I could not fix.  Also, having root access to my tablet is excellent.</p>
   <entry>
     <title type="html"><![CDATA[Cookies are bad for you: Improving web application security]]></title>
     <link href="http://sitr.us/2011/08/26/cookies-are-bad-for-you.html"/>
-    <updated>2011-08-26T00:00:00-04:00</updated>
+    <updated>2011-08-26T00:00:00-07:00</updated>
     <id>http://sitr.us/2011/08/26/cookies-are-bad-for-you</id>
     <content type="html"><![CDATA[<p>Most web applications today use browser cookies to keep a user logged in
 while she is using the application.  Cookies are a decades-old device
@@ -4815,7 +5244,7 @@ are in the public domain.</p>
   <entry>
     <title type="html"><![CDATA[How Mobile Safari emulates mouse events]]></title>
     <link href="http://sitr.us/2011/07/28/how-mobile-safari-emulates-mouse-events.html"/>
-    <updated>2011-07-28T00:00:00-04:00</updated>
+    <updated>2011-07-28T00:00:00-07:00</updated>
     <id>http://sitr.us/2011/07/28/how-mobile-safari-emulates-mouse-events</id>
     <content type="html"><![CDATA[<p>When you are adapting web apps to touchscreen devices particular
 challenges come up around events like <code>mouseover</code> and <code>mouseout</code>.
@@ -4894,7 +5323,7 @@ and <a href="http://jsfiddle.net/hallettj/m5EXk/">a third that makes no changes 
   <entry>
     <title type="html"><![CDATA[CouchDB Notes]]></title>
     <link href="http://sitr.us/2009/09/13/couchdb-notes.html"/>
-    <updated>2009-09-13T00:00:00-04:00</updated>
+    <updated>2009-09-13T00:00:00-07:00</updated>
     <id>http://sitr.us/2009/09/13/couchdb-notes</id>
     <content type="html"><![CDATA[<p>Recently I gave a talk at <a href="http://pdxruby.org/" title="Portland Ruby Brigade">Portland Ruby Brigade</a> meeting on
 <a href="http://couchdb.apache.org/" title="CouchDB">CouchDB</a>, a document-oriented database.  I thought I would share my notes
@@ -5061,7 +5490,7 @@ updated accordingly.</p>
   <entry>
     <title type="html"><![CDATA[How to install Haskell "Batteries Included" Platform on Ubuntu Jaunty]]></title>
     <link href="http://sitr.us/2009/07/02/how-to-install-haskell-platform-on-ubuntu-jaunty.html"/>
-    <updated>2009-07-02T00:00:00-04:00</updated>
+    <updated>2009-07-02T00:00:00-07:00</updated>
     <id>http://sitr.us/2009/07/02/how-to-install-haskell-platform-on-ubuntu-jaunty</id>
     <content type="html"><![CDATA[<p>Just for kicks I thought I would take another shot at some Haskell programming.
 To get all of the common libraries and the automated package installer, cabal,
@@ -5135,7 +5564,7 @@ you can install Haskell libraries with <code>cabal</code>.</p>
   <entry>
     <title type="html"><![CDATA[Database Queries the CouchDB Way]]></title>
     <link href="http://sitr.us/2009/06/30/database-queries-the-couchdb-way.html"/>
-    <updated>2009-06-30T00:00:00-04:00</updated>
+    <updated>2009-06-30T00:00:00-07:00</updated>
     <id>http://sitr.us/2009/06/30/database-queries-the-couchdb-way</id>
     <content type="html"><![CDATA[<p><a href="http://couchdb.apache.org/">CouchDB</a> is a document-oriented database. It has no rows or tables. Instead
 CouchDB is a collection of JSON documents. It uses a map-reduce pattern to
@@ -5501,7 +5930,7 @@ from the original array removed.</p>
   <entry>
     <title type="html"><![CDATA[How to use RSpec to describe a Sinatra application]]></title>
     <link href="http://sitr.us/2008/07/29/how-to-use-rspec-to-describe-a-sinatra-application.html"/>
-    <updated>2008-07-29T00:00:00-04:00</updated>
+    <updated>2008-07-29T00:00:00-07:00</updated>
     <id>http://sitr.us/2008/07/29/how-to-use-rspec-to-describe-a-sinatra-application</id>
     <content type="html"><![CDATA[<p>This information was written a long time ago and has become pretty outdated.</p>
 
@@ -5661,7 +6090,7 @@ The Sinatra application that led to this article is now open source and is avail
   <entry>
     <title type="html"><![CDATA[International Phonetic Alphabet]]></title>
     <link href="http://sitr.us/2007/10/02/international-phonetic-alphabet.html"/>
-    <updated>2007-10-02T00:00:00-04:00</updated>
+    <updated>2007-10-02T00:00:00-07:00</updated>
     <id>http://sitr.us/2007/10/02/international-phonetic-alphabet</id>
     <content type="html"><![CDATA[<p>In <a href="http://sitr.us/ling/2007/09/24/anatomy-of-a-syllable/">last week’s post</a> I provided phonetic
 transcriptions of some example words using the International Phonetic
@@ -5789,206 +6218,6 @@ the same and sounds that are treated as the same by language speakers
 is a very important consideration in linguistics - and it has to do
 with the sudden switch from square brackets to slashes surrounding the
 transcriptions above. I will talk about that in a future article too.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Anatomy of a Syllable]]></title>
-    <link href="http://sitr.us/2007/09/24/anatomy-of-a-syllable.html"/>
-    <updated>2007-09-24T00:00:00-04:00</updated>
-    <id>http://sitr.us/2007/09/24/anatomy-of-a-syllable</id>
-    <content type="html"><![CDATA[<p>The syllable is a constant feature in every spoken language in the
-world. Each language has its own rules about what kinds of syllables
-are allowed, and what kinds aren’t - but the general structure is the
-same everywhere.</p>
-
-<p>A syllable has as many as three parts: <em>onset</em>, <em>nucleus</em>, and
-<em>coda</em>. The onset and the coda are consonants, or consonant clusters,
-that appear at the beginning and the end of the syllable
-respectively. The nucleus forms the the core of the syllable; it is
-most often a vowel, or a combination of vowels - but there are many
-exceptions to that. If you examine enough languages you can find
-almost every kind phone used as a syllable nucleus. In the word “far”,
-[f] is the syllable onset, [a] is the nucleus, and [r] the coda. If a
-coda is present in a syllable, the nucleus and the coda form a single
-unit called a <em>rhyme</em>; otherwise the nucleus makes up the rhyme by
-itself. Looking at “far” again, [ar] forms the rhyme. A syllable does
-not necessarily have to have an onset or a coda - depending on the
-language - but a nucleus is always present.</p>
-
-<p>Even in English, syllable nuclei are not restricted to vowels. For
-example, in the monosyllabic word, “hmm”, the syllable nucleus is [ṃ],
-which is a consonant but is more specifically a <em>nasal</em>. Another
-nasal, [n], can be seen as a syllable nucleus in the word “isn’t”,
-which is transcribed into the <a href="http://en.wikipedia.org/wiki/International_Phonetic_Alphabet">International Phonetic Alphabet (IPA)</a>
-as [ɪzzṇt]. In this case there are two syllables, and [ṇ] forms the
-nucleus of the second syllable.</p>
-
-<!-- more -->
-
-<p>The small dot underneath the characters ṇ and ṃ indicates that the
-sound represented is a <em>syllabic consonant</em>, which is any consonant
-that forms a syllable nucleus. Vowels are not marked with the same
-diacritic because they are always considered to be syllabic. Usually
-syllabicity is marked in IPA with a vertical stroke under the character
-instead of a dot; but in this case a dot was as close as I could get.</p>
-
-<p>Anyone following closely may notice that it is difficult to decide
-exactly how to divide “isn’t” into syllables. It seems like it should
-be either [‘ɪz.ṇt], or [‘ɪ.zṇt], where the dot (.) represents a
-syllable boundary and the apostrophe (‘) represents the beginning of a
-stressed syllable; but it is tricky to figure out whether the [z] is
-the coda of the first syllable or the onset of the second
-syllable. That is because in the [z] in “isn’t” demonstrates
-<em>ambisyllabicity</em>, a common feature in English that I will write about
-in a future article. The short explanation is that [z] is both an
-onset and a coda, which is why I transcribed the word with two
-[z]’s. Anyway, in both analyses [ṇ] forms the nucleus of the second
-syllable, so we don’t need to worry about the placement of [z] for
-now.</p>
-
-<p>There are also arguably cases where a <em>liquid</em> forms the nucleus of a
-syllable in English. The liquids in English are [l] and [r]. Consider
-the word “sir” and the second syllable of “apple”. If it is the case
-that the liquids in these syllables are the nuclei, then the words
-would be transcribed as [sṛ] and [æppḷ] respectively. However, not
-everybody agrees with that interpretation, and so these words are
-often analyzed as [sər] and [æppəl]. That would make the syllable
-nuclei [ə], which is a vowel. And by the way, the [p] in “apple” is
-also ambisyllabic.</p>
-
-<p>The reason vowels are so likely to form syllable nuclei is that they
-are the most <em>sonorous</em> sounds available in spoken language. It is a
-general rule that syllable nuclei are formed by sonorous
-phones. Liquids and nasals are right behind vowels in that they are
-more sonorous than any other type of consonant. But it is possible to
-find syllable nuclei in other languages that are considerably less
-sonorant than any of the above. For example, there is at least one
-<a href="http://en.wikipedia.org/wiki/Berber_languages">Berber language</a> that contains syllables like [tḳt], where the
-nucleus of the syllable is [ḳ].</p>
-
-<p>The onset and coda are always made up of consonants. Many languages
-have strict rules about how many consonants can appear, and what sort
-of order they appear in. English is relatively lax in this respect, so
-we can see syllables with several consonants clustered together in
-both positions. For example, “scrumptious”, transcribed as
-[‘skrʌmp.ʃəs], has three distinct consonant phones in the onset and
-two in the coda of the first syllable. But notice that you would never
-see a word in English like [‘rksʌpm.ʃəs], which would probably be
-spelled “rksupmtious”. Try pronouncing that and see what happens - and
-remember that it’s cheating to make the [r] or the [m] into separate
-syllables!</p>
-
-<p>Consonants in syllable onsets and codas are also governed by
-sonority. There is a rule, called the <em>sonority sequencing
-generalization</em>, that says that the sonority of a syllable peaks at
-the nucleus and decreases toward either boundary. So the sonority of
-consonants in the onset is supposed to increase going forward, and the
-sonority in the coda is supposed to fall of. This is a generalization,
-so there are exceptions - but if you deviate too much from the rule the
-result becomes difficult to pronounce. In the made-up word above I
-reversed the order of the consonants in the onset and coda of the
-first syllable, thus making the sonority sequence “wrong”.</p>
-
-<p>Every sound in a language has a place somewhere in the sonority
-hierarchy. And every language has its own sonority hierarchy
-ordering. So for example [star] is easy for English speakers to
-pronounce, but you don’t see a word like [tsar]: [t] is more sonorous
-than [s] in English. But in Russian it is not uncommon to see a word
-like [tsar].</p>
-
-<p>Restrictions on what is allowed in a syllable vary from language to
-language. Not all languages allow as many consonants to be clustered
-in a syllable onset as English does, while some allow more. Some
-languages require every syllable to have an onset, while others allow
-naked nuclei. Syllable codas are especially restricted. For example,
-in Mandarin Chinese the only syllable codas that are allowed are
-nasals. There are no languages that forbid onsets, but many languages
-don’t allow syllable codas to appear at all.</p>
-
-<p>For more information, and some neat diagrams, visit <a href="http://www.sil.org/LINGUISTICS/GlossaryOfLinguisticTerms/WhatIsASyllable.htm">What is a
-syllable?</a> and <a href="http://en.wikipedia.org/wiki/Syllable">the Wikipedia entry for “Syllable”</a>.</p>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Deixis]]></title>
-    <link href="http://sitr.us/2007/09/17/deixis.html"/>
-    <updated>2007-09-17T00:00:00-04:00</updated>
-    <id>http://sitr.us/2007/09/17/deixis</id>
-    <content type="html"><![CDATA[<p>When someone says to you, “here” or “now”, you probably know what he
-means. “Here” might the room that you are both sitting in. “Now” would
-be the span of time you spent sitting together. But if either word
-were uttered under different circumstances, it could mean something
-very different. For example, if I called you from the Andes and I used
-the word, “here”, it would mean a mountainside somewhere - possibly
-thousands of miles away from the aforementioned room. The same word
-can mean both the room and the mountainside because of <a href="http://en.wikipedia.org/wiki/Deixis">deixis</a>.</p>
-
-<p>Deixis is a form of <a href="http://en.wikipedia.org/wiki/Exophora">exophora</a>, which is an utterance that is given
-meaning by the context it is uttered in. Specifically, deixis
-represents the speech event itself: deictic expressions reference the
-speaker, the speaker’s utterances, the speaker’s location, and the
-time at which the speech event occurs. There are different types of
-deictic expressions that refer to each particular aspect.</p>
-
-<p><a href="http://en.wikipedia.org/wiki/Personal_pronoun">Personal pronouns</a>, such as “I”, “you”, “he”, and “she”, are deictic
-expressions. “I” refers simply to the speaker. The other pronouns are
-defined by the relation the referenced person has to the speaker in
-the discourse. As the role of speaker switches from person to person,
-the context represented by deixis in understood by participants of the
-discourse to change too.</p>
-
-<!-- more -->
-
-<p>Location and time are a little more complicated. Whenever someone
-speaks - or writes, or is quoted, etc. - there is an implicit deictic
-center that is formed in the minds of the speaker and any listeners. A
-deictic center is the point in space and time that spatial and
-temporal deictic expressions refer to. “Here” and “now” are the
-simplest examples. The verbs “to come” and to “to go” are also spatial
-deictic expressions: “to come” means motion towards the deictic
-center, and “to go” means motion away.</p>
-
-<p>Based on this analysis, the phrase “come here” seems redundant at
-first. But actually the addition of “here” can be important, due to a
-phenomenon called <em>sympathetic deixis</em>. It is not uncommon, especially
-in phone conversations, to hear an utterance like, “I will come by
-later”. For the speaker to move toward the deictic center is almost
-nonsensical when the speaker is the deictic center. But in this case
-sympathetic deixis causes the deictic center to shift from the
-speaker’s location to the listener’s location. So motion towards the
-deictic center actually translates to motion toward the listener.</p>
-
-<p>Note that the shift caused by sympathetic deixis does not necessarily
-affect all the aspects of deixis. In the example above the meanings of
-personal pronouns do not change after the deictic center has shifted;
-in a similar sentence, “I will come to see you”, “I” refers to the
-speaker, and “you” refers to the listener - as would be expected with
-or without a shifted deictic center.</p>
-
-<p>An especially fun deictic puzzle is often heard in answering machine
-messages like, “I’m not here right now”. It isn’t possible that the
-deictic center is fixed upon the speaker during this message, because
-it is not possible for the speaker to not occupy his own location. So
-there must be sympathetic deixis in effect to shift the deictic center
-either spatially or temporally. As someone who has been on the
-receiving end of this message, I expect “here” to mean the location
-where the message was recorded, and “now” to be the time when I am
-calling. By that analysis the spatial location of the deictic center
-remains fixed on the location of the speech event, while the temporal
-aspect shifts to the listening event via sympathetic deixis. There is
-another possible analysis where both spatial and temporal sympathetic
-deictic shifts occur. In that case the spatial shift does not move the
-location of the deictic center to the listener, but instead moves it
-to the place where the listener expects it to be: in this case
-wherever the speaker’s phone is. Under either analysis, the answering
-machine example demonstrates that deictic shifts can be temporal as
-well as spatial.</p>
-
-<p>There are other forms of deictic expressions. There is a more complete
-list in <a href="http://en.wikipedia.org/wiki/Deixis">the Wikipedia article on deixis</a>.</p>
 ]]></content>
   </entry>
   

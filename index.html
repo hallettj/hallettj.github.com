@@ -9,9 +9,8 @@
   <meta name="author" content="Jesse Hallett">
 
   
-  <meta name="description" content="Flow v0.11 was released recently.
-The latest set of changes really improve type checking in React apps.
-But there are some guidelines to follow to &hellip;">
+  <meta name="description" content="This recipe is part of the Flow Cookbook series. Hacker News provides a public API.
+One of the endpoints of that API accepts an ID and responds with &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -90,6 +89,115 @@ But there are some guidelines to follow to &hellip;">
       
   <header>
     
+      <h1 class="entry-title"><a href="/2016/12/20/flow-cookbook-unpacking-json.html">Flow Cookbook: Unpacking JSON API data</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-12-20T00:00:00-08:00" pubdate data-updated="true">2016-12-20</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><em>This recipe is part of the <a href="/2016/12/20/flow-cookbook.html">Flow Cookbook</a> series.</em></p>
+
+<p>Hacker News provides <a href="https://github.com/HackerNews/API">a public API</a>.
+One of the endpoints of that API accepts an ID and responds with an item:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="nx">fetch</span><span class="p">(</span><span class="err">`</span><span class="nx">https</span><span class="o">:</span><span class="c1">//hacker-news.firebaseio.com/v0/item/${id}.json`)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>An “item” might be a story, a comment, a question, a job posting, a poll, or
+a voting option in a poll.
+If you don’t have context for the ID,
+the only way to know what you have fetched is to check the <code>type</code> property of
+the response at runtime.
+To add type safety to a call to this API,
+it is necessary to describe a type that encompasses all of the possible shapes
+that the returned data might take.
+That is going to be a <a href="https://flowtype.org/docs/union-intersection-types.html">union type</a>, which will look something like this:</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/2016/12/20/flow-cookbook-unpacking-json.html">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2016/12/20/flow-cookbook.html">Flow Cookbook</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-12-20T00:00:00-08:00" pubdate data-updated="true">2016-12-20</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Type-checking can be a useful asset in a Javascript project.
+A type checker can catch problems that are introduced when adding features or
+refactoring, which can reduce the amount of time spent debugging and testing.
+Type annotations provide a form of always-up-to-date documentation that makes
+it easier for developers to understand an unfamiliar code base.
+But it is important to use type-checking effectively to get its full benefit.</p>
+
+<p>The Javascript community is fortunate to have a choice of two great type
+checkers.
+These recipes focus on <a href="https://flowtype.org/">Flow</a>, and introduce patterns for using Flow
+effectively.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/2016/12/20/flow-cookbook.html">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
       <h1 class="entry-title"><a href="/2015/05/31/type-checking-react-with-flow.html">Type checking React with Flow v0.11</a></h1>
     
     
@@ -106,7 +214,7 @@ But there are some guidelines to follow to &hellip;">
   
 
 
-<time datetime="2015-05-31T00:00:00-04:00" pubdate data-updated="true">2015-05-31</time>
+<time datetime="2015-05-31T00:00:00-07:00" pubdate data-updated="true">2015-05-31</time>
         
       </p>
     
@@ -149,7 +257,7 @@ But there are some guidelines to follow to get the full benefits.</p>
   
 
 
-<time datetime="2015-05-31T00:00:00-04:00" pubdate data-updated="true">2015-05-31</time>
+<time datetime="2015-05-31T00:00:00-07:00" pubdate data-updated="true">2015-05-31</time>
         
       </p>
     
@@ -197,7 +305,7 @@ and <a href="https://github.com/facebook/flow/blob/master/lib/react.js">react.js
   
 
 
-<time datetime="2014-11-21T00:00:00-04:00" pubdate data-updated="true">2014-11-21</time>
+<time datetime="2014-11-21T00:00:00-08:00" pubdate data-updated="true">2014-11-21</time>
         
       </p>
     
@@ -267,7 +375,7 @@ appropriate.
   
 
 
-<time datetime="2014-08-02T00:00:00-04:00" pubdate data-updated="true">2014-08-02</time>
+<time datetime="2014-08-02T00:00:00-07:00" pubdate data-updated="true">2014-08-02</time>
         
       </p>
     
@@ -330,7 +438,7 @@ generators into code that can be run in any ES5-compatible web browser.</p>
   
 
 
-<time datetime="2014-05-19T00:00:00-04:00" pubdate data-updated="true">2014-05-19</time>
+<time datetime="2014-05-19T00:00:00-07:00" pubdate data-updated="true">2014-05-19</time>
         
       </p>
     
@@ -387,7 +495,7 @@ So I decided to get replacement keycaps.</p>
   
 
 
-<time datetime="2014-05-05T00:00:00-04:00" pubdate data-updated="true">2014-05-05</time>
+<time datetime="2014-05-05T00:00:00-07:00" pubdate data-updated="true">2014-05-05</time>
         
       </p>
     
@@ -448,7 +556,7 @@ This makes it possible to translate a lot of interesting math into machine-verif
   
 
 
-<time datetime="2013-11-04T00:00:00-04:00" pubdate data-updated="true">2013-11-04</time>
+<time datetime="2013-11-04T00:00:00-08:00" pubdate data-updated="true">2013-11-04</time>
         
       </p>
     
@@ -552,7 +660,7 @@ code that uses mutable data structures.</p>
   
 
 
-<time datetime="2013-05-22T00:00:00-04:00" pubdate data-updated="true"></time>
+<time datetime="2013-05-22T00:00:00-07:00" pubdate data-updated="true"></time>
         
       </p>
     
@@ -601,161 +709,6 @@ value of the input has a length greater than two.</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/2012/09/04/monkey-patching-document-write.html">Monkey patching document.write()</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-09-04T00:00:00-04:00" pubdate data-updated="true"></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>This is one of the crazier workarounds that I have implemented.  I was
-working on a web page that embeds third-party widgets.  The widgets are
-drawn in the page document - they do not get their own frames.  And
-sometimes the widgets are redrawn after page load.</p>
-
-<p>We had a problem with one widget invoking <code>document.write()</code>.  In case
-you are not familiar with it, if that method is called while the page is
-rendering it inserts content into the DOM immediately after the script
-tag in which the call is made.  But if <code>document.write()</code> is called
-after page rendering is complete it erases the entire DOM.  When this
-widget was redrawn after page load it would kill the whole page.</p>
-
-<p>The workaround we went with was to disable <code>document.write()</code> after page
-load by replacing it with a wrapper that checks whether the jQuery ready
-event has fired.</p>
-
-<div class="highlight"><pre><code class="js"><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">originalWrite</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">write</span><span class="p">;</span>
-    <span class="nb">document</span><span class="p">.</span><span class="nx">write</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">jQuery</span> <span class="o">!==</span> <span class="s1">&#39;undefined&#39;</span> <span class="o">&amp;&amp;</span> <span class="nx">jQuery</span><span class="p">.</span><span class="nx">isReady</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">console</span> <span class="o">!==</span> <span class="s1">&#39;undefined&#39;</span> <span class="o">&amp;&amp;</span> <span class="nx">console</span><span class="p">.</span><span class="nx">warn</span><span class="p">)</span> <span class="p">{</span>
-                <span class="nx">console</span><span class="p">.</span><span class="nx">warn</span><span class="p">(</span><span class="s2">&quot;document.write called after page load&quot;</span><span class="p">);</span>
-            <span class="p">}</span>
-        <span class="p">}</span>
-        <span class="k">else</span> <span class="p">{</span>
-            <span class="c1">// In IE before version 8 `document.write()` does not</span>
-            <span class="c1">// implement Function methods, like `apply()`.</span>
-            <span class="k">return</span> <span class="nb">Function</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">apply</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span>
-                <span class="nx">originalWrite</span><span class="p">,</span> <span class="nb">document</span><span class="p">,</span> <span class="nx">arguments</span>
-            <span class="p">);</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">})();</span>
-</code></pre></div>
-
-<p>The new implementation checks the value of <code>jQuery.isReady</code> and
-delegates to the original <code>document.write()</code> implementation if the page
-is not finished rendering yet.  Otherwise it does nothing other than to
-output a warning message.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/2012/09/04/monkey-patching-document-write.html">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/2012/07/31/promise-pipelines-in-javascript.html">Promise Pipelines in JavaScript</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-07-31T00:00:00-04:00" pubdate data-updated="true"></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><aside class="translations"><p>This page has been translated into <a href="http://www.webhostinghub.com/support/es/misc/las-bases-de">Spanish</a>
-language by Maria Ramos  from <a href="http://www.webhostinghub.com/">Webhostinghub.com</a>.</p></aside>
-
-<p>Promises, also know as deferreds or futures, are a wonderful abstraction
-for manipulating asynchronous actions.  Dojo has had <a href="http://dojotoolkit.org/reference-guide/1.7/dojo/Deferred.html">Deferreds</a>
-for some time.  jQuery introduced <a href="http://api.jquery.com/category/deferred-object/">its own Deferreds</a>
-in version 1.5 based on the CommonJS <a href="http://wiki.commonjs.org/wiki/Promises/A">Promises/A</a> specification.  I’m
-going to show you some recipes for working with jQuery Deferreds.  Use
-these techniques to turn callback-based spaghetti code into elegant
-declarative code.</p>
-
-<h2 id="the-basics-of-jquery-deferreds">The basics of jQuery Deferreds</h2>
-
-<p>A Deferred is an object that represents some future outcome.  Eventually
-it will either resolve with one or more values if that outcome was
-successful; or it will fail with one or more values if the outcome was
-not successful.  You can get at those resolved or failed values by
-adding callbacks to the Deferred.</p>
-
-<p>In jQuery’s terms a promise is a read-only view of a deferred.</p>
-
-<p>Here is a simple example of creating and then resolving a promise:</p>
-
-<div class="highlight"><pre><code class="js"><span class="kd">function</span> <span class="nx">fooPromise</span><span class="p">()</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">deferred</span> <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">Deferred</span><span class="p">();</span>
-
-    <span class="nx">setTimeout</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-        <span class="nx">deferred</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="s2">&quot;foo&quot;</span><span class="p">);</span>
-    <span class="p">},</span> <span class="mi">1000</span><span class="p">);</span>
-
-    <span class="k">return</span> <span class="nx">deferred</span><span class="p">.</span><span class="nx">promise</span><span class="p">();</span>
-<span class="p">}</span>
-</code></pre></div>
-
-<p>Callbacks can be added to a deferred or a promise using the <code>.then()</code>
-method.  The first callback is called on success, the second on failure:</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/2012/07/31/promise-pipelines-in-javascript.html">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -771,6 +724,14 @@ method.  The first callback is called on success, the second on failure:</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/2016/12/20/flow-cookbook-unpacking-json.html">Flow Cookbook: Unpacking JSON API data</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2016/12/20/flow-cookbook.html">Flow Cookbook</a>
+      </li>
+    
+      <li class="post">
         <a href="/2015/05/31/type-checking-react-with-flow.html">Type checking React with Flow v0.11</a>
       </li>
     
@@ -780,14 +741,6 @@ method.  The first callback is called on success, the second on failure:</p>
     
       <li class="post">
         <a href="/2014/11/21/flow-is-the-javascript-type-checker-i-have-been-waiting-for.html">Flow is the JavaScript type checker I have been waiting for</a>
-      </li>
-    
-      <li class="post">
-        <a href="/2014/08/02/javascript-generators-and-functional-reactive-programming.html">Javascript generators and functional reactive programming</a>
-      </li>
-    
-      <li class="post">
-        <a href="/2014/05/19/kinesis-advantage-with-dsa-keycaps.html">Kinesis Advantage with DSA keycaps</a>
       </li>
     
   </ul>
