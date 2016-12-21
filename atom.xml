@@ -4,7 +4,7 @@
   <title><![CDATA[sitr.us]]></title>
   <link href="http://sitr.us/atom.xml" rel="self"/>
   <link href="http://sitr.us/"/>
-  <updated>2016-12-20T17:27:16-08:00</updated>
+  <updated>2016-12-20T17:29:14-08:00</updated>
   <id>http://sitr.us/</id>
   <author>
     <name><![CDATA[Jesse Hallett]]></name>
@@ -436,8 +436,8 @@ The answer is, once again, type-narrowing:</p>
 </pre></td><td class="code"><pre><code class="js"><span class="line"><span class="nx">async</span> <span class="kd">function</span> <span class="nx">fetchPollOpts</span><span class="p">({</span> <span class="nx">parts</span> <span class="p">}</span><span class="o">:</span> <span class="nx">Poll</span><span class="p">)</span><span class="o">:</span> <span class="nx">Promise</span><span class="o">&lt;</span><span class="nx">PollOpt</span><span class="p">[]</span><span class="o">&gt;</span> <span class="p">{</span>
 </span><span class="line">  <span class="kr">const</span> <span class="nx">promises</span> <span class="o">=</span> <span class="nx">parts</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">fetchItem</span><span class="p">)</span>
 </span><span class="line">  <span class="kr">const</span> <span class="nx">items</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Promise</span><span class="p">.</span><span class="nx">all</span><span class="p">(</span><span class="nx">promises</span><span class="p">)</span>
-</span><span class="line">  <span class="k">return</span> <span class="nx">flatMap</span><span class="p">(</span><span class="nx">items</span><span class="p">,</span> <span class="nx">i</span> <span class="o">=&gt;</span> <span class="p">(</span>
-</span><span class="line">    <span class="nx">i</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="s1">&#39;pollopt&#39;</span> <span class="o">?</span> <span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">:</span> <span class="p">[]</span>
+</span><span class="line">  <span class="k">return</span> <span class="nx">flatMap</span><span class="p">(</span><span class="nx">items</span><span class="p">,</span> <span class="nx">item</span> <span class="o">=&gt;</span> <span class="p">(</span>
+</span><span class="line">    <span class="nx">item</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="s1">&#39;pollopt&#39;</span> <span class="o">?</span> <span class="p">[</span><span class="nx">item</span><span class="p">]</span> <span class="o">:</span> <span class="p">[]</span>
 </span><span class="line">  <span class="p">))</span>
 </span><span class="line"><span class="p">}</span>
 </span><span class="line">
