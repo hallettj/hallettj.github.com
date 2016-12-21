@@ -260,12 +260,115 @@ async function fetchLatestItems(n: number): Promise<Item[]> {
 And finally, some code to set everything running:
 
 ```js
-(async function main() {
+async function main() {
   const latestItems = await fetchLatestItems(15)
   latestItems.forEach(item => {
     console.log(formatItem(item) + "\n")
   })
-}())
+}
+```
+
+
+## Refining the model
+
+Later on we may realize that it would be useful to be able to refer to each
+item type individually.
+To do that, we can create a named alias for each item type:
+
+```js
+type Story   = { type: 'story', kids: ID[], url: URL }                 & ItemCommon & TopLevel
+type Ask     = { type: 'ask',  kids: ID[], text: string, url: URL }    & ItemCommon & TopLevel
+type Job     = { type: 'job', text: string, url: URL }                 & ItemCommon & TopLevel
+type Poll    = { type: 'poll', kids: ID[], parts: ID[], text: string } & ItemCommon & TopLevel
+type PollOpt = { type: 'pollopt', parent: ID, score: number, text: string } & ItemCommon
+type Comment = { type: 'comment', kids: ID[], parent: ID, text: string }    & ItemCommon
+```
+
+Then we can replace the earlier definition of `Item` with a simpler one:
+
+```js
+type Item = Story | Ask | Job | Poll | PollOpt | Comment
+```
+
+This well let us write specialized functions,
+such as a function that specifically formats a poll with its options.
+
+```js
+function formatPoll({ by, title }: Poll, opts: PollOpt[]): string {
+  const headline = `${by} started a poll: "${title}"`
+  return headline + opts.map(opt => `  - ${opt.text}`)
+}
+```
+
+So how do we get to a point where we can call a function that accepts only
+polls?
+The answer is, once again, type-narrowing:
+
+```js
+async function fetchPollOpts({ parts }: Poll): Promise<PollOpt[]> {
+  const promises = parts.map(fetchItem)
+  const items = await Promise.all(promises)
+  return flatMap(items, i => (
+    i.type === 'pollopt' ? [i] : []
+  ))
+}
+
+async function displayItem(item) {
+  if (item.type === 'poll') {
+    // At this point the type of `item` has been narrowed so that we can pass it
+    // to specialized functions.
+    const opts = await fetchPollOpts(item)
+    formatPoll(item, opts)
+  }
+  else if (item.type === 'pollopt') {
+    // do nothing
+  }
+  else {
+    console.log(formatItem(item) + "\n")
+  }
+}
+```
+
+Notice the use of `flatMap` in `fetchPollOpts`.
+This filters results to check that the results are actually poll options.
+At the same time, Flow is able to infer that the filtered results all have the
+`PollOpt` type.
+This uses a custom definition for `flatMap`:
+
+```js
+// Provides flexible array processing - this function can be used to remove
+// items from an array, to replace individual items with multiple items in the
+// output array, or pretty much anything you might need.
+function flatMap<A, B>(xs: A[], fn: (x: A) => B[]): B[] {
+  const result = []
+  for (const x of xs) {
+    result.push.apply(result, fn(x))
+  }
+  return result
+}
+```
+
+If you trust that all of the items that are fetched will be of the right type,
+and you do not want to bother with a runtime check,
+then you could use a type-cast instead:
+
+```js
+async function fetchPollOpts({ parts }: Poll): Promise<PollOpt[]> {
+  const promises = parts.map(fetchItem)
+  return (Promise.all(promises):any)
+}
+```
+
+Finally, here is a function that feeds fetched items to the new-and-improved
+item formatting function:
+
+```js
+export async function betterClient() {
+  const latestItems = await fetchLatestItems(15)
+  for (const item of latestItems) {
+    await displayItem(item)
+  }
+}
 ```
 
 The code from this article is available at
