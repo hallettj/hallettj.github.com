@@ -372,7 +372,7 @@ export async function betterClient() {
 ```
 
 The code from this article is available at
-https://github.com/hallettj/hacker-news-example.
+[https://github.com/hallettj/hacker-news-example](https://github.com/hallettj/hacker-news-example).
 I encourage you to check out the code to tinker with it.
 Try building more functionality,
 and see how type-checking affects the way you write code.
