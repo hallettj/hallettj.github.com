@@ -6,6 +6,8 @@ date: 2016-12-20
 comments: true
 ---
 
+_Last updated 2017-01-03_
+
 Type-checking can be a useful asset in a Javascript project.
 A type checker can catch problems that are introduced when adding features or
 refactoring, which can reduce the amount of time spent debugging and testing.
@@ -101,3 +103,8 @@ Union types are great, but not perfect.
 This post introduces an alternative formulation for sum types that allows Flow
 to check for missing pattern matches.
 It also shows that GADTs are _almost_ possible in Flow.
+
+
+## Changes
+
+- *2017-01-03:* Added recipe, [Flow & React][]

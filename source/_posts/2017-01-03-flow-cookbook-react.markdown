@@ -10,14 +10,14 @@ _This recipe is part of the [Flow Cookbook][] series._
 
 [Flow Cookbook]: /2016/12/20/flow-cookbook.html
 
-Flow and React are both Facebook projects;
+Flow and React are both Facebook projects -
 so as you might imagine, they work quite well together.
 React components can take type parameters to specify types for props, default
 props, and state.
 Type-checking works well with both [functional and class components][].
 
 Flow type annotations provide an alternative to `propTypes` runtime checks.
-The Flow way has some advantages:
+Flow's static checking has some advantages:
 
 - Problems are reported immediately - it is not necessary to run tests that
 evaluate every component to identify `props` mismatches.
@@ -45,9 +45,20 @@ class MyComponent extends React.Component<DefaultProps, Props, State> {
 
 Where `DefaultProps`, `Props`, and `State` can be whatever object types you
 want.
-For any parameter that you don't want to use,
+For example, if your component has the props `title`, `createdAt`, and
+`authorId` then a definition for `Props` could look like this:
+
+```js
+type Props = {
+  title: string,
+  createdAt: Date,
+  authorId: number,
+}
+```
+
+For any type parameter that you don't want to use,
 give the type `void` instead.
-For example, a component that has no internal state gets `void` for its state
+For example, a component that has no internal state gets `void` for its third
 type parameter.
 
 If you use `defaultProps`, the props type should include types for *all* props -
@@ -69,7 +80,7 @@ function MyComponent(props: Props): React.Element<*> {
 
 Once again, `Props` can be any object type that you want,
 and should include types for all props, even those that have default values.
-Notice also the return type, `React.Element<*>`.
+Notice the return type, `React.Element<*>`.
 Flow uses a type parameter for `Element` to track internal details,
 such as the class and props that produced an element.
 You will probably never want to specify that parameter by hand;
@@ -108,7 +119,7 @@ We import the `Story` type from `'hacker-news-example'`,
 which is the example code from the [Unpacking JSON API data][] recipe.
 That `Story` type is a ready-made type that describes everything we will want
 to display in the new client.
-Take a look at [the source file][Story] to see what `Story` looks like.
+Take a look at the [source file][Story] to see what `Story` looks like.
 (The `import type` syntax is [Flow syntax][import syntax] -
 it is not part of Javascript.)
 
@@ -117,9 +128,9 @@ component.
 The props are a `story`,
 and a callback called `onSelect`.
 The type indicates that `onSelect` must be a function that takes zero arguments,
-and that returns `undefined`.
+and that returns `undefined` (a.k.a. `void`).
 It is not necessary to require that the return type be `undefined` -
-you could use `mixed` if you do not want to put any constraint on the
+you could use `mixed` instead if you do not want to put any constraint on the
 callback's return type.
 My opinion is that using `void` is a clear indication to the caller that the
 component will not do anything with a return value.
@@ -146,13 +157,15 @@ The type annotation, `props: StoryListItemProps`,
 does two things for us:
 when `StoryListItem` is rendered, Flow will check that it is given the required
 props of the appropriate types;
-and Flow will also check uses of `props` in the component definition for
-consistency with the `StoryListItemProps` definition.
+and Flow will also check uses of `props` in the body of the `StoryListItem`
+function for consistency with `StoryListItemProps`.
+Checking props from both directions ensures that a component is in alignment
+with its callers.
 
 In general if a component does not have internal state,
 and does not use lifecycle callbacks such as `componentDidMount`,
-then I prefer to use a functional component.
-That means that the component cannot have methods that refer to `this.props`;
+then I prefer to use a functional component, like `StoryListItem`.
+A functional component cannot have methods that refer to `this.props`;
 so I made the `selectStory` event handler a top-level function that accepts
 a reference to the component's props as an argument.
 Reusing the `StoryListItemProps` type in the signatures for the component and
@@ -163,7 +176,7 @@ both functions.
 The `Event` type is built into Flow,
 and Flow knows about the `preventDefault` method.
 Flow's take on the `Event` type is defined in Flow's
-[DOM type definitions file][].
+[DOM type-definitions file][].
 
 To populate instances of the `StoryListItem` component,
 we will need to make API requests and update some state.
@@ -171,17 +184,21 @@ Here is a type for that state,
 and the parameters for the top-level component, which will manage that state:
 
 ```js
+type AppProps = {
+  numStories: number,
+}
+
 type AppState = {
   selectedStory?: ?Story,
   stories?: Story[],
   error?: Error,
 }
 
-class App extends Component<void,void,AppState> {
+class App extends Component<void, AppProps, AppState> {
   // Must declare `state` type in two places
   state: AppState
 
-  constructor(props: void) {
+  constructor(props: AppProps) {
     super(props)
     this.state = {}
   }
@@ -203,15 +220,12 @@ Because every property in `AppState` is optional,
 not be set.)
 `selectedStory` is optional, and its type is nullable,
 so there are two question marks on that line.
-That is because `selectedStory` is initially not defined,
+That is because `selectedStory` is initially not set,
 and after a user views a story and then backs out to the story list
 `selectedStory` is set to `null`.
 
-Note that `App` does not take any props.
-We can see that because it's second type parameter is `void`.
-Everything is handled by internal state.
-Note also that since this component has a `constructor`,
-we specify the props type both in a class type parameter,
+Since `App` has a `constructor`,
+we specify the props type both in the second class type parameter,
 and again in the type of the `props` argument to `constructor`.
 
 `App` will fetch stories when it is mounted.
@@ -220,11 +234,11 @@ So we extend its definition with a `componentDidMount` callback.
 ```js
 import { fetchTopStories } from 'hacker-news-example'
 
-class App extends Component<void,void,AppState> {
+class App extends Component<void, AppProps, AppState> {
   /* ... same as before */
 
   componentDidMount() {
-    fetchTopStories(15 /* number of stories to fetch */)
+    fetchTopStories(this.props.numStories /* number of stories to fetch */)
       .then(stories => {
         // On success, update component state with an array of stories
         this.setState({ stories })
@@ -249,7 +263,7 @@ so we will have to check whether stories have loaded,
 and display a loading indicator if they are not ready.
 
 ```js
-class App extends Component<void,void,AppState> {
+class App extends Component<void, AppProps, AppState> {
   /* ... */
 
   render() {
@@ -304,21 +318,24 @@ a specific story has been selected,
 or there is an array of stories available, and none has been selected.
 If none of those cases applies,
 then it means that stories are still loading.
+
 When displaying a list of stories, `content` is populated by a list of
 instances of `StoryListItem`,
 which we defined earlier.
+Note that there is nothing special about rendering a type-checked component -
+you pass props the same way as with any component.
 
 Flow can track changes to the type of a variable over a series of statements.
-Flow infers that when `content` is first defined its type is `void`,
-and that no matter which code path gets executed,
-the type changes to either `React.Element<*>` or `React.Element<*>[]` by the
-time we get to the `return` statement.
+Flow infers that when `content` is first defined its type is `void`;
+and it infers that no matter which code path gets executed,
+by the time we get to the `return` statement the type has changed to either
+`React.Element<*>` or `React.Element<*>[]`.
 
 The event handling methods `selectStory` and `deselectStory` just make simple
 state updates:
 
 ```js
-class App extends Component<void,void,AppState> {
+class App extends Component<void, AppProps, AppState> {
   /* ... */
 
   selectStory(story: Story) {
@@ -355,9 +372,9 @@ or to display profile pages for posters and commenters.
 
 The example code here uses React's own state features to manage app state.
 That helps to keep this recipe self-contained.
-But in my opinion the best practice is to combine React with a state-management
-framework, such as [react-redux][].
-For details on using Flow with react-redux,
+But in my opinion the best practice is to keep state in a third-party
+state-management framework, such as [Redux][].
+For details on using Flow with Redux and [react-redux][],
 take a look at the next recipe, [Flow & Redux][].
 
 
@@ -367,7 +384,8 @@ take a look at the next recipe, [Flow & Redux][].
 [existential type]: /2015/05/31/advanced-features-in-flow.html#existential-types
 [Story]: https://github.com/hallettj/hacker-news-example/blob/master/index.js.flow#L9
 [import syntax]: https://flowtype.org/docs/syntax.html#importing-and-exporting-types
-[DOM type definitions file]: https://github.com/facebook/flow/blob/master/lib/dom.js#L182
+[DOM type-definitions file]: https://github.com/facebook/flow/blob/master/lib/dom.js#L182
 [StoryView]: https://github.com/hallettj/flow-cookbook-react/blob/master/src/StoryView.js
+[Redux]: http://redux.js.org/
 [react-redux]: http://redux.js.org/docs/basics/UsageWithReact.html
 [Flow & Redux]: /todo.html
