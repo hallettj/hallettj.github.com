@@ -98,13 +98,176 @@ type StoryListItemProps = {
 }
 ```
 
-We import the `Story` type from [`'hacker-news-example'`][API client],
+We import the `Story` type from `'hacker-news-example'`,
 which is the example code from the [Unpacking JSON API data][] recipe.
 That `Story` type is a ready-made type that describes everything we will want
 to display in the new client.
+Take a look at [the source file][Story] to see what that type looks like.
 (The `import type` syntax is [Flow syntax][import syntax] -
 it is not part of the Javascript language.)
 
+The `StoryListItemProps` type lists the props that will be given to our
+component.
+The props are a `story`,
+and a callback called `onSelect`.
+The type indicates that `onSelect` must be a function that takes zero arguments,
+and that returns `undefined`.
+It is not necessary to require that the return type be undefined -
+you could use `mixed` if you do not want to put any constraint on the
+callback's return type.
+My opinion is that using `void` is a clear indication to the caller that the
+component will not do anything with a return value.
+
+And here is the `StoryListItem` component itself:
+
+```js
+function StoryListItem(props: StoryListItemProps): React.Element<*> {
+  const { by, title } = props.story
+  return <p>
+    <a href="#" onClick={event => selectStory(props, event)}>
+      {title}
+    </a> posted by {by}
+  </p>
+}
+
+function selectStory(props: StoryListItemProps, event: Event) {
+  event.preventDefault()
+  props.onSelect()
+}
+```
+
+In general if a component does not have internal state,
+and does not use lifecycle callbacks such as `componentDidMount`,
+then I prefer to use a functional component.
+That means that the component cannot have methods that refer to `this.props`;
+so I made the `selectStory` event handler a top-level function that accepts
+a reference to the component's props as an argument.
+Reusing the `StoryListItemProps` type in the signatures for the component and
+for the event handler means that we can easily keep track of available props in
+both functions.
+
+To populate instances of the `StoryListItem` component,
+we will need to make API requests and update some state.
+Here is a type for that state,
+and the parameters for the top-level component, which will manage that state:
+
+```js
+type AppState = {
+  selectedStory?: ?Story,
+  stories?: Story[],
+  error?: Error,
+}
+
+class App extends Component<void,void,AppState> {
+  // Must declare `state` type in two places
+  state: AppState
+
+  constructor(props: void) {
+    super(props)
+    this.state = {}
+  }
+
+  /* ... */
+}
+```
+
+The definition of `AppState` shows that the state will hold an array of `stories`,
+which will not be defined while stories are loading;
+a `selectedStory`,
+which will be defined when the user is viewing comments on a story;
+and an `error`,
+in case something goes wrong while loading stories.
+
+Because every property in `AppState` is optional,
+`state` can be initialized as an empty object.
+(The question mark at the end of a property name indicates that property might
+not be set.)
+`selectedStory` is optional, and its type is nullable.
+That is because `selectedStory` is initially not defined;
+and after a user views a story and then backs out to the story list
+`selectedStory` is set to `null`.
+
+Note that `App` does not take any props.
+Everything is handled by internal state.
+Note also that since this component has a `constructor`,
+we specify the props type both in a class type parameter,
+and again in the argument type to `constructor` -
+and in this case that type is `void`.
+
+`App` will fetch stories when it is mounted.
+So we extend its definition with a `componentDidMount` callback.
+
+```js
+import { fetchTopStories } from 'hacker-news-example'
+
+class App extends Component<void,void,AppState> {
+  /* ... same as before */
+
+  componentDidMount() {
+    fetchTopStories(15 /* number of stories to fetch */)
+      .then(stories => {
+        // On success, update component state with an array of stories
+        this.setState({ stories })
+      })
+      .catch(error => {
+        // On error, update state to capture the error for display
+        this.setState({ error })
+      })
+  }
+}
+```
+
+`fetchTopStories` takes an argument that specifies the number of stories to
+fetch,
+and it returns a promise.
+
+Once stories are loaded, we can display them via a `render` method.
+But the component will display before those requests are complete -
+so we will have to check whether stories have loaded,
+and display a loading indicator if they have not.
+
+```js
+class App extends Component<void,void,AppState> {
+  /* ... */
+
+  render() {
+    const { error, selectedStory, stories } = this.state
+
+    let content
+    if (error) {
+      content = <p className="error">{error.message}</p>
+    }
+    else if (selectedStory) {
+      content = <StoryView
+        story={selectedStory}
+        onNavigateBack={() => this.deselectStory()}
+      />
+    }
+    else if (stories) {
+      content = stories.map(story => (
+        <StoryListItem
+          story={story}
+          onSelect={() => this.selectStory(story)}
+          key={story.id}
+        />
+      ))
+    }
+    else {
+      content = <p className="loading">loading...</p>
+    }
+
+    return (
+      <div className="App">
+        <div className="App-header">
+          <h1>Flow Cookbook: React Example</h1>
+        </div>
+        <div>
+          {content}
+        </div>
+      </div>
+  }
+}
+```
 
 
 
@@ -127,7 +290,7 @@ take a look at the [Redux recipe][].
 [Unpacking JSON API data]: /2016/12/20/flow-cookbook-unpacking-json.html
 [react lib]: https://github.com/facebook/flow/blob/master/lib/react.js
 [existential type]: http://sitr.us/2015/05/31/advanced-features-in-flow.html#existential-types
-[API client]: https://github.com/hallettj/hacker-news-example
-[impport syntax]: TODO
+[Story]: https://github.com/hallettj/hacker-news-example/blob/master/index.js.flow#L9
+[import syntax]: TODO
 [react-redux]: TODO
 [Redux recipe]: http://sitr.us/todo.html
