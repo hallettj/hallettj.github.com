@@ -1,8 +1,8 @@
 ---
 layout: post
-title: "Flow Cookbook: React"
+title: "Flow Cookbook: Flow & React"
 author: Jesse Hallett
-date: 2017-01-02
+date: 2017-01-03
 comments: true
 ---
 
@@ -10,7 +10,7 @@ _This recipe is part of the [Flow Cookbook][] series._
 
 [Flow Cookbook]: /2016/12/20/flow-cookbook.html
 
-Flow and React are both Facebook projects -
+Flow and React are both Facebook projects;
 so as you might imagine, they work quite well together.
 React component classes can type type parameters to specify types for props,
 default props, and state.
@@ -25,6 +25,8 @@ evaluate every component to identify `props` mismatches.
 - Flow can also check `state` as well as `props`.
 - In addition to checking that a component gets the correct `props`,
 Flow checks that `props` and `states` are used correctly within the component.
+
+<!-- more -->
 
 
 ## The basics

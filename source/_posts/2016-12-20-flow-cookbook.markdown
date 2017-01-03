@@ -49,7 +49,7 @@ Union types are helpful for describing Redux actions,
 for unpacking incoming JSON data,
 and for passing messages over a channel.
 If you have been tempted to use subclasses,
-take a look at union types to see if they might be a better fit. 
+take a look at union types to see if they might be a better fit.
 
 [Unpacking JSON API data][] -
 Javascript's flexibility is useful for handling incoming data in whatever form
@@ -59,19 +59,20 @@ process data.
 This is a case study that uses the Hacker News API as an example for type-safe
 data processing.
 
-(Coming soon) *React* -
+[Flow & React][] -
 This recipe demonstrates how to use Flow effectively when creating React
 components.
 Including type parameters in [functional and class components][] provides an
 alternative to `propTypes` that can provide better safety and modularity.
 
-(Coming soon) *Redux* -
+(Coming soon) *Flow & Redux* -
 Flow and Redux could have been made for each other.
 This recipe demonstrates several patterns that are useful for building Redux
 action creators and reducers.
 This is a companion to the post on React.
 
 [Unpacking JSON API data]: /2016/12/20/flow-cookbook-unpacking-json.html
+[Flow & React]: /2017/01/03/flow-cookbook-react.html
 
 [functional and class components]: https://facebook.github.io/react/docs/components-and-props.html#functional-and-class-components
 
