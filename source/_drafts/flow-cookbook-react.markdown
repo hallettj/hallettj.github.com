@@ -336,7 +336,7 @@ take a look at the [Redux recipe][].
 [react lib]: https://github.com/facebook/flow/blob/master/lib/react.js
 [existential type]: http://sitr.us/2015/05/31/advanced-features-in-flow.html#existential-types
 [Story]: https://github.com/hallettj/hacker-news-example/blob/master/index.js.flow#L9
-[import syntax]: TODO
-[react-redux]: TODO
+[import syntax]: https://flowtype.org/docs/syntax.html#importing-and-exporting-types
+[react-redux]: http://redux.js.org/docs/basics/UsageWithReact.html
 [Redux recipe]: http://sitr.us/todo.html
 [StoryView]: https://github.com/hallettj/flow-cookbook-react/blob/master/src/StoryView.js
