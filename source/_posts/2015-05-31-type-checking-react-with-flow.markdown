@@ -5,6 +5,10 @@ date: 2015-05-31
 comments: true
 ---
 
+_This is an old post - for an up-to-date guide see [Flow Cookbook: Flow & React][cookbook]._
+
+[cookbook]: http://sitr.us/2017/01/03/flow-cookbook-react.html
+
 Flow v0.11 was [released][changelog] recently.
 The latest set of changes really improve type checking in React apps.
 But there are some guidelines to follow to get the full benefits.
