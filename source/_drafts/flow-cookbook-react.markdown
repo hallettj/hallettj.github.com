@@ -214,6 +214,8 @@ class App extends Component<void,void,AppState> {
         this.setState({ error })
       })
   }
+
+  /* ... */
 }
 ```
 
@@ -266,11 +268,54 @@ class App extends Component<void,void,AppState> {
         </div>
       </div>
   }
+
+  /* ... */
 }
 ```
 
+The import piece of the JSX that is finally returned from `render` is `content`,
+which is assigned a different value depending on whether an error occurred
+while fetching stories,
+a specific story has been selected,
+or there is an array of stories available, and none has been selected.
+When displaying a list of stories, `content` is populated by a list of
+instances of `StoryListItem`,
+which we defined earlier.
 
+The event handling methods `selectStory` and `deselectStory` just make simple
+state updates:
 
+```js
+class App extends Component<void,void,AppState> {
+  /* ... */
+
+  selectStory(story: Story) {
+    this.setState({ selectedStory: story })
+  }
+
+  deselectStory() {
+    this.setState({ selectedStory: null })
+  }
+}
+```
+
+Bringing the focus back to Flow:
+we have made references to `App`'s state in `componentDidMount`, `render`,
+`selectStory`, and `deselectStory`.
+Flow checks all of those uses against the definition of `AppState`.
+For example, if we made a mistaken assumption that `selectedStory` holds an ID,
+as opposed to a value of type `Story`,
+and tried to something like `this.setState({ selectedStory: story.id })`,
+Flow would report an error, and point out the mismatch.
+Likewise, if we neglected to pass a required prop to `StoryListItem`,
+Flow would report the problem.
+
+I have not given the implementation of `StoryView`,
+which is responsible for displaying comments on a story.
+It happens that `StoryView` is quite similar to `App` -
+except that `StoryView` loads comments where `App` loads stories.
+The interested reader can see the full details of `StoryView` in the
+[accompanying code][StoryView].
 
 Complete working code is available at
 [https://github.com/hallettj/flow-cookbook-react](https://github.com/hallettj/flow-cookbook-react).
@@ -294,3 +339,4 @@ take a look at the [Redux recipe][].
 [import syntax]: TODO
 [react-redux]: TODO
 [Redux recipe]: http://sitr.us/todo.html
+[StoryView]: https://github.com/hallettj/flow-cookbook-react/blob/master/src/StoryView.js
