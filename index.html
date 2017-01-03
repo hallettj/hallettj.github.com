@@ -9,8 +9,8 @@
   <meta name="author" content="Jesse Hallett">
 
   
-  <meta name="description" content="This recipe is part of the Flow Cookbook series. Hacker News provides a public API.
-One of the endpoints of that API accepts an ID and responds with &hellip;">
+  <meta name="description" content="This recipe is part of the Flow Cookbook series. Flow and React are both Facebook projects -
+so as you might imagine, they work quite well together. &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -83,6 +83,67 @@ One of the endpoints of that API accepts an ID and responds with &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2017/01/03/flow-cookbook-react.html">Flow Cookbook: Flow & React</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2017-01-03T00:00:00-08:00" pubdate data-updated="true">2017-01-03</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><em>This recipe is part of the <a href="/2016/12/20/flow-cookbook.html">Flow Cookbook</a> series.</em></p>
+
+<p>Flow and React are both Facebook projects -
+so as you might imagine, they work quite well together.
+React components can take type parameters to specify types for props, default
+props, and state.
+Type-checking works well with both <a href="https://facebook.github.io/react/docs/components-and-props.html#functional-and-class-components">functional and class components</a>.</p>
+
+<p>Flow type annotations provide an alternative to <code>propTypes</code> runtime checks.
+Flow’s static checking has some advantages:</p>
+
+<ul>
+  <li>Problems are reported immediately - it is not necessary to run tests that
+evaluate every component to identify <code>props</code> mismatches.</li>
+  <li>Flow types can be more precise and concise than <code>propTypes</code>.</li>
+  <li>Flow can also check <code>state</code> as well as <code>props</code>.</li>
+  <li>In addition to checking that a component gets the correct <code>props</code>,
+Flow checks that <code>props</code> and <code>states</code> are used correctly within the component’s
+<code>render</code> method,
+and in other component methods.</li>
+</ul>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/2017/01/03/flow-cookbook-react.html">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -196,7 +257,9 @@ That is going to be a <a href="https://flowtype.org/docs/union-intersection-type
   </header>
 
 
-  <div class="entry-content"><p>Type-checking can be a useful asset in a Javascript project.
+  <div class="entry-content"><p><em>Last updated 2017-01-03</em></p>
+
+<p>Type-checking can be a useful asset in a Javascript project.
 A type checker can catch problems that are introduced when adding features or
 refactoring, which can reduce the amount of time spent debugging and testing.
 Type annotations provide a form of always-up-to-date documentation that makes
@@ -665,76 +728,6 @@ code that uses mutable data structures.</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/2013/05/22/functional-reactive-programming-in-javascript.html">Functional Reactive Programming in JavaScript</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-05-22T00:00:00-07:00" pubdate data-updated="true"></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>I had a great time at <a href="http://nodepdx.org/">NodePDX</a> last week.  There were many talks
-packed into a short span of time and I saw many exciting ideas
-presented.  One topic that seemed particularly useful to me was <a href="http://lanyrd.com/2013/nodepdx/schbpc/">Chris
-Meiklejohn’s talk on Functional Reactive Programming (FRP)</a>.</p>
-
-<p>I have talked and written about how useful promises are.  See <a href="http://sitr.us/2012/07/31/promise-pipelines-in-javascript.html">Promise
-Pipelines in JavaScript</a>.  Promises are useful when you want
-to represent the outcome of an action or a value that will be available
-at some future time.  FRP is similar except that it deals with streams
-of reoccurring events and dynamic values.</p>
-
-<p>Here is an example of using FRP to subscribe to changes to a text input.
-This creates an event stream that could be used for a typeahead search
-feature:</p>
-
-<div class="highlight"><pre><code class="js"><span class="kd">var</span> <span class="nx">inputs</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#search&#39;</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">asEventStream</span><span class="p">(</span><span class="s1">&#39;keyup change&#39;</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">event</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">value</span><span class="p">;</span> <span class="p">})</span>
-    <span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">value</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">value</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">;</span> <span class="p">});</span>
-
-<span class="kd">var</span> <span class="nx">throttled</span> <span class="o">=</span> <span class="nx">inputs</span><span class="p">.</span><span class="nx">throttle</span><span class="p">(</span><span class="mi">500</span> <span class="cm">/* ms */</span><span class="p">);</span>
-
-<span class="kd">var</span> <span class="nx">distinct</span> <span class="o">=</span> <span class="nx">throttled</span><span class="p">.</span><span class="nx">skipDuplicates</span><span class="p">();</span>
-</code></pre></div>
-
-<p>This creates an event stream from all <code>keyup</code> and <code>change</code> events on the
-given input.  The stream is transformed into a stream of strings matching
-the value of the input when each event occurs.  Then that stream is
-filtered so that subscribers to <code>inputs</code> will only receive events if the
-value of the input has a length greater than two.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/2013/05/22/functional-reactive-programming-in-javascript.html">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -750,6 +743,10 @@ value of the input has a length greater than two.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/2017/01/03/flow-cookbook-react.html">Flow Cookbook: Flow & React</a>
+      </li>
+    
+      <li class="post">
         <a href="/2016/12/20/flow-cookbook-unpacking-json.html">Flow Cookbook: Unpacking JSON API data</a>
       </li>
     
@@ -763,10 +760,6 @@ value of the input has a length greater than two.</p>
     
       <li class="post">
         <a href="/2015/05/31/advanced-features-in-flow.html">Advanced features in Flow</a>
-      </li>
-    
-      <li class="post">
-        <a href="/2014/11/21/flow-is-the-javascript-type-checker-i-have-been-waiting-for.html">Flow is the JavaScript type checker I have been waiting for</a>
       </li>
     
   </ul>

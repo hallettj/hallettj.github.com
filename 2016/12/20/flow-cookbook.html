@@ -9,8 +9,8 @@
   <meta name="author" content="Jesse Hallett">
 
   
-  <meta name="description" content="Type-checking can be a useful asset in a Javascript project.
-A type checker can catch problems that are introduced when adding features or &hellip;">
+  <meta name="description" content="Last updated 2017-01-03 Type-checking can be a useful asset in a Javascript project.
+A type checker can catch problems that are introduced when &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -109,7 +109,9 @@ A type checker can catch problems that are introduced when adding features or &h
   </header>
 
 
-<div class="entry-content"><p>Type-checking can be a useful asset in a Javascript project.
+<div class="entry-content"><p><em>Last updated 2017-01-03</em></p>
+
+<p>Type-checking can be a useful asset in a Javascript project.
 A type checker can catch problems that are introduced when adding features or
 refactoring, which can reduce the amount of time spent debugging and testing.
 Type annotations provide a form of always-up-to-date documentation that makes
@@ -146,7 +148,7 @@ Union types are helpful for describing Redux actions,
 for unpacking incoming JSON data,
 and for passing messages over a channel.
 If you have been tempted to use subclasses,
-take a look at union types to see if they might be a better fit. </p>
+take a look at union types to see if they might be a better fit.</p>
 
 <p><a href="/2016/12/20/flow-cookbook-unpacking-json.html">Unpacking JSON API data</a> -
 Javascript’s flexibility is useful for handling incoming data in whatever form
@@ -156,13 +158,13 @@ process data.
 This is a case study that uses the Hacker News API as an example for type-safe
 data processing.</p>
 
-<p>(Coming soon) <em>React</em> -
+<p><a href="/2017/01/03/flow-cookbook-react.html">Flow &amp; React</a> -
 This recipe demonstrates how to use Flow effectively when creating React
 components.
 Including type parameters in <a href="https://facebook.github.io/react/docs/components-and-props.html#functional-and-class-components">functional and class components</a> provides an
 alternative to <code>propTypes</code> that can provide better safety and modularity.</p>
 
-<p>(Coming soon) <em>Redux</em> -
+<p>(Coming soon) <em>Flow &amp; Redux</em> -
 Flow and Redux could have been made for each other.
 This recipe demonstrates several patterns that are useful for building Redux
 action creators and reducers.
@@ -192,6 +194,12 @@ Union types are great, but not perfect.
 This post introduces an alternative formulation for sum types that allows Flow
 to check for missing pattern matches.
 It also shows that GADTs are <em>almost</em> possible in Flow.</p>
+
+<h2 id="changes">Changes</h2>
+
+<ul>
+  <li><em>2017-01-03:</em> Added recipe, <a href="/2017/01/03/flow-cookbook-react.html">Flow &amp; React</a></li>
+</ul>
 </div>
 
 
@@ -253,6 +261,10 @@ It also shows that GADTs are <em>almost</em> possible in Flow.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/2017/01/03/flow-cookbook-react.html">Flow Cookbook: Flow & React</a>
+      </li>
+    
+      <li class="post">
         <a href="/2016/12/20/flow-cookbook-unpacking-json.html">Flow Cookbook: Unpacking JSON API data</a>
       </li>
     
@@ -266,10 +278,6 @@ It also shows that GADTs are <em>almost</em> possible in Flow.</p>
     
       <li class="post">
         <a href="/2015/05/31/advanced-features-in-flow.html">Advanced features in Flow</a>
-      </li>
-    
-      <li class="post">
-        <a href="/2014/11/21/flow-is-the-javascript-type-checker-i-have-been-waiting-for.html">Flow is the JavaScript type checker I have been waiting for</a>
       </li>
     
   </ul>
