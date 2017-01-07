@@ -4,7 +4,7 @@
   <title><![CDATA[sitr.us]]></title>
   <link href="http://sitr.us/atom.xml" rel="self"/>
   <link href="http://sitr.us/"/>
-  <updated>2017-01-03T10:33:32-08:00</updated>
+  <updated>2017-01-07T15:11:00-08:00</updated>
   <id>http://sitr.us/</id>
   <author>
     <name><![CDATA[Jesse Hallett]]></name>
@@ -1027,7 +1027,7 @@ and see how type-checking affects the way you write code.</p>
     <link href="http://sitr.us/2016/12/20/flow-cookbook.html"/>
     <updated>2016-12-20T00:00:00-08:00</updated>
     <id>http://sitr.us/2016/12/20/flow-cookbook</id>
-    <content type="html"><![CDATA[<p><em>Last updated 2017-01-03</em></p>
+    <content type="html"><![CDATA[<p><em>Last updated 2017-01-07</em></p>
 
 <p>Type-checking can be a useful asset in a Javascript project.
 A type checker can catch problems that are introduced when adding features or
@@ -1113,10 +1113,35 @@ This post introduces an alternative formulation for sum types that allows Flow
 to check for missing pattern matches.
 It also shows that GADTs are <em>almost</em> possible in Flow.</p>
 
+<h2 id="more-resources">More resources</h2>
+
+<p>Flow has inspired many programmers to put bits to screen.
+Here are some articles that I found to particularly helpful:</p>
+
+<p><a href="https://flowtype.org/docs/getting-started.html">Getting started with Flow</a>
+is a tutorial from the official documentation.
+If you don’t know where to start, start there.</p>
+
+<p>Why use type-checking?
+And if you do, <a href="https://blog.aria.ai/post/why-use-flow/">Why Use Flow?</a>
+Follow that link for the answers,
+and learn some things that you might not know about Flow.
+Aria Fallah covers a lot of background,
+and also introduces some interesting work from <a href="https://medium.com/@gcanti">Gulio Canti</a>.</p>
+
+<p>[Authoring and publishing JavaScript modules with Flow][]
+is a detailed guide on publishing an NPM module with Flow type annotations
+included,
+so that anyone who uses the library can benefit from those annotations if they
+choose to use Flow as well.</p>
+
+<p>[Authoring and publishing JavaScript modules with Flow]:</p>
+
 <h2 id="changes">Changes</h2>
 
 <ul>
   <li><em>2017-01-03:</em> Added recipe, <a href="http://sitr.us/2017/01/03/flow-cookbook-react.html">Flow &amp; React</a></li>
+  <li><em>2017-01-07:</em> Added “More resources” section</li>
 </ul>
 ]]></content>
   </entry>
