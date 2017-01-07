@@ -6,7 +6,7 @@ date: 2016-12-20
 comments: true
 ---
 
-_Last updated 2017-01-03_
+_Last updated 2017-01-07_
 
 Type-checking can be a useful asset in a Javascript project.
 A type checker can catch problems that are introduced when adding features or
@@ -105,6 +105,37 @@ to check for missing pattern matches.
 It also shows that GADTs are _almost_ possible in Flow.
 
 
+## More resources
+
+Flow has inspired many programmers to put bits to screen.
+Here are some articles that I found to particularly helpful:
+
+[Getting started with Flow][]
+is a tutorial from the official documentation.
+If you don't know where to start, start there.
+
+[Getting started with Flow]: https://flowtype.org/docs/getting-started.html
+
+Why use type-checking?
+And if you do, [Why Use Flow?][]
+Follow that link for the answers,
+and learn some things that you might not know about Flow.
+Aria Fallah covers a lot of background,
+and also introduces some interesting work from [Gulio Canti][].
+
+[Why Use Flow?]: https://blog.aria.ai/post/why-use-flow/
+[Gulio Canti]: https://medium.com/@gcanti
+
+[Authoring and publishing JavaScript modules with Flow][]
+is a detailed guide on publishing an NPM module with Flow type annotations
+included,
+so that anyone who uses the library can benefit from those annotations if they
+choose to use Flow as well.
+
+[Authoring and publishing JavaScript modules with Flow]:
+
+
 ## Changes
 
 - *2017-01-03:* Added recipe, [Flow & React][]
+- *2017-01-07:* Added "More resources" section
