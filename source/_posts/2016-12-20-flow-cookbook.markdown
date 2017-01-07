@@ -121,10 +121,10 @@ And if you do, [Why Use Flow?][]
 Follow that link for the answers,
 and learn some things that you might not know about Flow.
 Aria Fallah covers a lot of background,
-and also introduces some interesting work from [Gulio Canti][].
+and also introduces some interesting work from [Giulio Canti][].
 
 [Why Use Flow?]: https://blog.aria.ai/post/why-use-flow/
-[Gulio Canti]: https://medium.com/@gcanti
+[Giulio Canti]: https://medium.com/@gcanti
 
 [Authoring and publishing JavaScript modules with Flow][]
 is a detailed guide on publishing an NPM module with Flow type annotations
