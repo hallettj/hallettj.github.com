@@ -132,7 +132,7 @@ included,
 so that anyone who uses the library can benefit from those annotations if they
 choose to use Flow as well.
 
-[Authoring and publishing JavaScript modules with Flow]:
+[Authoring and publishing JavaScript modules with Flow]: http://javascriptplayground.com/blog/2017/01/npm-flowjs-javascript/
 
 
 ## Changes
