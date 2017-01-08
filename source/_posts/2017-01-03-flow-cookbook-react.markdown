@@ -6,6 +6,8 @@ date: 2017-01-03
 comments: true
 ---
 
+_Last updated 2017-01-07_
+
 _This recipe is part of the [Flow Cookbook][] series._
 
 [Flow Cookbook]: /2016/12/20/flow-cookbook.html
@@ -107,7 +109,7 @@ and accepts a callback to do something if the user selects that story.
 Let's start be defining a type for the props that this component will accept.
 
 ```js
-import type { Story } from 'hacker-news-example'
+import type { Story } from 'flow-cookbook-hacker-news'
 
 type StoryListItemProps = {
   story: Story,
@@ -115,7 +117,7 @@ type StoryListItemProps = {
 }
 ```
 
-We import the `Story` type from `'hacker-news-example'`,
+We import the `Story` type from `'flow-cookbook-hacker-news'`,
 which is the example code from the [Unpacking JSON API data][] recipe.
 That `Story` type is a ready-made type that describes everything we will want
 to display in the new client.
@@ -232,7 +234,7 @@ and again in the type of the `props` argument to `constructor`.
 So we extend its definition with a `componentDidMount` callback.
 
 ```js
-import { fetchTopStories } from 'hacker-news-example'
+import { fetchTopStories } from 'flow-cookbook-hacker-news'
 
 class App extends Component<void, AppProps, AppState> {
   /* ... same as before */
@@ -378,11 +380,16 @@ For details on using Flow with Redux and [react-redux][],
 take a look at the next recipe, [Flow & Redux][].
 
 
+## Changes
+
+- *2017-01-07:* The hacker news client library is now on npm - updated references accordingly
+
+
 [functional and class components]: https://facebook.github.io/react/docs/components-and-props.html#functional-and-class-components
 [Unpacking JSON API data]: /2016/12/20/flow-cookbook-unpacking-json.html
 [react lib]: https://github.com/facebook/flow/blob/master/lib/react.js
 [existential type]: /2015/05/31/advanced-features-in-flow.html#existential-types
-[Story]: https://github.com/hallettj/hacker-news-example/blob/master/index.js.flow#L9
+[Story]: https://github.com/hallettj/flow-cookbook-hacker-news/blob/master/index.js.flow#L9
 [import syntax]: https://flowtype.org/docs/syntax.html#importing-and-exporting-types
 [DOM type-definitions file]: https://github.com/facebook/flow/blob/master/lib/dom.js#L182
 [StoryView]: https://github.com/hallettj/flow-cookbook-react/blob/master/src/StoryView.js
