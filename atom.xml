@@ -4,7 +4,7 @@
   <title><![CDATA[sitr.us]]></title>
   <link href="http://sitr.us/atom.xml" rel="self"/>
   <link href="http://sitr.us/"/>
-  <updated>2017-01-07T15:15:55-08:00</updated>
+  <updated>2017-01-07T18:09:44-08:00</updated>
   <id>http://sitr.us/</id>
   <author>
     <name><![CDATA[Jesse Hallett]]></name>
@@ -18,7 +18,9 @@
     <link href="http://sitr.us/2017/01/03/flow-cookbook-react.html"/>
     <updated>2017-01-03T00:00:00-08:00</updated>
     <id>http://sitr.us/2017/01/03/flow-cookbook-react</id>
-    <content type="html"><![CDATA[<p><em>This recipe is part of the <a href="http://sitr.us/2016/12/20/flow-cookbook.html">Flow Cookbook</a> series.</em></p>
+    <content type="html"><![CDATA[<p><em>Last updated 2017-01-07</em></p>
+
+<p><em>This recipe is part of the <a href="http://sitr.us/2016/12/20/flow-cookbook.html">Flow Cookbook</a> series.</em></p>
 
 <p>Flow and React are both Facebook projects -
 so as you might imagine, they work quite well together.
@@ -132,7 +134,7 @@ Let’s start be defining a type for the props that this component will accept.<
 <span class="line-number">4</span>
 <span class="line-number">5</span>
 <span class="line-number">6</span>
-</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="kr">import</span> <span class="nx">type</span> <span class="p">{</span> <span class="nx">Story</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;hacker-news-example&#39;</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="kr">import</span> <span class="nx">type</span> <span class="p">{</span> <span class="nx">Story</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;flow-cookbook-hacker-news&#39;</span>
 </span><span class="line">
 </span><span class="line"><span class="nx">type</span> <span class="nx">StoryListItemProps</span> <span class="o">=</span> <span class="p">{</span>
 </span><span class="line">  <span class="nx">story</span><span class="o">:</span> <span class="nx">Story</span><span class="p">,</span>
@@ -140,11 +142,11 @@ Let’s start be defining a type for the props that this component will accept.<
 </span><span class="line"><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>We import the <code>Story</code> type from <code>'hacker-news-example'</code>,
+<p>We import the <code>Story</code> type from <code>'flow-cookbook-hacker-news'</code>,
 which is the example code from the <a href="http://sitr.us/2016/12/20/flow-cookbook-unpacking-json.html">Unpacking JSON API data</a> recipe.
 That <code>Story</code> type is a ready-made type that describes everything we will want
 to display in the new client.
-Take a look at the <a href="https://github.com/hallettj/hacker-news-example/blob/master/index.js.flow#L9">source file</a> to see what <code>Story</code> looks like.
+Take a look at the <a href="https://github.com/hallettj/flow-cookbook-hacker-news/blob/master/index.js.flow#L9">source file</a> to see what <code>Story</code> looks like.
 (The <code>import type</code> syntax is <a href="https://flowtype.org/docs/syntax.html#importing-and-exporting-types">Flow syntax</a> -
 it is not part of Javascript.)</p>
 
@@ -307,7 +309,7 @@ So we extend its definition with a <code>componentDidMount</code> callback.</p>
 <span class="line-number">17</span>
 <span class="line-number">18</span>
 <span class="line-number">19</span>
-</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="kr">import</span> <span class="p">{</span> <span class="nx">fetchTopStories</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;hacker-news-example&#39;</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="kr">import</span> <span class="p">{</span> <span class="nx">fetchTopStories</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;flow-cookbook-hacker-news&#39;</span>
 </span><span class="line">
 </span><span class="line"><span class="kr">class</span> <span class="nx">App</span> <span class="kr">extends</span> <span class="nx">Component</span><span class="o">&lt;</span><span class="k">void</span><span class="p">,</span> <span class="nx">AppProps</span><span class="p">,</span> <span class="nx">AppState</span><span class="o">&gt;</span> <span class="p">{</span>
 </span><span class="line">  <span class="cm">/* ... same as before */</span>
@@ -506,6 +508,12 @@ But in my opinion the best practice is to keep state in a third-party
 state-management framework, such as <a href="http://redux.js.org/">Redux</a>.
 For details on using Flow with Redux and <a href="http://redux.js.org/docs/basics/UsageWithReact.html">react-redux</a>,
 take a look at the next recipe, <a href="http://sitr.us/todo.html">Flow &amp; Redux</a>.</p>
+
+<h2 id="changes">Changes</h2>
+
+<ul>
+  <li><em>2017-01-07:</em> The hacker news client library is now on npm - updated references accordingly</li>
+</ul>
 
 ]]></content>
   </entry>
