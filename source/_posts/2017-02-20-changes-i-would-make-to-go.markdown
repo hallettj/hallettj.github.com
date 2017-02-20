@@ -35,6 +35,8 @@ I will add to those with some of my own opinions.
 To highlight exactly how I think Go could have been better,
 I want to make comparisons to Rust.
 
+<!-- more -->
+
 Work on Go and Rust began at close to the same time:
 Go was first announced to the world in 2009,
 Rust in 2010.
