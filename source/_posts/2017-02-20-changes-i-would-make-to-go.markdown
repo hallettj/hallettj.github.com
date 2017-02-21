@@ -75,6 +75,7 @@ and has a sophisticated type system that can, for example,
 detect problems due to concurrent access to shared data at compile time.
 Those requirements add to the complexity of Rust programs.
 The [borrow-checker][] in particular has a reputation for its learning curve.
+
 My purpose for making comparisons to Rust is to provide context for specific
 ways in which I think Go could be better.
 There are some good ideas in Rust that are not tied to borrow-checking,
@@ -123,7 +124,7 @@ This is one of my favorites:
 Goroutines are cheap,
 so programs can be structured in the way that makes most sense algorithmically,
 even if that involves spawning large numbers of goroutines.
-(But this is not unique to Go. 
+(But this is not unique to Go.
 Erlang and Scala also implement lightweight actors.
 Rust and other languages have their own solutions for lightweight concurrent
 and parallel programming.)
@@ -275,12 +276,12 @@ func fetchAllBySameAuthor(postID string) ([]Post, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	author, err := fetchUser(post.AuthorID)
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return fetchPosts(author.Posts)
 }
 ```
@@ -373,7 +374,7 @@ Rust allocates enough space to hold either `T` or `E`
 plus a tag to distinguish between an `Ok(value)` value and an `Err(err)` value.
 
 A nice thing about the generality of Rust enums is that if `Result<T,E>` did
-not exist, 
+not exist,
 it would be easy to implement it as a library.
 So what about using the Result or Option pattern in Go?
 Well, we can't put methods on Go tuples (a.k.a, multiple return values),
@@ -445,12 +446,12 @@ Consider this Go function:
 // Take the titles of the first `count` docs that are not archived
 func LatestTitles(docs []Document, count int) []string {
 	var latest []string
-	for doc := range docs {
+	for _, doc := range docs {
 		if len(latest) >= count {
 			return latest
 		}
 		if !doc.IsArchived {
-			latest = latest.append(doc.title)
+			latest = append(latest, doc.Title)
 		}
 	}
 	return latest
@@ -641,7 +642,7 @@ number of arguments that are assigned from its output:
 
 ```go
 for idx, value := range values { /* ... */ }  // `range` returns indexes and values
-for value := range values { /* ... */ }  // this time it just returns values
+for idx := range values { /* ... */ }  // this time it just returns indexes
 ```
 
 But more importantly:
@@ -652,10 +653,10 @@ as a slice, or to spit out values over a channel.
 But that puts extra complexity on code that uses third-party data structures;
 and requires programmers to use non-standard idioms.
 
-Yet more privileges that standard library types have are that only standard
-types can be compared using `==`, `>`, etc.
+Yet another privilege is that only standard types can be compared using `==`,
+`>`, etc.
 
-But the biggest problem is that only standard libraries are allowed to define
+The biggest problem is that only standard libraries are allowed to define
 generic types.
 This is severely limiting to the library ecosystem around Go.
 It means that, for example,
@@ -1060,5 +1061,43 @@ Usually you do not actually want both at the same time.
 How do I think Go could be better?
 Generics.
 Nearly all of my complaints boil down to lack of support for generics.
-But I think that Rust-style traits, and getting rid of `nil` would also be very
+But I think that Rust-style traits, and getting rid of `nil` would also be
 useful changes.
+
+In its current form, I prefer not to use Go.
+It is not that Go is bad - it is just that there are lots of languages
+available that I find more enjoyable.
+When I work with Go I cannot help thinking about how I could be doing things
+differently in another language.
+
+If you are willing to put in the time to understand lifetimes and borrow checking,
+Rust makes a fantastic language that does everything that Go does,
+but has none of the "bad parts" that I called out.
+
+Javascript is (like Go) easy to learn,
+and has wonderful support for concurrency (if not parallelism).
+When paired with Flow or Typescript you get (in my opinion) more robust
+type safety than Go provides.
+Javascript with Flow in particular has none of the "bad parts" from this post.
+
+Erlang and Scala both support lightweight concurrency in the same style that Go
+does,
+and they are both great for functional programming.
+
+Clojure is not type-safe - but it does fantastic things!
+My favorite functional data structure implementations are the ones in Clojure.
+
+Haskell has amazing type safety,
+some of the best concurrency and parallelism features that I have seen in any
+language,
+and is well-suited to network server code.
+Haskell is another language that avoids the "bad parts" from this post.
+
+We have better tools than ever for getting work done.
+Even Go - whether I like it or not - is clearly useful for building cool things.
+But if you take anything away from this post,
+I hope it is an interest in taking a look beyond the imperative
+/ object-oriented world.
+I encourage you to pick one of the languages above,
+and take some time to learn about it and to get a good feel for its strengths.
+I think you will be glad that you did.
