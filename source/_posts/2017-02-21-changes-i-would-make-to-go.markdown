@@ -83,6 +83,11 @@ and I think that Go could be a better language if it adopted some of those ideas
 
 [borrow-checker]: https://doc.rust-lang.org/book/ownership.html
 
+You can grab the [code examples][] from this post.
+The examples come with executable tests to encourage experimentation.
+
+[code examples]: https://github.com/hallettj/comparing-go-and-rust
+
 So, here is my view of how Go compares:
 
 
@@ -234,9 +239,11 @@ The Rust Book has [a lot more detail][error handling].
 
 It is possible to implement the Option pattern in Go with similar efficiency;
 and one could even get a compile-time check that errors are handled by
-implementing a `match` method that uses the visitor pattern.
+implementing a `match` method that uses the visitor pattern ([example][go-option]).
 But without generics there would be no type safety for values wrapped in an
 `Option` type.
+
+[go-option]: https://github.com/hallettj/comparing-go-and-rust/tree/master/go/option
 
 
 ### Error-handling boilerplate & lack of compile-time checks for error handling
