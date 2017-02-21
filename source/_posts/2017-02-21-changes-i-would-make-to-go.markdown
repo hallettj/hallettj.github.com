@@ -32,7 +32,7 @@ Here are other posts that echo my feelings:
 - [Everyday hassles in Go](http://crufter.com/@crufter/everyday-hassles-in-go)
 
 I will add to those with some of my own opinions.
-To highlight exactly how I think Go could have been better,
+To highlight exactly how I think Go could be better,
 I want to make comparisons to Rust.
 
 <!-- more -->
@@ -366,7 +366,7 @@ check for an error, return the error if it exists, otherwise continue.
 It is more [DRY][] to abstract that into a helper method or a macro.
 And again,
 a common theme in all of these Rust implementations is that there is
-a compile-time guarantee that every error handled.
+a compile-time guarantee that every error is handled.
 That could be with some recovery code,
 or by passing the error up the call stack.
 
@@ -433,10 +433,10 @@ either -
 at least not in the sense of compile-time checking.
 But functional idioms work just fine in those languages.
 For example,
-in Javascript can pass any list to a generic list manipulation function,
+in Javascript I can pass any list to a generic list manipulation function,
 and it just works.
 Go occupies an awkward middle ground where it checks types at compile time,
-but does not provide tools to describe what to check for.
+but does not provide tools to describe relationships between types.
 
 Generics - and type variables in particular -
 are a means to "talk" about types.
