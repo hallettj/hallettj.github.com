@@ -9,9 +9,9 @@
   <meta name="author" content="Jesse Hallett">
 
   
-  <meta name="description" content="I had a great time at NodePDX last week. There were many talks
-packed into a short span of time and I saw many exciting ideas
-presented. One topic &hellip;">
+  <meta name="description" content="I have a long-standing desire for a JavaScript library that provides
+good implementations of functional data structures. Recently I found
+Mori, and I &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -90,6 +90,110 @@ presented. One topic &hellip;">
       
   <header>
     
+      <h1 class="entry-title"><a href="/2013/11/04/functional-data-structures.html">Functional data structures in JavaScript with Mori</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-11-04T00:00:00-04:00" pubdate data-updated="true">2013-11-04</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I have a long-standing desire for a JavaScript library that provides
+good implementations of functional data structures.  Recently I found
+<a href="http://swannodette.github.io/mori/">Mori</a>, and I think that it may be just the library that I have been
+looking for.  Mori packages data structures from the <a href="http://clojure.org/">Clojure</a>
+standard library for use in JavaScript code.</p>
+
+<ul id="markdown-toc">
+  <li><a href="#functional-data-structures">Functional data structures</a></li>
+  <li><a href="#clojure-clojurescript-and-mori">Clojure, ClojureScript, and Mori</a></li>
+  <li><a href="#installing-and-running">Installing and running</a></li>
+  <li><a href="#examples">Examples</a>    <ul>
+      <li><a href="#vector"><code>vector</code></a></li>
+      <li><a href="#higher-order-functions">higher-order functions</a></li>
+      <li><a href="#sortedsetby"><code>sorted_set_by</code></a></li>
+      <li><a href="#hashmap"><code>hash_map</code></a></li>
+    </ul>
+  </li>
+  <li><a href="#apples-to-apples">Apples to apples</a></li>
+  <li><a href="#mori-pairs-well-with-bacon">Mori pairs well with Bacon</a></li>
+  <li><a href="#list-versus-vector">List versus Vector</a></li>
+  <li><a href="#equality-ordering-and-hashing">Equality, ordering, and hashing</a>    <ul>
+      <li><a href="#hash">hash</a></li>
+      <li><a href="#equals">equals</a></li>
+      <li><a href="#compare">compare</a></li>
+    </ul>
+  </li>
+  <li><a href="#different-map-and-set-implementations">Different map and set implementations</a></li>
+  <li><a href="#laziness">Laziness</a>    <ul>
+      <li><a href="#efficiency">Efficiency</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="functional-data-structures">Functional data structures</h2>
+
+<p>A functional data structure (also called a persistent data structure)
+has two important qualities: it is immutable and it can be updated by
+creating a copy with modifications (copy-on-write).  Creating copies
+should be nearly as cheap as modifying a comparable mutable data
+structure in place.  This is achieved with structural sharing: pointers
+to unchanged portions of a structure are shared between copies so that
+memory need only be allocated for changed portions of the data
+structure.</p>
+
+<p>A simple example is a <a href="https://en.wikipedia.org/wiki/Linked_list">linked list</a>.  A linked list is an object,
+specifically a list node, with a value and a pointer to the next list
+node, which points to the next list node.  (Eventually you get to the
+end of the list where there is a node that points to the empty list.)
+Prepending an element to the front of such a list is a constant-time
+operation: you just create a new list element with a pointer to the
+start of the existing list.  When lists are immutable there is no need
+to actually copy the original list.  Removing an element from the front
+of a list is also a constant-time operation: you just return a pointer
+to the second element of the list.  Here is <a href="http://anorwell.com/index.php?id=61">a slightly more-detailed
+explanation</a>.</p>
+
+<p>Lists are just one example.  There are functional implementations of
+maps, sets, and other types of structures.</p>
+
+<p>Rich Hickey, the creator Clojure, describes functional data structures
+as <a href="http://clojure.org/state">decoupling state and time</a>.  (Also available in
+<a href="http://www.infoq.com/presentations/Are-We-There-Yet-Rich-Hickey">video form</a>.)  The idea is that code that uses
+functional data structures is easier to reason about and to verify than
+code that uses mutable data structures.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/2013/11/04/functional-data-structures.html">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
       <h1 class="entry-title"><a href="/2013/05/22/functional-reactive-programming-in-javascript.html">Functional Reactive Programming in JavaScript</a></h1>
     
     
@@ -106,7 +210,7 @@ presented. One topic &hellip;">
   
 
 
-<time datetime="2013-05-22T00:00:00-07:00" pubdate data-updated="true"></time>
+<time datetime="2013-05-22T00:00:00-04:00" pubdate data-updated="true"></time>
         
       </p>
     
@@ -176,7 +280,7 @@ value of the input has a length greater than two.</p>
   
 
 
-<time datetime="2012-09-04T00:00:00-07:00" pubdate data-updated="true"></time>
+<time datetime="2012-09-04T00:00:00-04:00" pubdate data-updated="true"></time>
         
       </p>
     
@@ -255,7 +359,7 @@ output a warning message.</p>
   
 
 
-<time datetime="2012-07-31T00:00:00-07:00" pubdate data-updated="true"></time>
+<time datetime="2012-07-31T00:00:00-04:00" pubdate data-updated="true"></time>
         
       </p>
     
@@ -331,7 +435,7 @@ method.  The first callback is called on success, the second on failure:</p>
   
 
 
-<time datetime="2012-05-12T00:00:00-07:00" pubdate data-updated="true"></time>
+<time datetime="2012-05-12T00:00:00-04:00" pubdate data-updated="true"></time>
         
       </p>
     
@@ -387,7 +491,7 @@ this then you probably already know why you want to install a custom ROM
   
 
 
-<time datetime="2011-08-26T00:00:00-07:00" pubdate data-updated="true"></time>
+<time datetime="2011-08-26T00:00:00-04:00" pubdate data-updated="true"></time>
         
       </p>
     
@@ -455,7 +559,7 @@ Plain cookie authentication is vulnerable to all three.</p>
   
 
 
-<time datetime="2011-07-28T00:00:00-07:00" pubdate data-updated="true"></time>
+<time datetime="2011-07-28T00:00:00-04:00" pubdate data-updated="true"></time>
         
       </p>
     
@@ -526,7 +630,7 @@ aforementioned events on the new element.</p>
   
 
 
-<time datetime="2009-09-13T00:00:00-07:00" pubdate data-updated="true"></time>
+<time datetime="2009-09-13T00:00:00-04:00" pubdate data-updated="true"></time>
         
       </p>
     
@@ -601,7 +705,7 @@ technical overview</a>.</p>
   
 
 
-<time datetime="2009-07-02T00:00:00-07:00" pubdate data-updated="true"></time>
+<time datetime="2009-07-02T00:00:00-04:00" pubdate data-updated="true"></time>
         
       </p>
     
@@ -668,7 +772,7 @@ sudo apt-get install ghc6 ghc6-prof ghc6-doc haddock
   
 
 
-<time datetime="2009-06-30T00:00:00-07:00" pubdate data-updated="true"></time>
+<time datetime="2009-06-30T00:00:00-04:00" pubdate data-updated="true"></time>
         
       </p>
     
@@ -729,73 +833,6 @@ non-user-record documents from the resulting index.</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/2008/07/29/how-to-use-rspec-to-describe-a-sinatra-application.html">How to use RSpec to describe a Sinatra application</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2008-07-29T00:00:00-07:00" pubdate data-updated="true"></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>This information was written a long time ago and has become pretty outdated.</p>
-
-<p><a href="http://sinatrarb.com/">Sinatra</a> is a fun little web application microframework. Recently I
-started working on an application using Sinatra - and since I am
-working on good programming habits, before I dove into any coding I
-sat down to work out how to write specs for a Sinatra application.</p>
-
-<p>Sinatra comes bundled with support for <a href="http://chneukirchen.org/repos/testspec/README">test/spec</a>: a spec framework
-that builds on top of Rail’s own Test::Unit to provide support for
-writing specs. Which is a really neat idea. But I have been using
-<a href="http://rspec.info/">RSpec</a> for my other work, and I wanted to continue doing so.</p>
-
-<p>It turns out that RSpec takes a little bit of manual work to get
-going with Sinatra. I read a <a href="http://www.gittr.com/index.php/archive/sinatra-rspec-integration-without-a-patch-with-examples/">helpful article on gittr.com</a> that
-pointed me in the right direction. The article advised me to add these
-lines to my spec files:</p>
-
-<div class="highlight"><pre><code class="ruby"><span class="nb">require</span> <span class="no">File</span><span class="o">.</span><span class="n">expand_path</span><span class="p">(</span><span class="no">File</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">__FILE__</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;/your_application&#39;</span><span class="p">)</span>
-<span class="nb">require</span> <span class="s1">&#39;spec&#39;</span>
-<span class="nb">require</span> <span class="s1">&#39;spec/interop/test&#39;</span>
-<span class="nb">require</span> <span class="s1">&#39;sinatra/test/unit&#39;</span>
-</code></pre></div>
-
-<p>The first line loads your application; the second line loads RSpec;
-the third loads an RSpec-Test::Unit compatibility layer; and the
-fourth loads Sinatra’s test helpers, which are written for
-Test::Unit.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/2008/07/29/how-to-use-rspec-to-describe-a-sinatra-application.html">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/3/">&larr; Older</a>
@@ -813,6 +850,10 @@ Test::Unit.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/2017/02/20/changes-i-would-make-to-go.html">Changes I would make to Go</a>
+      </li>
+    
+      <li class="post">
         <a href="/2017/01/03/flow-cookbook-react.html">Flow Cookbook: Flow & React</a>
       </li>
     
@@ -826,10 +867,6 @@ Test::Unit.</p>
     
       <li class="post">
         <a href="/2015/05/31/type-checking-react-with-flow.html">Type checking React with Flow v0.11</a>
-      </li>
-    
-      <li class="post">
-        <a href="/2015/05/31/advanced-features-in-flow.html">Advanced features in Flow</a>
       </li>
     
   </ul>

@@ -103,7 +103,7 @@ The goal of Idris is to &hellip;">
   
 
 
-<time datetime="2014-05-04T00:00:00-07:00" pubdate data-updated="true">2014-05-04</time>
+<time datetime="2014-05-04T00:00:00-04:00" pubdate data-updated="true">2014-05-04</time>
         
       </p>
     
@@ -793,7 +793,7 @@ as I continue to explore Category theory.
   
 
 
-<time datetime="2014-05-04T00:00:00-07:00" pubdate data-updated="true">2014-05-04</time>
+<time datetime="2014-05-04T00:00:00-04:00" pubdate data-updated="true">2014-05-04</time>
       
 
 
@@ -828,6 +828,10 @@ as I continue to explore Category theory.
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/2017/02/20/changes-i-would-make-to-go.html">Changes I would make to Go</a>
+      </li>
+    
+      <li class="post">
         <a href="/2017/01/03/flow-cookbook-react.html">Flow Cookbook: Flow & React</a>
       </li>
     
@@ -841,10 +845,6 @@ as I continue to explore Category theory.
     
       <li class="post">
         <a href="/2015/05/31/type-checking-react-with-flow.html">Type checking React with Flow v0.11</a>
-      </li>
-    
-      <li class="post">
-        <a href="/2015/05/31/advanced-features-in-flow.html">Advanced features in Flow</a>
       </li>
     
   </ul>

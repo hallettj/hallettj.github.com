@@ -4,7 +4,7 @@
   <title><![CDATA[sitr.us]]></title>
   <link href="http://sitr.us/atom.xml" rel="self"/>
   <link href="http://sitr.us/"/>
-  <updated>2017-01-07T18:09:44-08:00</updated>
+  <updated>2017-02-21T10:48:12-04:00</updated>
   <id>http://sitr.us/</id>
   <author>
     <name><![CDATA[Jesse Hallett]]></name>
@@ -14,9 +14,1342 @@
 
   
   <entry>
+    <title type="html"><![CDATA[Changes I would make to Go]]></title>
+    <link href="http://sitr.us/2017/02/20/changes-i-would-make-to-go.html"/>
+    <updated>2017-02-20T00:00:00-04:00</updated>
+    <id>http://sitr.us/2017/02/20/changes-i-would-make-to-go</id>
+    <content type="html"><![CDATA[<p>I have been programming primarily in Go for about six months.
+I find it frustrating.
+There are two reasons for this:</p>
+
+<p>First, functional programming is particularly difficult in Go.
+In fact the language <a href="https://en.wikipedia.org/wiki/Go_(programming_language)#Conventions_and_code_style">discourages functional programming</a>.
+This frustrates me because the imperative code that I write requires a lot of
+boilerplate,
+and I think it is more error-prone than it could be if I could use functional
+abstractions.</p>
+
+<p>Second, I see Go as a missed opportunity.
+There is exciting innovation in programming languages -
+especially in areas of type checking and type inference to make code safer,
+faster, and more ergonomic.
+I wish Google had chosen to put their weight behind some of those ideas.</p>
+
+<p>I am not the first person to look at Go this way.
+Here are other posts that echo my feelings:</p>
+
+<ul>
+  <li><a href="http://yager.io/programming/go.html">Why Go Is Not Good</a></li>
+  <li><a href="http://crufter.com/@crufter/everyday-hassles-in-go">Everyday hassles in Go</a></li>
+</ul>
+
+<p>I will add to those with some of my own opinions.
+To highlight exactly how I think Go could have been better,
+I want to make comparisons to Rust.</p>
+
+<!-- more -->
+
+<p>Work on Go and Rust began at close to the same time:
+Go was first announced to the world in 2009,
+Rust in 2010.
+There is a lot of overlap in their philosophies;
+both languages:</p>
+
+<ul>
+  <li>aim for a simple core language</li>
+  <li>compile to fast, native binaries</li>
+  <li>eschew inheritance in favor of composition</li>
+  <li>support imperative programming</li>
+  <li>omit exception-catching in favor of explicitly passing error results</li>
+  <li>emphasize concurrency</li>
+  <li>come with static type-checking</li>
+  <li>come with a modern packaging system that promotes modularity</li>
+</ul>
+
+<p>Both languages may have been intended to replace C++:
+<a href="https://en.wikipedia.org/wiki/Go_(programming_language)#History">Go’s designers have said</a> that a primary motivation for Go was their
+dislike of the complexity of C++.
+One of Mozilla’s prominent applications for Rust is <a href="https://servo.org/">Servo</a>, a potential
+replacement for the Gecko HTML rendering engine, which is written in C++.</p>
+
+<p>As I see it the key difference is that
+Rust aims for <a href="http://logan.tw/posts/2014/11/12/soundness-and-completeness-of-the-type-system/">soundness</a>, and powerful abstractions;
+Go aims to be accessible to people who are familiar with imperative programming.</p>
+
+<p>That said, Rust is not necessarily a replacement for Go,
+and I do not mean to say that everyone using Go should switch to Rust.
+Rust supports real-time operation,
+can operate in stack-only mode if necessary,
+and has a sophisticated type system that can, for example,
+detect problems due to concurrent access to shared data at compile time.
+Those requirements add to the complexity of Rust programs.
+The <a href="https://doc.rust-lang.org/book/ownership.html">borrow-checker</a> in particular has a reputation for its learning curve.</p>
+
+<p>My purpose for making comparisons to Rust is to provide context for specific
+ways in which I think Go could be better.
+There are some good ideas in Rust that are not tied to borrow-checking,
+and I think that Go could be a better language if it adopted some of those ideas.</p>
+
+<p>You can grab the <a href="https://github.com/hallettj/comparing-go-and-rust">code examples</a> from this post.
+The examples come with executable tests to encourage experimentation.</p>
+
+<p>So, here is my view of how Go compares:</p>
+
+<h2 id="the-good">The Good</h2>
+
+<p>I think that Go’s use of interfaces to promote composition is great.</p>
+
+<p>I like the separation of behavior and data:
+structs store data, methods manipulate data in structs -
+it is clean separation of state (structs), and behavior (methods).
+I think that distinction can become unfortunately blurry in languages that use
+inheritance.</p>
+
+<p>Rust has a similar system,
+where data is described by structs or enums.
+Behavior is separate, in the form of trait methods and standalone functions.</p>
+
+<p>Go is easy to learn.
+Go repurposes object-oriented concepts to make something new in a way that
+makes it approachable to programmers who are familiar with other
+object-oriented languages.
+This is somewhat similar to what Rust does;
+but interfaces in Go match behaviors of object-oriented interfaces more closely
+than Rust’s traits do.</p>
+
+<p>There is often a pretty clear “Go way” to solve a problem.
+This is also an oft-touted virtue of, for example, Python.
+Encouraging consistent idioms via the languages makes it likely that any Go
+programmer will be able to understand code written by any other Go programmer.
+This is not so much the case in Rust.</p>
+
+<p>There are lots of Go APIs that have clearly had a lot of thought put into them.
+This is one of my favorites:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="go"><span class="line"><span class="mi">5</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Seconds</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Goroutines are cheap,
+so programs can be structured in the way that makes most sense algorithmically,
+even if that involves spawning large numbers of goroutines.
+(But this is not unique to Go.
+Erlang and Scala also implement lightweight actors.
+Rust and other languages have their own solutions for lightweight concurrent
+and parallel programming.)</p>
+
+<p>I could go on - there are plenty of nice features in Go.
+But there are also:</p>
+
+<h2 id="the-bad">The Bad</h2>
+
+<p>These are features of Go that I find especially frustrating.</p>
+
+<h3 id="nil"><code>nil</code></h3>
+
+<p>I am disappointed by the decision to include null pointers in a new language
+when safer solutions have been in use for decades.
+Or to be more precise: I think it is a bad idea for a language to use <code>nil</code> as
+a bottom type,
+where <code>nil</code> can be used in place of any pointer type.
+Some newer languages have a <code>null</code>, but treat it as a distinct type
+(e.g., <a href="http://fantom.org/">Fantom</a>, <a href="https://flowtype.org/">Flow</a>).
+In those languages values are non-nullable by default.
+Without that feature, uses of <code>nil</code> are contradictions of what is stated in
+your types,
+and every type comes with the implied ambiguity, “or it might be <code>nil</code>”.
+Checking for <code>nil</code> or <code>null</code> at compile time can prevent a lot of problems!</p>
+
+<p>The problem with <code>nil</code> in Go is exacerbated by the fact that <code>nil</code> checks
+sometimes fail.
+If an interface value has a type but its value is <code>nil</code>,
+<a href="http://devs.cloudimmunity.com/gotchas-and-common-mistakes-in-go-golang/index.html#nil_in_nil_in_vals">a <code>nil</code> check will not return <code>true</code></a>.</p>
+
+<p>Rust does not have a <code>null</code> or <code>nil</code> value.
+Rust uses enums, which are types whose values come in multiple variants,
+where each variant is effectively a distinct struct.
+If you want to represent an absence of a value you use an enum variant that
+holds no data.
+The generalized form of this pattern is known as the “Option Pattern”.
+The definition of the <code>Option</code> type from Rust’s standard library looks
+approximately like this:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class="rust"><span class="line"><span class="n">pub</span> <span class="k">enum</span> <span class="n">Option</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="p">{</span>
+</span><span class="line">    <span class="n">None</span><span class="p">,</span>    <span class="c1">// Holds no data</span>
+</span><span class="line">    <span class="n">Some</span><span class="p">(</span><span class="n">T</span><span class="p">),</span> <span class="c1">// Holds a value of the given type</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p><code>None</code> and <code>Some</code> are constructors:
+essentially they are each a function that returns a value of type <code>Option&lt;T&gt;</code>.
+<code>Some</code> takes one argument, <code>None</code> takes zero arguments.
+Given an <code>Option&lt;T&gt;</code> value, you can use pattern matching to determine which
+constructor was used to create the value;
+and pattern matching is also how you read back any constructor arguments.
+(In the case of a value created by calling <code>Some(x)</code>,
+pattern matching lets you get access to that <code>x</code> value.)</p>
+
+<p>Here is the Option pattern in action
+(<a href="http://rustbyexample.com/std/option.html">source</a>):</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+</pre></td><td class="code"><pre><code class="rust"><span class="line"><span class="k">fn</span> <span class="n">checked_division</span><span class="p">(</span><span class="n">dividend</span><span class="o">:</span> <span class="k">i32</span><span class="p">,</span> <span class="n">divisor</span><span class="o">:</span> <span class="k">i32</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Option</span><span class="o">&lt;</span><span class="k">i32</span><span class="o">&gt;</span> <span class="p">{</span>
+</span><span class="line">    <span class="k">if</span> <span class="n">divisor</span> <span class="o">==</span> <span class="m">0</span> <span class="p">{</span>
+</span><span class="line">        <span class="c1">// Failure is represented as the `None` variant</span>
+</span><span class="line">        <span class="n">None</span>
+</span><span class="line">    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class="line">        <span class="c1">// Result is wrapped in a `Some` variant</span>
+</span><span class="line">        <span class="n">Some</span><span class="p">(</span><span class="n">dividend</span> <span class="o">/</span> <span class="n">divisor</span><span class="p">)</span>
+</span><span class="line">    <span class="p">}</span>
+</span><span class="line"><span class="p">}</span>
+</span><span class="line">
+</span><span class="line"><span class="cp">#[test]</span>
+</span><span class="line"><span class="k">fn</span> <span class="n">divides_a_number</span><span class="p">()</span> <span class="p">{</span>
+</span><span class="line">    <span class="k">let</span> <span class="n">result</span> <span class="o">=</span> <span class="n">checked_division</span><span class="p">(</span><span class="m">12</span><span class="p">,</span> <span class="m">4</span><span class="p">);</span>
+</span><span class="line">    <span class="n">match</span> <span class="n">result</span> <span class="p">{</span>
+</span><span class="line">        <span class="n">Some</span><span class="p">(</span><span class="n">num</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="n">assert_eq</span><span class="o">!</span><span class="p">(</span><span class="m">3</span><span class="p">,</span> <span class="n">num</span><span class="p">),</span> <span class="c1">// Pattern on the left binds the variable `num`</span>
+</span><span class="line">        <span class="n">None</span>      <span class="o">=&gt;</span> <span class="k">assert</span><span class="o">!</span><span class="p">(</span><span class="k">false</span><span class="p">,</span> <span class="s">&quot;Expected `Some` but got `None`&quot;</span><span class="p">)</span>
+</span><span class="line">    <span class="p">};</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>I once advocated for use of the Option pattern at a Java company -
+but at least one of my coworkers was put off by the idea of allocating an extra
+object on the heap just to distinguish between a value and an absence of
+a value.
+Rust is built with the Option pattern in mind,
+and prioritizes zero-cost abstractions:
+If the type parameter for <code>Option&lt;T&gt;</code> is a reference type,
+then the <code>None</code> case can be safely represented at runtime as a null pointer.
+So the <code>Some</code> or <code>None</code> wrapper often disappears at compile time.
+In those cases the code is just as efficient as it would have been if the
+language used unsafe <code>null</code> values.</p>
+
+<p>In the example above since neither <code>Option&lt;i32&gt;</code> nor the <code>i32</code> parameter are
+reference types, the compiler allocates contiguous space on the stack for the
+numeric result, and for a tag to distinguish between <code>Some</code> and <code>None</code>.
+There is no extra heap allocation, and no added pointer indirection.</p>
+
+<p>The Rust Book has <a href="https://doc.rust-lang.org/book/error-handling.html">a lot more detail</a>.</p>
+
+<p>It is possible to implement the Option pattern in Go with similar efficiency;
+and one could even get a compile-time check that errors are handled by
+implementing a <code>match</code> method that uses the visitor pattern (<a href="https://github.com/hallettj/comparing-go-and-rust/tree/master/go/option">example</a>).
+But without generics there would be no type safety for values wrapped in an
+<code>Option</code> type.</p>
+
+<h3 id="error-handling-boilerplate--lack-of-compile-time-checks-for-error-handling">Error-handling boilerplate &amp; lack of compile-time checks for error handling</h3>
+
+<p>Error handling in Go has two related problems:
+there is a lot of boilerplate required;
+and if the programmer neglects to check for an error,
+or makes a small mistake such as checking the wrong error variable,
+the compiler will not report the problem.</p>
+
+<p>Rust has a type, <code>Result&lt;T,E&gt;</code>,
+that is quite similar to <code>Option&lt;T&gt;</code>.
+The difference is that the failure variant of the <code>Result&lt;T,E&gt;</code> enum is not empty -
+it contains an error value (of type <code>E</code>).
+A returned value of type <code>Result&lt;T,E&gt;</code> may be either
+<code>Ok(value)</code> (on success) or
+<code>Err(err)</code> (on error).</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class="rust"><span class="line"><span class="n">pub</span> <span class="k">enum</span> <span class="n">Result</span><span class="o">&lt;</span><span class="n">T</span><span class="p">,</span> <span class="n">E</span><span class="o">&gt;</span> <span class="p">{</span>
+</span><span class="line">    <span class="n">Ok</span><span class="p">(</span><span class="n">T</span><span class="p">),</span>
+</span><span class="line">    <span class="n">Err</span><span class="p">(</span><span class="n">E</span><span class="p">),</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>A common complaint about the Option / Result Pattern is that unwrapping
+success values is a pain.
+But a language with support for pattern matching makes unwrapping painless,
+and first-class result values permit combinators that can handle a series of
+potential failures more cleanly and safely than explicit error checks.</p>
+
+<p>Consider this Go function:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+</pre></td><td class="code"><pre><code class="go"><span class="line"><span class="kd">func</span> <span class="nx">fetchAllBySameAuthor</span><span class="p">(</span><span class="nx">postID</span> <span class="kt">string</span><span class="p">)</span> <span class="p">([]</span><span class="nx">Post</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">	<span class="nx">post</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">fetchPost</span><span class="p">(</span><span class="nx">postID</span><span class="p">)</span>
+</span><span class="line">	<span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span><span class="line">		<span class="k">return</span> <span class="kc">nil</span><span class="p">,</span> <span class="nx">err</span>
+</span><span class="line">	<span class="p">}</span>
+</span><span class="line">
+</span><span class="line">	<span class="nx">author</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">fetchUser</span><span class="p">(</span><span class="nx">post</span><span class="p">.</span><span class="nx">AuthorID</span><span class="p">)</span>
+</span><span class="line">	<span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span><span class="line">		<span class="k">return</span> <span class="kc">nil</span><span class="p">,</span> <span class="nx">err</span>
+</span><span class="line">	<span class="p">}</span>
+</span><span class="line">
+</span><span class="line">	<span class="k">return</span> <span class="nx">fetchPosts</span><span class="p">(</span><span class="nx">author</span><span class="p">.</span><span class="nx">Posts</span><span class="p">)</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>There are a few ways the <code>fetchAllBySameAuthor</code> function this could be
+implemented in Rust.
+The pattern matching approach is probably the most accessible to people who do
+not have prior experience with the Option or Result Pattern:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+</pre></td><td class="code"><pre><code class="rust"><span class="line"><span class="k">fn</span> <span class="n">fetch_all_by_same_author</span><span class="p">(</span><span class="n">post_id</span><span class="o">:</span> <span class="o">&amp;</span><span class="n">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Result</span><span class="o">&lt;</span><span class="n">Vec</span><span class="o">&lt;</span><span class="n">Post</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">io</span><span class="o">::</span><span class="n">Error</span><span class="o">&gt;</span> <span class="p">{</span>
+</span><span class="line">    <span class="k">let</span> <span class="n">post</span> <span class="o">=</span> <span class="n">match</span> <span class="n">fetch_post</span><span class="p">(</span><span class="n">post_id</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">        <span class="n">Ok</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>    <span class="o">=&gt;</span> <span class="n">p</span><span class="p">,</span>
+</span><span class="line">        <span class="n">Err</span><span class="p">(</span><span class="n">err</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="n">return</span> <span class="n">Err</span><span class="p">(</span><span class="n">err</span><span class="p">),</span>
+</span><span class="line">    <span class="p">};</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">let</span> <span class="n">author</span> <span class="o">=</span> <span class="n">match</span> <span class="n">fetch_user</span><span class="p">(</span><span class="o">&amp;</span><span class="n">post</span><span class="p">.</span><span class="n">author_id</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">        <span class="n">Ok</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>    <span class="o">=&gt;</span> <span class="n">a</span><span class="p">,</span>
+</span><span class="line">        <span class="n">Err</span><span class="p">(</span><span class="n">err</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="n">return</span> <span class="n">Err</span><span class="p">(</span><span class="n">err</span><span class="p">),</span>
+</span><span class="line">    <span class="p">};</span>
+</span><span class="line">
+</span><span class="line">    <span class="n">fetch_posts</span><span class="p">(</span><span class="o">&amp;</span><span class="n">author</span><span class="p">.</span><span class="n">posts</span><span class="p">)</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>That is no less verbose than the Go version -
+but it demonstrates that unwrapping <code>Result&lt;T,E&gt;</code> or <code>Option&lt;T&gt;</code> values does
+not have to be any more onerous than <code>nil</code> checks;
+and if we had left out a failure check in the Rust version Rust would have
+emitted an error at compile time.</p>
+
+<p>Rust has a macro, <code>try!</code>, that abstracts the pattern matches and early returns
+that we see above.
+So this is an equivalent function:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class="rust"><span class="line"><span class="k">fn</span> <span class="n">fetch_all_by_same_author</span><span class="p">(</span><span class="n">post_id</span><span class="o">:</span> <span class="o">&amp;</span><span class="n">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Result</span><span class="o">&lt;</span><span class="n">Vec</span><span class="o">&lt;</span><span class="n">Post</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">io</span><span class="o">::</span><span class="n">Error</span><span class="o">&gt;</span> <span class="p">{</span>
+</span><span class="line">    <span class="k">let</span> <span class="n">post</span>   <span class="o">=</span> <span class="n">try</span><span class="o">!</span><span class="p">(</span><span class="n">fetch_post</span><span class="p">(</span><span class="n">post_id</span><span class="p">));</span>
+</span><span class="line">    <span class="k">let</span> <span class="n">author</span> <span class="o">=</span> <span class="n">try</span><span class="o">!</span><span class="p">(</span><span class="n">fetch_user</span><span class="p">(</span><span class="o">&amp;</span><span class="n">post</span><span class="p">.</span><span class="n">author_id</span><span class="p">));</span>
+</span><span class="line">    <span class="n">fetch_posts</span><span class="p">(</span><span class="o">&amp;</span><span class="n">author</span><span class="p">.</span><span class="n">posts</span><span class="p">)</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>But Go does not support macros.
+Thankfully, the Result pattern does not require macros to be concise.
+For the more functionally-inclined,
+here is another equivalent implementation that uses combinator methods:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class="rust"><span class="line"><span class="k">fn</span> <span class="n">fetch_all_by_same_author</span><span class="p">(</span><span class="n">post_id</span><span class="o">:</span> <span class="o">&amp;</span><span class="n">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Result</span><span class="o">&lt;</span><span class="n">Vec</span><span class="o">&lt;</span><span class="n">Post</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">io</span><span class="o">::</span><span class="n">Error</span><span class="o">&gt;</span> <span class="p">{</span>
+</span><span class="line">    <span class="k">let</span> <span class="n">post</span>   <span class="o">=</span> <span class="n">fetch_post</span><span class="p">(</span><span class="n">post_id</span><span class="p">);</span>
+</span><span class="line">    <span class="k">let</span> <span class="n">author</span> <span class="o">=</span> <span class="n">post</span><span class="p">.</span><span class="n">and_then</span><span class="p">(</span><span class="o">|</span><span class="n">p</span><span class="o">|</span> <span class="n">fetch_user</span><span class="p">(</span><span class="o">&amp;</span><span class="n">p</span><span class="p">.</span><span class="n">author_id</span><span class="p">));</span>
+</span><span class="line">    <span class="n">author</span><span class="p">.</span><span class="n">and_then</span><span class="p">(</span><span class="o">|</span><span class="n">a</span><span class="o">|</span> <span class="n">fetch_posts</span><span class="p">(</span><span class="o">&amp;</span><span class="n">a</span><span class="p">.</span><span class="n">posts</span><span class="p">))</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p><code>and_then</code> is a method on <code>Result&lt;T,E&gt;</code> values.
+If the value is a successful result, it runs the given callback,
+which should return a new <code>Result&lt;U,E&gt;</code> value.
+Or if the value is an error result, <code>and_then</code> short-circuits,
+and passes the error result through.
+<code>and_then</code> is a lot like the <code>then</code> method on Javascript promises.</p>
+
+<p>But wait - what if you want to wrap error results to add context?
+There is a combinator for that to:
+<code>map_err</code> permits arbitrary transformations to error results.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="rust"><span class="line"><span class="k">let</span> <span class="n">post</span> <span class="o">=</span> <span class="n">fetch_post</span><span class="p">(</span><span class="n">post_id</span><span class="p">)</span>
+</span><span class="line">    <span class="p">.</span><span class="n">map_err</span><span class="p">(</span><span class="o">|</span><span class="n">e</span><span class="o">|</span> <span class="n">io</span><span class="o">::</span><span class="n">Error</span><span class="o">::</span><span class="n">new</span><span class="p">(</span><span class="n">io</span><span class="o">::</span><span class="n">ErrorKind</span><span class="o">::</span><span class="n">NotFound</span><span class="p">,</span> <span class="n">e</span><span class="p">));</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The idea is that failure checks are almost always the same:
+check for an error, return the error if it exists, otherwise continue.
+It is more <a href="http://deviq.com/don-t-repeat-yourself/">DRY</a> to abstract that into a helper method or a macro.
+And again,
+a common theme in all of these Rust implementations is that there is
+a compile-time guarantee that every error handled.
+That could be with some recovery code,
+or by passing the error up the call stack.</p>
+
+<p><code>Result&lt;T,E&gt;</code> does not get the same disappear-at-compile-time optimization that
+<code>Option&lt;T&gt;</code> does because both enum variants hold data.
+But its efficiency compares favorably with Go’s multiple return values.
+Go allocates enough space for every value in a multiple return.
+Rust allocates enough space to hold either <code>T</code> or <code>E</code>
+(i.e., enough space to hold the largest possible value),
+plus a tag to distinguish between an <code>Ok(value)</code> value and an <code>Err(err)</code> value.</p>
+
+<p>A nice thing about the generality of Rust enums is that if <code>Result&lt;T,E&gt;</code> did
+not exist,
+it would be easy to implement it as a library.
+So what about using the Result or Option pattern in Go?
+Well, we can’t put methods on Go tuples (a.k.a, multiple return values),
+because they are not first-class values.
+We could implement a custom struct type -
+but without generics it would not be very useful.</p>
+
+<h3 id="list-manipulation-cannot-be-abstracted">List manipulation cannot be abstracted</h3>
+
+<p>There is a special slap-in-the-face for functional programmers built into Go:
+A value of type <code>[]interface{}</code> cannot be easily coerced to another slice type -
+e.g. <code>[]string</code> or <code>[]MyStructType</code>.
+The only way to do that conversion is to create a new slice,
+and copy values one-at-a-time in a <code>for</code> loop.
+But any polymorphic function that acts on lists <em>must</em> operate on the
+<code>interface{}</code> top type because Go does not provide type variables.</p>
+
+<p>I can implement <code>Map</code> (or potentially <code>ParallelMap</code>) in Go without too much
+trouble:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+</pre></td><td class="code"><pre><code class="go"><span class="line"><span class="kd">func</span> <span class="nx">Map</span><span class="p">(</span><span class="nx">f</span> <span class="kd">func</span><span class="p">(</span><span class="nx">x</span> <span class="kd">interface</span><span class="p">{})</span> <span class="kd">interface</span><span class="p">{},</span> <span class="nx">xs</span> <span class="p">[]</span><span class="kd">interface</span><span class="p">{})</span> <span class="p">[]</span><span class="kd">interface</span><span class="p">{}</span> <span class="p">{</span>
+</span><span class="line">	<span class="nx">ys</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([]</span><span class="kd">interface</span><span class="p">{},</span> <span class="nb">len</span><span class="p">(</span><span class="nx">xs</span><span class="p">))</span>
+</span><span class="line">	<span class="k">for</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">x</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">xs</span> <span class="p">{</span>
+</span><span class="line">		<span class="nx">ys</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="p">=</span> <span class="nx">f</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span>
+</span><span class="line">	<span class="p">}</span>
+</span><span class="line">	<span class="k">return</span> <span class="nx">ys</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>But then I end up with some bad choices:</p>
+
+<ul>
+  <li>I can precede and follow every invocation of <code>Map</code> with custom <code>for</code> loops to
+fix up types;</li>
+  <li>or instead of one polymorphic implementation I can write a custom <code>Map</code> for
+every pair of types that I want to map from and to;</li>
+  <li>or I can give up on type safety and write programs using mostly <code>interface{}</code>
+values.</li>
+</ul>
+
+<p>The same problem applies to other list manipulation functions:
+<code>Filter</code>, <code>Take</code>, <code>Reduce</code>, etc.</p>
+
+<p>You might have noticed a pattern here:
+Go does not support generics, and that leads to problems.</p>
+
+<p>Dynamic languages like Javascript, Python, and Ruby do not support generics
+either -
+at least not in the sense of compile-time checking.
+But functional idioms work just fine in those languages.
+For example,
+in Javascript can pass any list to a generic list manipulation function,
+and it just works.
+Go occupies an awkward middle ground where it checks types at compile time,
+but does not provide tools to describe what to check for.</p>
+
+<p>Generics - and type variables in particular -
+are a means to “talk” about types.
+They let you use function signatures to make statements like,
+“This function takes a slice of values of some type, and returns a slice of
+values of the same type.”
+Working in a programming language with no type variables is as frustrating to
+me as talking in a spoken language without the word “the”.</p>
+
+<p>So Go code must re-implement list abstractions everywhere.
+Consider this Go function:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+</pre></td><td class="code"><pre><code class="go"><span class="line"><span class="c1">// Take the titles of the first `count` docs that are not archived</span>
+</span><span class="line"><span class="kd">func</span> <span class="nx">LatestTitles</span><span class="p">(</span><span class="nx">docs</span> <span class="p">[]</span><span class="nx">Document</span><span class="p">,</span> <span class="nx">count</span> <span class="kt">int</span><span class="p">)</span> <span class="p">[]</span><span class="kt">string</span> <span class="p">{</span>
+</span><span class="line">	<span class="kd">var</span> <span class="nx">latest</span> <span class="p">[]</span><span class="kt">string</span>
+</span><span class="line">	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">doc</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">docs</span> <span class="p">{</span>
+</span><span class="line">		<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">latest</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="nx">count</span> <span class="p">{</span>
+</span><span class="line">			<span class="k">return</span> <span class="nx">latest</span>
+</span><span class="line">		<span class="p">}</span>
+</span><span class="line">		<span class="k">if</span> <span class="p">!</span><span class="nx">doc</span><span class="p">.</span><span class="nx">IsArchived</span> <span class="p">{</span>
+</span><span class="line">			<span class="nx">latest</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">latest</span><span class="p">,</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">Title</span><span class="p">)</span>
+</span><span class="line">		<span class="p">}</span>
+</span><span class="line">	<span class="p">}</span>
+</span><span class="line">	<span class="k">return</span> <span class="nx">latest</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>That function iterates over an input collection, skips over some values, does
+something with the values that are not skipped, and returns a collection with
+the results.
+In other words, this is a <code>filter</code>, <code>map</code>, <code>take</code> operation.
+Here is an equivalent Rust implementation:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+</pre></td><td class="code"><pre><code class="rust"><span class="line"><span class="k">fn</span> <span class="n">latest_titles</span><span class="p">(</span><span class="n">docs</span><span class="o">:</span> <span class="o">&amp;</span><span class="p">[</span><span class="n">Document</span><span class="p">],</span> <span class="n">count</span><span class="o">:</span> <span class="n">usize</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vec</span><span class="o">&lt;&amp;</span><span class="n">str</span><span class="o">&gt;</span> <span class="p">{</span>
+</span><span class="line">    <span class="n">docs</span><span class="p">.</span><span class="n">iter</span><span class="p">()</span>
+</span><span class="line">        <span class="p">.</span><span class="n">filter</span><span class="p">(</span><span class="o">|</span><span class="n">ref</span> <span class="n">doc</span><span class="o">|</span> <span class="o">!</span><span class="n">doc</span><span class="p">.</span><span class="n">is_archived</span><span class="p">)</span>
+</span><span class="line">        <span class="p">.</span><span class="n">map</span><span class="p">(</span><span class="o">|</span><span class="n">ref</span> <span class="n">doc</span><span class="o">|</span> <span class="n">doc</span><span class="p">.</span><span class="n">title</span><span class="p">.</span><span class="n">as_str</span><span class="p">())</span>
+</span><span class="line">        <span class="p">.</span><span class="n">take</span><span class="p">(</span><span class="n">count</span><span class="p">)</span>
+</span><span class="line">        <span class="p">.</span><span class="n">collect</span><span class="p">()</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The Rust version lets me say what I mean.
+In other words, the Rust function is “declarative”.
+And the difference becomes more pronounced if I want to process values
+concurrently -
+for example to make network requests in parallel.
+More on that in a bit.</p>
+
+<p>I once complained to a coworker about a lack of abstractions in Go.
+My coworker replied, “Well, maybe you shouldn’t be doing that.”
+So I want to emphasize that functional abstractions do not necessarily make
+code less efficient.
+Rust typically does “list” manipulation using lazily-evaluated iterators.
+(This is also how the standard data structures in Clojure work.)
+So you can chain <code>filter</code>, <code>map</code>, <code>take</code>, without intermediate collection
+allocations,
+and without wasting cycles on computing values beyond those that the caller
+requests.
+The function above does not run those <code>filter</code> and <code>map</code> callbacks on every
+element in the input collection -
+it stops processing elements as soon as it has enough results to satisfy the
+<code>take(count)</code> step.
+On top of that,
+<code>iter</code>, <code>filter</code>, <code>map</code>, <code>take</code>, and <code>collect</code> are polymorphic methods,
+but they are dispatched statically thanks to a compile-time monomorphization
+step.
+And the compiler will probably inline the <code>filter</code> and <code>map</code> callbacks.
+There are some notes in the Rust Book on
+<a href="https://rust-lang.github.io/book/ch13-04-performance.html">performance of functional abstractions on iterators</a>.</p>
+
+<p>It is possible that my coworker was more concerned with cognitive burden
+than with performance.
+I think that complaints of cognitive burden may be partly a result of looking
+at unfamiliar idioms.
+To an experienced functional programmer,
+a call to, e.g., <code>map</code> states a clear intention:
+“The input collection will be transformed according to this mapping function.”
+With some practice declarative code is fast to read and understand.
+And type checkers are more effective at checking declarative code than at
+checking custom <code>for</code> loops.</p>
+
+<p>Let’s get into the parallel-fetch problem that I mentioned.
+Here is a Go function that I wrote recently to fetch a set of documents in
+parallel:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+</pre></td><td class="code"><pre><code class="go"><span class="line"><span class="kd">func</span> <span class="p">(</span><span class="nx">client</span> <span class="nx">docClient</span><span class="p">)</span> <span class="nx">FetchDocuments</span><span class="p">(</span><span class="nx">ids</span> <span class="p">[]</span><span class="kt">int64</span><span class="p">)</span> <span class="p">([]</span><span class="nx">models</span><span class="p">.</span><span class="nx">Document</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">	<span class="nx">docs</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([]</span><span class="nx">models</span><span class="p">.</span><span class="nx">Document</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="nx">ids</span><span class="p">))</span>
+</span><span class="line">	<span class="kd">var</span> <span class="nx">err</span> <span class="kt">error</span>
+</span><span class="line">
+</span><span class="line">	<span class="kd">var</span> <span class="nx">wg</span> <span class="nx">sync</span><span class="p">.</span><span class="nx">WaitGroup</span>
+</span><span class="line">	<span class="nx">wg</span><span class="p">.</span><span class="nx">Add</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nx">ids</span><span class="p">))</span>
+</span><span class="line">
+</span><span class="line">	<span class="k">for</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">id</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">ids</span> <span class="p">{</span>
+</span><span class="line">		<span class="k">go</span> <span class="kd">func</span><span class="p">(</span><span class="nx">i</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">id</span> <span class="kt">int64</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">			<span class="nx">doc</span><span class="p">,</span> <span class="nx">e</span> <span class="o">:=</span> <span class="nx">client</span><span class="p">.</span><span class="nx">FetchDocument</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span>
+</span><span class="line">			<span class="k">if</span> <span class="nx">e</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span><span class="line">				<span class="nx">err</span> <span class="p">=</span> <span class="nx">e</span>
+</span><span class="line">			<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class="line">				<span class="nx">docs</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="p">=</span> <span class="o">*</span><span class="nx">doc</span>
+</span><span class="line">			<span class="p">}</span>
+</span><span class="line">			<span class="nx">wg</span><span class="p">.</span><span class="nx">Done</span><span class="p">()</span>
+</span><span class="line">		<span class="p">}(</span><span class="nx">i</span><span class="p">,</span> <span class="nx">id</span><span class="p">)</span>
+</span><span class="line">	<span class="p">}</span>
+</span><span class="line">
+</span><span class="line">	<span class="nx">wg</span><span class="p">.</span><span class="nx">Wait</span><span class="p">()</span>
+</span><span class="line">
+</span><span class="line">	<span class="k">return</span> <span class="nx">docs</span><span class="p">,</span> <span class="nx">err</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The use of a <code>WaitGroup</code>, the allocation of a new slice, copying result values,
+and explicit error checks are all low-level details that I should not have to
+reimplement every time I want to do things concurrently.</p>
+
+<p>Now that I am looking at this again,
+I realize there might be a problem here with concurrent access to the
+<code>docs</code> slice.
+Maybe it would be a good idea to use a mutex around updates to <code>docs</code>,
+or to send results from goroutines back to the main thread via a channel.
+But if I use a channel I will need to implement a custom struct or use two channels,
+because I want to capture errors,
+and I cannot send the type <code>(models.Document, error)</code> over a channel,
+because Go tuples are not first-class values…</p>
+
+<p>Rust gives a compile-time error if a mutable reference to a thread-unsafe data
+structure is passed to a function that could run in another thread.
+So I don’t have to worry as much about what is or is not thread-safe when
+writing Rust code.
+But that is almost made moot by the fact that Rust can hide hairy concurrency
+details in library functions.</p>
+
+<p>Compare the Go code to an equivalent Rust function that uses the <a href="https://aturon.github.io/blog/2016/08/11/futures/">futures</a>
+library:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class="rust"><span class="line"><span class="k">fn</span> <span class="n">fetch_documents</span><span class="p">(</span><span class="n">ids</span><span class="o">:</span> <span class="o">&amp;</span><span class="p">[</span><span class="k">i64</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Result</span><span class="o">&lt;</span><span class="n">Vec</span><span class="o">&lt;</span><span class="n">Document</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">io</span><span class="o">::</span><span class="n">Error</span><span class="o">&gt;</span> <span class="p">{</span>
+</span><span class="line">    <span class="k">let</span> <span class="n">results</span> <span class="o">=</span> <span class="n">ids</span><span class="p">.</span><span class="n">iter</span><span class="p">()</span>
+</span><span class="line">        <span class="p">.</span><span class="n">map</span><span class="p">(</span><span class="o">|&amp;</span><span class="n">id</span><span class="o">|</span> <span class="n">fetch_document_future</span><span class="p">(</span><span class="n">id</span><span class="p">));</span>
+</span><span class="line">    <span class="n">future</span><span class="o">::</span><span class="n">join_all</span><span class="p">(</span><span class="n">results</span><span class="p">).</span><span class="n">wait</span><span class="p">()</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The Rust function works the same way that the Go function does:
+if all fetches are successful,
+you get a collection of data from responses.
+But if any fetches fail, you get the first failure as an error value.
+The difference is that in the Rust version the concurrency, mapping, and
+error-checking details are handled by a general-purpose library.
+(Another difference is that the Rust version returns as soon as any fetch fails,
+but the Go version always waits for all fetches to finish.)</p>
+
+<p>This example shows that the <code>map</code> abstraction is so powerful that concurrent
+versus sequential execution is an implementation detail.
+(I will talk more about more about functional parallel processing in a later
+section.)</p>
+
+<p>The Rust implementation assumes that <code>fetch_document</code> returns a <code>Future</code>.
+The function <code>future::join_all</code> also returns a <code>Future</code>.
+(Futures work very similarly to promises in Javascript:
+they represent an eventual result or error.)
+It would be more idiomatic to return that last future directly instead of using
+<code>wait</code> to block on the result.
+But blocking gives us a function that is logically equivalent to the Go version,
+and shows that using futures in Rust does not lock you into using
+callback-driven code everywhere.</p>
+
+<p>Using futures, and the related <code>Stream</code> type,
+makes some kinds of network server implementations much simpler than with
+blocking IO.
+In particular, streaming requests and responses are easy if code is implemented
+in terms of <code>Stream</code> values.</p>
+
+<h3 id="third-party-libraries-are-second-class-citizens">Third-party libraries are second-class citizens</h3>
+
+<p>Go has a magical function called <code>make</code> that seems to do whatever the standard
+library authors need for a given type.
+It takes a type as an argument, which is unlike other Go functions.
+For custom types <code>make</code> just returns an empty value, or <code>nil</code> for pointer types.
+But in some cases <code>make</code> can take additional arguments to initialize a value.
+For example, when creating a slice you can provide a capacity:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="go"><span class="line"><span class="nx">mySlice</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([]</span><span class="kt">int</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Without the second argument <code>make</code> returns <code>nil</code> as usual -
+but with that argument <code>make</code> has a very different behavior where it allocates
+a backing array to hold the specified number of values.</p>
+
+<p>When creating a channel, you can specify the channel’s buffer size with
+a second argument to <code>make</code>.
+As far as I know, this is the only way to set a channel’s buffer size.</p>
+
+<p>It seems that standard libraries have a special privilege to overload <code>make</code>
+to delegate to custom constructor code when initializing their types.
+Third-party libraries do not get to do this.</p>
+
+<p>We see something like this with the <code>range</code> operator also.
+<code>range</code> is one of the few constructs that changes its behavior depending on the
+number of arguments that are assigned from its output:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="go"><span class="line"><span class="k">for</span> <span class="nx">idx</span><span class="p">,</span> <span class="nx">value</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">values</span> <span class="p">{</span> <span class="cm">/* ... */</span> <span class="p">}</span>  <span class="c1">// `range` returns indexes and values</span>
+</span><span class="line"><span class="k">for</span> <span class="nx">idx</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">values</span> <span class="p">{</span> <span class="cm">/* ... */</span> <span class="p">}</span>  <span class="c1">// this time it just returns indexes</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>But more importantly:
+only standard library types get to be range-able.
+There is no way to make a third-party data type iterable.
+Library authors can implement adapters to output a view of their data structure
+as a slice, or to spit out values over a channel.
+But that puts extra complexity on code that uses third-party data structures;
+and requires programmers to use non-standard idioms.</p>
+
+<p>Yet another privilege is that only standard types can be compared using <code>==</code>,
+<code>&gt;</code>, etc.</p>
+
+<p>The biggest problem is that only standard libraries are allowed to define
+generic types.
+This is severely limiting to the library ecosystem around Go.
+It means that, for example,
+a third-party functional data structures library,
+or a third-party futures library
+will never be as usable as the standard library collection types.</p>
+
+<p>Rust supports generics for third-party code.
+And Rust implements iteration, equality, and comparison via traits that any
+third-party type can implement.
+Third-party Rust types are nearly indistinguishable from standard library
+types,
+which promotes innovation in Rust’s library ecosystem.</p>
+
+<p>Incidentally,
+<code>make</code> and <code>range</code> are ad-hoc examples of a pattern that has generalized
+support in Rust:
+functions that are polymorphic in their return type.
+Rust traits are more flexible than typical object-oriented interfaces:
+the choice of implementation of an interface method is determined solely by the
+receiver of the method.
+But a trait method implementation can be selected based on
+the type of the receiver,
+the type of any argument position,
+the types of multiple argument positions (e.g., for an equality trait),
+or by the expected return type.
+An implementation of <code>make</code> in Rust might look like this:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+<span class="line-number">33</span>
+<span class="line-number">34</span>
+<span class="line-number">35</span>
+<span class="line-number">36</span>
+<span class="line-number">37</span>
+<span class="line-number">38</span>
+<span class="line-number">39</span>
+<span class="line-number">40</span>
+<span class="line-number">41</span>
+<span class="line-number">42</span>
+<span class="line-number">43</span>
+<span class="line-number">44</span>
+<span class="line-number">45</span>
+<span class="line-number">46</span>
+<span class="line-number">47</span>
+<span class="line-number">48</span>
+<span class="line-number">49</span>
+<span class="line-number">50</span>
+<span class="line-number">51</span>
+<span class="line-number">52</span>
+<span class="line-number">53</span>
+<span class="line-number">54</span>
+<span class="line-number">55</span>
+<span class="line-number">56</span>
+<span class="line-number">57</span>
+<span class="line-number">58</span>
+<span class="line-number">59</span>
+<span class="line-number">60</span>
+</pre></td><td class="code"><pre><code class="rust"><span class="line"><span class="k">use</span> <span class="n">std</span><span class="o">::</span><span class="n">sync</span><span class="o">::</span><span class="n">mpsc</span><span class="o">::</span><span class="p">{</span><span class="n">Receiver</span><span class="p">,</span> <span class="n">Sender</span><span class="p">,</span> <span class="n">channel</span><span class="p">};</span>
+</span><span class="line">
+</span><span class="line"><span class="c1">// A `trait` declares some common behavior</span>
+</span><span class="line"><span class="n">trait</span> <span class="n">Make</span> <span class="p">{</span>
+</span><span class="line">    <span class="k">fn</span> <span class="n">make</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">;</span>
+</span><span class="line">    <span class="k">fn</span> <span class="n">make_with_capacity</span><span class="p">(</span><span class="n">capacity</span><span class="o">:</span> <span class="n">usize</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">;</span>
+</span><span class="line"><span class="p">}</span>
+</span><span class="line">
+</span><span class="line"><span class="c1">// An `impl` provides implementations for trait methods for given concrete types.</span>
+</span><span class="line"><span class="c1">// Note that we can implement `Make` for the standard `Vec&lt;T&gt;` type right here.</span>
+</span><span class="line"><span class="c1">// It is not necessary to change the implementation of `Vec&lt;T&gt;`.</span>
+</span><span class="line"><span class="k">impl</span> <span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">Make</span> <span class="k">for</span> <span class="n">Vec</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="p">{</span>
+</span><span class="line">    <span class="k">fn</span> <span class="n">make</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Vec</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="p">{</span>
+</span><span class="line">        <span class="n">Vec</span><span class="o">::</span><span class="n">new</span><span class="p">()</span>
+</span><span class="line">    <span class="p">}</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">fn</span> <span class="n">make_with_capacity</span><span class="p">(</span><span class="n">capacity</span><span class="o">:</span> <span class="n">usize</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vec</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="p">{</span>
+</span><span class="line">        <span class="n">Vec</span><span class="o">::</span><span class="n">with_capacity</span><span class="p">(</span><span class="n">capacity</span><span class="p">)</span>
+</span><span class="line">    <span class="p">}</span>
+</span><span class="line"><span class="p">}</span>
+</span><span class="line">
+</span><span class="line"><span class="c1">// `Sender` and `Receiver` are Rust&#39;s standard channel types.</span>
+</span><span class="line"><span class="c1">// This trait implementation constructs a connected sender/receiver pair.</span>
+</span><span class="line"><span class="k">impl</span> <span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">Make</span> <span class="k">for</span> <span class="p">(</span><span class="n">Sender</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">Receiver</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">    <span class="c1">// Rust channels do not have a fixed buffer size - a channel is either</span>
+</span><span class="line">    <span class="c1">// non-blocking (with an unlimited buffer), or is blocking. But a non-blocking</span>
+</span><span class="line">    <span class="c1">// channel has a different type; so that will require a different trait impl.</span>
+</span><span class="line">    <span class="k">fn</span> <span class="n">make</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">Sender</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">Receiver</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">        <span class="n">channel</span><span class="p">()</span>
+</span><span class="line">    <span class="p">}</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">fn</span> <span class="n">make_with_capacity</span><span class="p">(</span><span class="n">_</span><span class="o">:</span> <span class="n">usize</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">Sender</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">Receiver</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">        <span class="n">Make</span><span class="o">::</span><span class="n">make</span><span class="p">()</span>
+</span><span class="line">    <span class="p">}</span>
+</span><span class="line"><span class="p">}</span>
+</span><span class="line">
+</span><span class="line"><span class="cp">#[test]</span>
+</span><span class="line"><span class="k">fn</span> <span class="n">makes_a_vec</span><span class="p">()</span> <span class="p">{</span>
+</span><span class="line">    <span class="c1">// We specify a type for the variable to instruct the compiler with</span>
+</span><span class="line">    <span class="c1">// implementation of `make` to use.</span>
+</span><span class="line">    <span class="k">let</span> <span class="k">mut</span> <span class="n">v</span><span class="o">:</span> <span class="n">Vec</span><span class="o">&lt;&amp;</span><span class="n">str</span><span class="o">&gt;</span> <span class="o">=</span> <span class="n">Make</span><span class="o">::</span><span class="n">make</span><span class="p">();</span>
+</span><span class="line">    <span class="n">v</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="s">&quot;some string&quot;</span><span class="p">);</span>
+</span><span class="line">    <span class="n">assert_eq</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;some string&quot;</span><span class="p">,</span> <span class="n">v</span><span class="p">[</span><span class="m">0</span><span class="p">]);</span>
+</span><span class="line"><span class="p">}</span>
+</span><span class="line">
+</span><span class="line"><span class="cp">#[test]</span>
+</span><span class="line"><span class="k">fn</span> <span class="n">makes_a_sized_vec</span><span class="p">()</span> <span class="p">{</span>
+</span><span class="line">    <span class="k">let</span> <span class="n">v</span><span class="o">:</span> <span class="n">Vec</span><span class="o">&lt;</span><span class="n">isize</span><span class="o">&gt;</span> <span class="o">=</span> <span class="n">Make</span><span class="o">::</span><span class="n">make_with_capacity</span><span class="p">(</span><span class="m">4</span><span class="p">);</span>
+</span><span class="line">    <span class="n">assert_eq</span><span class="o">!</span><span class="p">(</span><span class="m">4</span><span class="p">,</span> <span class="n">v</span><span class="p">.</span><span class="n">capacity</span><span class="p">());</span>
+</span><span class="line"><span class="p">}</span>
+</span><span class="line">
+</span><span class="line"><span class="cp">#[test]</span>
+</span><span class="line"><span class="k">fn</span> <span class="n">makes_a_channel</span><span class="p">()</span> <span class="p">{</span>
+</span><span class="line">    <span class="c1">// Or we can just let the compiler infer the type that we expect.</span>
+</span><span class="line">    <span class="k">let</span> <span class="p">(</span><span class="n">sender</span><span class="p">,</span> <span class="n">receiver</span><span class="p">)</span> <span class="o">=</span> <span class="n">Make</span><span class="o">::</span><span class="n">make</span><span class="p">();</span>
+</span><span class="line">    <span class="k">let</span> <span class="n">msg</span>    <span class="o">=</span> <span class="s">&quot;hello&quot;</span><span class="p">;</span>
+</span><span class="line">    <span class="k">let</span> <span class="n">_</span>      <span class="o">=</span> <span class="n">sender</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">msg</span><span class="p">);</span>
+</span><span class="line">    <span class="k">let</span> <span class="n">result</span> <span class="o">=</span> <span class="n">receiver</span><span class="p">.</span><span class="n">recv</span><span class="p">().</span><span class="n">expect</span><span class="p">(</span><span class="s">&quot;a successfully received value&quot;</span><span class="p">);</span>
+</span><span class="line">    <span class="n">assert_eq</span><span class="o">!</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">result</span><span class="p">);</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Any type can implement any trait.
+The only rule is that the code for an implementation must be in the same crate
+as either the type or the trait.
+(A “crate” is a distributable Rust package.)
+So if Rust itself or a Rust library implemented <code>make</code>,
+then any third-party library could define their own custom implementations.</p>
+
+<h2 id="the-ugly">The Ugly</h2>
+
+<p>These are some features of Go that I dislike on what I think are more
+subjective grounds than the “bad parts”,
+or that could be worked around if some of the bad parts were fixed.</p>
+
+<h3 id="no-tagged-unions-limited-pattern-matching">No tagged unions, limited pattern matching</h3>
+
+<p>Some older languages that make heavy use of channels
+(e.g. Erlang and Scala)
+support tagged-union types in combination with pattern matching.
+These features make great companions for channels:
+a tagged union describes a fixed set of message types that a channel can accept
+or produce.</p>
+
+<p>Rust supports tagged-union types in the form of enums:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+<span class="line-number">33</span>
+<span class="line-number">34</span>
+<span class="line-number">35</span>
+<span class="line-number">36</span>
+<span class="line-number">37</span>
+<span class="line-number">38</span>
+<span class="line-number">39</span>
+<span class="line-number">40</span>
+<span class="line-number">41</span>
+<span class="line-number">42</span>
+<span class="line-number">43</span>
+<span class="line-number">44</span>
+<span class="line-number">45</span>
+<span class="line-number">46</span>
+<span class="line-number">47</span>
+<span class="line-number">48</span>
+<span class="line-number">49</span>
+<span class="line-number">50</span>
+<span class="line-number">51</span>
+<span class="line-number">52</span>
+<span class="line-number">53</span>
+<span class="line-number">54</span>
+<span class="line-number">55</span>
+<span class="line-number">56</span>
+<span class="line-number">57</span>
+<span class="line-number">58</span>
+<span class="line-number">59</span>
+<span class="line-number">60</span>
+<span class="line-number">61</span>
+<span class="line-number">62</span>
+<span class="line-number">63</span>
+<span class="line-number">64</span>
+</pre></td><td class="code"><pre><code class="rust"><span class="line"><span class="k">use</span> <span class="n">std</span><span class="o">::</span><span class="n">sync</span><span class="o">::</span><span class="n">mpsc</span><span class="o">::</span><span class="p">{</span><span class="n">Receiver</span><span class="p">,</span> <span class="n">Sender</span><span class="p">,</span> <span class="n">channel</span><span class="p">};</span>
+</span><span class="line"><span class="k">use</span> <span class="n">std</span><span class="o">::</span><span class="n">thread</span><span class="p">;</span>
+</span><span class="line">
+</span><span class="line"><span class="c1">// This is a description of all of the messages that may be sent to a counter.</span>
+</span><span class="line"><span class="c1">// Sending a value that is not produced by one of these enum constructors is a</span>
+</span><span class="line"><span class="c1">// compile-time error.</span>
+</span><span class="line"><span class="cp">#[derive(Clone, Copy, Debug)]</span>
+</span><span class="line"><span class="n">pub</span> <span class="k">enum</span> <span class="n">CounterInstruction</span> <span class="p">{</span>
+</span><span class="line">    <span class="n">Increment</span><span class="p">(</span><span class="n">isize</span><span class="p">),</span>
+</span><span class="line">    <span class="n">Reset</span><span class="p">,</span>
+</span><span class="line">    <span class="n">Terminate</span><span class="p">,</span>
+</span><span class="line"><span class="p">}</span>
+</span><span class="line">
+</span><span class="line"><span class="n">pub</span> <span class="k">type</span> <span class="n">CounterResponse</span> <span class="o">=</span> <span class="n">isize</span><span class="p">;</span>
+</span><span class="line">
+</span><span class="line"><span class="k">use</span> <span class="n">self</span><span class="o">::</span><span class="n">CounterInstruction</span><span class="o">::*</span><span class="p">;</span>
+</span><span class="line">
+</span><span class="line"><span class="n">pub</span> <span class="k">fn</span> <span class="n">new_counter</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">Sender</span><span class="o">&lt;</span><span class="n">CounterInstruction</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">Receiver</span><span class="o">&lt;</span><span class="n">CounterResponse</span><span class="o">&gt;</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">    <span class="k">let</span> <span class="p">(</span><span class="n">instr_tx</span><span class="p">,</span> <span class="n">instr_rx</span><span class="p">)</span> <span class="o">=</span> <span class="n">channel</span><span class="o">::&lt;</span><span class="n">CounterInstruction</span><span class="o">&gt;</span><span class="p">();</span>
+</span><span class="line">    <span class="k">let</span> <span class="p">(</span><span class="n">resp_tx</span><span class="p">,</span>  <span class="n">resp_rx</span><span class="p">)</span>  <span class="o">=</span> <span class="n">channel</span><span class="o">::&lt;</span><span class="n">CounterResponse</span><span class="o">&gt;</span><span class="p">();</span>
+</span><span class="line">
+</span><span class="line">    <span class="n">thread</span><span class="o">::</span><span class="n">spawn</span><span class="p">(</span><span class="n">move</span> <span class="o">||</span> <span class="p">{</span>
+</span><span class="line">        <span class="k">let</span> <span class="k">mut</span> <span class="n">count</span><span class="o">:</span> <span class="n">isize</span> <span class="o">=</span> <span class="m">0</span><span class="p">;</span>
+</span><span class="line">
+</span><span class="line">        <span class="c1">// If the channel has closed then `recv()` will produce an `Err` value</span>
+</span><span class="line">        <span class="c1">// instead of `Ok`, and the loop will terminate.</span>
+</span><span class="line">        <span class="n">while</span> <span class="k">let</span> <span class="n">Ok</span><span class="p">(</span><span class="n">instr</span><span class="p">)</span> <span class="o">=</span> <span class="n">instr_rx</span><span class="p">.</span><span class="n">recv</span><span class="p">()</span> <span class="p">{</span>
+</span><span class="line">
+</span><span class="line">            <span class="c1">// We match on messages to pull out the possible distinct values and</span>
+</span><span class="line">            <span class="c1">// types from channel messages. Because each `enum` type is sealed,</span>
+</span><span class="line">            <span class="c1">// it is a compile-time error to omit any valid patterns.</span>
+</span><span class="line">            <span class="c1">// This avoids potential run-time failures if we add message types</span>
+</span><span class="line">            <span class="c1">// later, but forget to update the match here.</span>
+</span><span class="line">            <span class="n">match</span> <span class="n">instr</span> <span class="p">{</span>
+</span><span class="line">                <span class="n">Increment</span><span class="p">(</span><span class="n">amount</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="n">count</span> <span class="o">+=</span> <span class="n">amount</span><span class="p">,</span>
+</span><span class="line">                <span class="n">Reset</span>             <span class="o">=&gt;</span> <span class="n">count</span> <span class="o">=</span> <span class="m">0</span><span class="p">,</span>
+</span><span class="line">                <span class="n">Terminate</span>         <span class="o">=&gt;</span> <span class="n">return</span>
+</span><span class="line">            <span class="p">}</span>
+</span><span class="line">
+</span><span class="line">            <span class="c1">// `send` returns a `Result` because sending might fail in some</span>
+</span><span class="line">            <span class="c1">// circumstances. But for this example we assign the result to `_`</span>
+</span><span class="line">            <span class="c1">// to ignore it.</span>
+</span><span class="line">            <span class="k">let</span> <span class="n">_</span> <span class="o">=</span> <span class="n">resp_tx</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">count</span><span class="p">);</span>
+</span><span class="line">        <span class="p">};</span>
+</span><span class="line">
+</span><span class="line">    <span class="p">});</span>
+</span><span class="line">
+</span><span class="line">    <span class="p">(</span><span class="n">instr_tx</span><span class="p">,</span> <span class="n">resp_rx</span><span class="p">)</span>
+</span><span class="line"><span class="p">}</span>
+</span><span class="line">
+</span><span class="line"><span class="cp">#[test]</span>
+</span><span class="line"><span class="k">fn</span> <span class="n">runs_a_counter</span><span class="p">()</span> <span class="p">{</span>
+</span><span class="line">    <span class="k">let</span> <span class="p">(</span><span class="n">tx</span><span class="p">,</span> <span class="n">rx</span><span class="p">)</span> <span class="o">=</span> <span class="n">new_counter</span><span class="p">();</span>
+</span><span class="line">    <span class="k">let</span> <span class="n">_</span> <span class="o">=</span> <span class="n">tx</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">Increment</span><span class="p">(</span><span class="m">1</span><span class="p">));</span>
+</span><span class="line">    <span class="k">let</span> <span class="n">_</span> <span class="o">=</span> <span class="n">tx</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">Increment</span><span class="p">(</span><span class="m">1</span><span class="p">));</span>
+</span><span class="line">    <span class="k">let</span> <span class="n">_</span> <span class="o">=</span> <span class="n">tx</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">Terminate</span><span class="p">);</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">let</span> <span class="k">mut</span> <span class="n">latest_count</span> <span class="o">=</span> <span class="m">0</span><span class="p">;</span>
+</span><span class="line">    <span class="n">while</span> <span class="k">let</span> <span class="n">Ok</span><span class="p">(</span><span class="n">resp</span><span class="p">)</span> <span class="o">=</span> <span class="n">rx</span><span class="p">.</span><span class="n">recv</span><span class="p">()</span> <span class="p">{</span>
+</span><span class="line">        <span class="n">latest_count</span> <span class="o">=</span> <span class="n">resp</span>
+</span><span class="line">    <span class="p">}</span>
+</span><span class="line">
+</span><span class="line">    <span class="n">assert_eq</span><span class="o">!</span><span class="p">(</span><span class="m">2</span><span class="p">,</span> <span class="n">latest_count</span><span class="p">);</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Go has type switches, which are similar to pattern matching.
+Comparable Go matching code could look like this:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+</pre></td><td class="code"><pre><code class="go"><span class="line"><span class="k">switch</span> <span class="nx">instr</span> <span class="o">:=</span> <span class="o">&lt;-</span><span class="nx">instrChan</span><span class="p">.(</span><span class="kd">type</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">	<span class="k">case</span> <span class="nx">Increment</span><span class="p">:</span>
+</span><span class="line">		<span class="nx">count</span> <span class="o">+=</span> <span class="nx">Increment</span><span class="p">.</span><span class="nx">Amount</span>
+</span><span class="line">	<span class="k">case</span> <span class="nx">Reset</span><span class="p">:</span>
+</span><span class="line">		<span class="nx">count</span> <span class="p">=</span> <span class="mi">0</span>
+</span><span class="line">	<span class="k">case</span> <span class="nx">Terminate</span><span class="p">:</span>
+</span><span class="line">		<span class="k">return</span>
+</span><span class="line">	<span class="k">default</span><span class="p">:</span>
+</span><span class="line">		<span class="nb">panic</span><span class="p">(</span><span class="s">&quot;received an unexpected message!&quot;</span><span class="p">)</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The difference is in compile-time type-safety:
+A tagged union describes a <em>fixed</em> set of possible messages.
+When sending a value to a channel in Rust,
+the compiler is able to check that the value has a type that the channel
+consumer knows how to handle.
+And what is especially valuable is checking that all pieces of code that send
+or receive on a channel are consistent in the types of values that the they
+produce or consume.
+If we make a change to the set of possible messages,
+but forget to update some critical code to accommodate the change,
+the type checker will report an error at compile time.</p>
+
+<p>Because Go does not support tagged unions,
+messages over polymorphic channels are dynamically typed.
+You can use an interface as the type parameter for a channel,
+which does limit the types of messages that are sent over the channel.
+But a Go interface is not sealed;
+when a new type is created that implements the given interface,
+there is no compile-time check to ensure that all consumers of the channel are
+updated to handle the new type.
+If you use a type switch to unpack channel messages
+(as opposed to using exclusively interface methods)
+then you may end up introducing bugs that a different type system would have
+caught.</p>
+
+<h3 id="dynamic-typing">Dynamic typing</h3>
+
+<p>Go uses a mixture of static and dynamic type checking.
+Any use of <code>interface{}</code>, any type assertion or type switch,
+is dynamic typing.
+This leads to reduced compile-time type safety.</p>
+
+<h3 id="dynamic-dispatch-stuck-in-an-old-object-oriented-mindset">Dynamic dispatch, stuck in an old object-oriented mindset</h3>
+
+<p>In general Rust resolves every value to a concrete type at compile time.<sup id="fnref:trait-objects"><a href="#fn:trait-objects" rel="footnote">1</a></sup>
+That means that Rust can use static dispatch when invoking trait methods.
+Compile-time resolution also means that there is no top type
+(like <code>interface{}</code>)
+that has to be refined at runtime.</p>
+
+<p>In Go every invocation of an interface method uses dynamic dispatch.
+Dynamic dispatch, and runtime reflection relating to type assertions
+add some runtime overhead.</p>
+
+<p>The technique of resolving concrete types at compile-time is not new to Rust,
+and it has nothing to do with borrow-checking.
+Haskell was doing the same thing at least ten years before work began on Go.
+(Rust traits are an adaptation of Haskell <a href="http://learnyouahaskell.com/types-and-typeclasses">type classes</a>.)</p>
+
+<p>The designers of Go wanted a model for polymorphism that is simpler and more
+flexible than what other object-oriented languages provide.
+In particular they wanted composition over inheritance,
+and an ability to implement interfaces after-the-fact
+(so that new interfaces can be applied to pre-existing types).
+This is <em>exactly</em> what traits and type classes do.
+The solution that Go introduced feels to me like a less-capable reinvented wheel.</p>
+
+<h3 id="no-first-class-tuple">No first-class tuple</h3>
+
+<p>Go supports multiple return values.
+Other languages (including Rust) support multiple return values via first-class
+data types called “tuples”.
+First-class values can have methods,
+can be stored in data structures,
+and can be passed over channels.
+Multiple-values in Go cannot do any of those things.</p>
+
+<p>We already saw a tuple return value in the implementation of the <code>Make</code> trait.
+Here is a smaller example:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+</pre></td><td class="code"><pre><code class="rust"><span class="line"><span class="c1">// Returns a tuple</span>
+</span><span class="line"><span class="k">fn</span> <span class="n">min_and_max</span><span class="p">(</span><span class="n">xs</span><span class="o">:</span> <span class="o">&amp;</span><span class="p">[</span><span class="n">isize</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">isize</span><span class="p">,</span> <span class="n">isize</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">    <span class="k">let</span> <span class="n">init</span> <span class="o">=</span> <span class="p">(</span><span class="n">xs</span><span class="p">[</span><span class="m">0</span><span class="p">],</span> <span class="n">xs</span><span class="p">[</span><span class="m">0</span><span class="p">]);</span>
+</span><span class="line">    <span class="n">xs</span><span class="p">.</span><span class="n">iter</span><span class="p">()</span>
+</span><span class="line">        <span class="p">.</span><span class="n">fold</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="o">|</span><span class="p">(</span><span class="n">min</span><span class="p">,</span> <span class="n">max</span><span class="p">),</span> <span class="o">&amp;</span><span class="n">x</span><span class="o">|</span> <span class="p">(</span><span class="n">cmp</span><span class="o">::</span><span class="n">min</span><span class="p">(</span><span class="n">min</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> <span class="n">cmp</span><span class="o">::</span><span class="n">max</span><span class="p">(</span><span class="n">max</span><span class="p">,</span> <span class="n">x</span><span class="p">)))</span>
+</span><span class="line"><span class="p">}</span>
+</span><span class="line">
+</span><span class="line"><span class="k">fn</span> <span class="n">consume_tuple</span><span class="p">()</span> <span class="p">{</span>
+</span><span class="line">    <span class="k">let</span> <span class="n">xs</span> <span class="o">=</span> <span class="n">vec</span><span class="o">!</span><span class="p">[</span><span class="m">1</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="m">3</span><span class="p">,</span> <span class="m">4</span><span class="p">,</span> <span class="m">5</span><span class="p">];</span>
+</span><span class="line">    <span class="k">let</span> <span class="p">(</span><span class="n">min</span><span class="p">,</span> <span class="n">max</span><span class="p">)</span> <span class="o">=</span> <span class="n">min_and_max</span><span class="p">(</span><span class="o">&amp;</span><span class="n">xs</span><span class="p">);</span> <span class="c1">// unpack tuple with destructuring assignment</span>
+</span><span class="line">    <span class="n">assert_eq</span><span class="o">!</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="n">min</span><span class="p">);</span>
+</span><span class="line">    <span class="n">assert_eq</span><span class="o">!</span><span class="p">(</span><span class="m">5</span><span class="p">,</span> <span class="n">max</span><span class="p">);</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>A consequence of the lack of first-classness in Go is that there is no obvious
+way to communicate potential failures over a channel.
+It seems like this should work, but it does not:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="go"><span class="line"><span class="c1">// Nope</span>
+</span><span class="line"><span class="nx">results</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="p">(</span><span class="o">*</span><span class="nx">models</span><span class="p">.</span><span class="nx">Document</span><span class="p">,</span> <span class="kt">error</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>As far as I know the best options for doing this are to define a custom
+<code>struct</code> type,
+to make type assertions on values from channels,
+or to send success values and errors over separate channels.</p>
+
+<p>Another consequence is that there is no good way to define methods on multiple
+return values,
+or to define a function that accepts multiple return values with a callback.
+This makes it impractical to define an analog of Rust’s <code>and_then</code> combinator
+for Go return values.</p>
+
+<h3 id="shortage-of-high-level-parallelism-and-concurrency-features">Shortage of high-level parallelism and concurrency features</h3>
+
+<p>The post <a href="https://gist.github.com/kachayev/21e7fe149bc5ae0bd878">Channels Are Not Enough</a> makes a detailed argument about problems
+with Go’s lack of concurrency abstractions.
+In the section “List manipulation cannot be abstracted” I pointed out that Go
+does not provide an easy way to run a set of computations in parallel.
+@kachayev points out that the problem is more general than that.
+Really this is another symptom of lack of generics.</p>
+
+<p>In the parallel fetch example I showed a Rust solution that uses futures,
+which are great for concurrent IO.
+The <a href="https://aturon.github.io/blog/2016/08/11/futures/">futures</a> library relates to a larger async IO library called <a href="https://tokio.rs/">Tokio</a>,
+which seems to be popular.
+But async IO is not intended to provide parallelism.
+The excellent book <a href="http://chimera.labs.oreilly.com/books/1230000000929">Parallel and Concurrent Programming in Haskell</a> has this
+to say about the distinction between parallel and concurrent code:</p>
+
+<blockquote>
+  <p>A parallel program is one that uses a multiplicity of computational hardware
+(e.g., several processor cores) to perform a computation more quickly. The aim
+is to arrive at the answer earlier, by delegating different parts of the
+computation to different processors that execute at the same time.</p>
+
+  <p>By contrast, concurrency is a program-structuring technique in which there
+are multiple threads of control. Conceptually, the threads of control execute
+“at the same time”; that is, the user sees their effects interleaved. Whether
+they actually execute at the same time or not is an implementation detail;
+a concurrent program can execute on a single processor through interleaved
+execution or on multiple physical processors.</p>
+</blockquote>
+
+<p>Go uses goroutines for both parallel and concurrent programming.
+Rust libraries offer a selection of tools whose strengths make them especially
+useful for different kinds of problems.</p>
+
+<p>When you want true multi-core parallel processing,
+the Map-Reduce pattern offers a powerful solution.
+This is another application of list abstractions.
+You can apply Map-Reduce in Rust using parallel iterators from the <a href="https://github.com/nikomatsakis/rayon">Rayon</a>
+library:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+</pre></td><td class="code"><pre><code class="rust"><span class="line"><span class="c1">// This import brings the `par_iter` method into scope.</span>
+</span><span class="line"><span class="c1">// `par_iter` is a method on a Rayon trait, and Rayon provides an implementation</span>
+</span><span class="line"><span class="c1">// of that trait for standard slice types.</span>
+</span><span class="line"><span class="k">use</span> <span class="n">rayon</span><span class="o">::</span><span class="n">prelude</span><span class="o">::*</span><span class="p">;</span>
+</span><span class="line">
+</span><span class="line"><span class="n">pub</span> <span class="k">fn</span> <span class="n">average_response_time</span><span class="p">(</span><span class="n">logs</span><span class="o">:</span> <span class="o">&amp;</span><span class="p">[</span><span class="n">LogEntry</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">usize</span> <span class="p">{</span>
+</span><span class="line">    <span class="k">let</span> <span class="n">total</span> <span class="o">=</span> <span class="n">logs</span><span class="p">.</span><span class="n">par_iter</span><span class="p">()</span>
+</span><span class="line">        <span class="p">.</span><span class="n">map</span><span class="p">(</span><span class="o">|</span><span class="n">ref</span> <span class="n">entry</span><span class="o">|</span> <span class="n">entry</span><span class="p">.</span><span class="n">end_time</span> <span class="o">-</span> <span class="n">entry</span><span class="p">.</span><span class="n">start_time</span><span class="p">)</span>
+</span><span class="line">        <span class="p">.</span><span class="n">sum</span><span class="p">();</span>
+</span><span class="line">    <span class="n">total</span> <span class="o">/</span> <span class="n">logs</span><span class="p">.</span><span class="n">len</span><span class="p">()</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Parallel iterators implement a variation of the <code>map</code> method that divides work
+among a set of job queues that feed into a worker pool,
+so that invocations of the <code>map</code> callback run in parallel.
+As with goroutines,
+this is lightweight parallelism that scales to a large number of parallel tasks.
+But parallel iterators are a high-level abstraction that take care of some
+complicated details for you.
+For example, Rayon transparently splits work into batches,
+which provides better performance than queueing up every invocation of the
+<code>map</code> callback separately.
+(The default batch size is 5000 items, but that value is tunable.)
+The <code>sum</code> method (which is the Reduce step in this example) is also part of Rayon,
+which means that it is optimized for consuming batches of results from worker
+threads.</p>
+
+<p>It might seem strange to have to use two different libraries for concurrent vs
+parallel code.
+But those are separate concerns, with different underlying assumptions.
+Usually you do not actually want both at the same time.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>How do I think Go could be better?
+Generics.
+Nearly all of my complaints boil down to lack of support for generics.
+But I think that Rust-style traits, and getting rid of <code>nil</code> would also be
+useful changes.</p>
+
+<p>In its current form, I prefer not to use Go.
+It is not that Go is bad - it is just that there are lots of languages
+available that I find more enjoyable.
+When I work with Go I cannot help thinking about how I could be doing things
+differently in another language.</p>
+
+<p>If you are willing to put in the time to understand lifetimes and borrow checking,
+Rust makes a fantastic language that does everything that Go does,
+but has none of the “bad parts” that I called out.</p>
+
+<p>Javascript is (like Go) easy to learn,
+and has wonderful support for concurrency (if not parallelism).
+When paired with Flow or Typescript you get (in my opinion) more robust
+type safety than Go provides.
+Javascript with Flow in particular has none of the “bad parts” from this post.</p>
+
+<p>Erlang and Scala both support lightweight concurrency in the same style that Go
+does,
+and they are both great for functional programming.</p>
+
+<p>Clojure is not type-safe - but it does fantastic things!
+My favorite functional data structure implementations are the ones in Clojure.</p>
+
+<p>Haskell has amazing type safety,
+some of the best concurrency and parallelism features that I have seen in any
+language,
+and is well-suited to network server code.
+Haskell is another language that avoids the “bad parts” from this post.</p>
+
+<p>We have better tools than ever for getting work done.
+Even Go - whether I like it or not - is clearly useful for building cool things.
+But if you take anything away from this post,
+I hope it is an interest in taking a look beyond the imperative
+/ object-oriented world.
+I encourage you to pick one of the languages above,
+and take some time to learn about it and to get a good feel for its strengths.
+I think you will be glad that you did.</p>
+<div class="footnotes">
+  <ol>
+    <li id="fn:trait-objects">
+      <p>The exception is <a href="https://doc.rust-lang.org/book/trait-objects.html">trait objects</a>. My understanding is that idiomatic Rust code uses these sparingly. Most uses of traits in Rust use the trait as a type bound on a type variable, which permits static resolution to a concrete type. For details see the Rust book sections on <a href="https://doc.rust-lang.org/book/traits.html">traits</a> and <a href="https://doc.rust-lang.org/book/trait-objects.html">trait objects</a>.<a href="#fnref:trait-objects" rel="reference">&#8617;</a></p>
+    </li>
+  </ol>
+</div>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[Flow Cookbook: Flow & React]]></title>
     <link href="http://sitr.us/2017/01/03/flow-cookbook-react.html"/>
-    <updated>2017-01-03T00:00:00-08:00</updated>
+    <updated>2017-01-03T00:00:00-04:00</updated>
     <id>http://sitr.us/2017/01/03/flow-cookbook-react</id>
     <content type="html"><![CDATA[<p><em>Last updated 2017-01-07</em></p>
 
@@ -521,7 +1854,7 @@ take a look at the next recipe, <a href="http://sitr.us/todo.html">Flow &amp; Re
   <entry>
     <title type="html"><![CDATA[Flow Cookbook: Unpacking JSON API data]]></title>
     <link href="http://sitr.us/2016/12/20/flow-cookbook-unpacking-json.html"/>
-    <updated>2016-12-20T00:00:00-08:00</updated>
+    <updated>2016-12-20T00:00:00-04:00</updated>
     <id>http://sitr.us/2016/12/20/flow-cookbook-unpacking-json</id>
     <content type="html"><![CDATA[<p><em>This recipe is part of the <a href="http://sitr.us/2016/12/20/flow-cookbook.html">Flow Cookbook</a> series.</em></p>
 
@@ -1033,7 +2366,7 @@ and see how type-checking affects the way you write code.</p>
   <entry>
     <title type="html"><![CDATA[Flow Cookbook]]></title>
     <link href="http://sitr.us/2016/12/20/flow-cookbook.html"/>
-    <updated>2016-12-20T00:00:00-08:00</updated>
+    <updated>2016-12-20T00:00:00-04:00</updated>
     <id>http://sitr.us/2016/12/20/flow-cookbook</id>
     <content type="html"><![CDATA[<p><em>Last updated 2017-01-07</em></p>
 
@@ -1155,7 +2488,7 @@ choose to use Flow as well.</p>
   <entry>
     <title type="html"><![CDATA[Type checking React with Flow v0.11]]></title>
     <link href="http://sitr.us/2015/05/31/type-checking-react-with-flow.html"/>
-    <updated>2015-05-31T00:00:00-07:00</updated>
+    <updated>2015-05-31T00:00:00-04:00</updated>
     <id>http://sitr.us/2015/05/31/type-checking-react-with-flow</id>
     <content type="html"><![CDATA[<p><em>This is an old post - for an up-to-date guide see <a href="http://sitr.us/2017/01/03/flow-cookbook-react.html">Flow Cookbook: Flow &amp; React</a>.</em></p>
 
@@ -1254,7 +2587,7 @@ see my post on <a href="http://sitr.us/2015/05/31/advanced-features-in-flow.html
   <entry>
     <title type="html"><![CDATA[Advanced features in Flow]]></title>
     <link href="http://sitr.us/2015/05/31/advanced-features-in-flow.html"/>
-    <updated>2015-05-31T00:00:00-07:00</updated>
+    <updated>2015-05-31T00:00:00-04:00</updated>
     <id>http://sitr.us/2015/05/31/advanced-features-in-flow</id>
     <content type="html"><![CDATA[<p>Flow has some very interesting features that are currently not documented.
 It is likely that the reason for missing documentation is that these features
@@ -1832,7 +3165,7 @@ lead me to use classes more often than I would if I were not using Flow.</p>
   <entry>
     <title type="html"><![CDATA[Flow is the JavaScript type checker I have been waiting for]]></title>
     <link href="http://sitr.us/2014/11/21/flow-is-the-javascript-type-checker-i-have-been-waiting-for.html"/>
-    <updated>2014-11-21T00:00:00-08:00</updated>
+    <updated>2014-11-21T00:00:00-04:00</updated>
     <id>http://sitr.us/2014/11/21/flow-is-the-javascript-type-checker-i-have-been-waiting-for</id>
     <content type="html"><![CDATA[<p>I am very excited about <a href="http://flowtype.org/">Flow</a>, a new JavaScript type checker from Facebook.
 I have put some thought into what a type checker for JavaScript should do -
@@ -2087,7 +3420,7 @@ Flow is a type checker that I actually plan to use.</p>
   <entry>
     <title type="html"><![CDATA[Javascript generators and functional reactive programming]]></title>
     <link href="http://sitr.us/2014/08/02/javascript-generators-and-functional-reactive-programming.html"/>
-    <updated>2014-08-02T00:00:00-07:00</updated>
+    <updated>2014-08-02T00:00:00-04:00</updated>
     <id>http://sitr.us/2014/08/02/javascript-generators-and-functional-reactive-programming</id>
     <content type="html"><![CDATA[<p>tl;dr: ECMAScript 6 introduces a language feature called <a href="http://tobyho.com/2013/06/16/what-are-generators/">generators</a>, which
 are really great for working with asynchronous code that uses promises.  But
@@ -2334,7 +3667,7 @@ not stateless.  Thanks to Blixt for pointing out the distinction.</p>
   <entry>
     <title type="html"><![CDATA[Kinesis Advantage with DSA keycaps]]></title>
     <link href="http://sitr.us/2014/05/19/kinesis-advantage-with-dsa-keycaps.html"/>
-    <updated>2014-05-19T00:00:00-07:00</updated>
+    <updated>2014-05-19T00:00:00-04:00</updated>
     <id>http://sitr.us/2014/05/19/kinesis-advantage-with-dsa-keycaps</id>
     <content type="html"><![CDATA[<p><img src="https://lh4.googleusercontent.com/MPfjOyaNmMKZRL36XEekqRiaeoHcUFLQLN-Kx62XKbgN=w1024-h576-no" /></p>
 
@@ -2528,7 +3861,7 @@ And they make a more pleasant sound than the thinner ABS caps that came with the
   <entry>
     <title type="html"><![CDATA[Category Theory proofs in Idris]]></title>
     <link href="http://sitr.us/2014/05/05/category-theory-proofs-in-idris.html"/>
-    <updated>2014-05-05T00:00:00-07:00</updated>
+    <updated>2014-05-05T00:00:00-04:00</updated>
     <id>http://sitr.us/2014/05/05/category-theory-proofs-in-idris</id>
     <content type="html"><![CDATA[<p><a href="http://www.idris-lang.org/">Idris</a> is a programming language with dependent types.
 It is similar to <a href="http://wiki.portal.chalmers.se/agda/pmwiki.php">Agda</a>, but hews more closely to <a href="http://www.haskell.org/haskellwiki/Haskell">Haskell</a>.
@@ -3336,7 +4669,7 @@ as I continue to explore Category theory.</p>
   <entry>
     <title type="html"><![CDATA[Functional data structures in JavaScript with Mori]]></title>
     <link href="http://sitr.us/2013/11/04/functional-data-structures.html"/>
-    <updated>2013-11-04T00:00:00-08:00</updated>
+    <updated>2013-11-04T00:00:00-04:00</updated>
     <id>http://sitr.us/2013/11/04/functional-data-structures</id>
     <content type="html"><![CDATA[<p>I have a long-standing desire for a JavaScript library that provides
 good implementations of functional data structures.  Recently I found
@@ -4430,7 +5763,7 @@ to minimize the actual work that is done.</p>
   <entry>
     <title type="html"><![CDATA[Functional Reactive Programming in JavaScript]]></title>
     <link href="http://sitr.us/2013/05/22/functional-reactive-programming-in-javascript.html"/>
-    <updated>2013-05-22T00:00:00-07:00</updated>
+    <updated>2013-05-22T00:00:00-04:00</updated>
     <id>http://sitr.us/2013/05/22/functional-reactive-programming-in-javascript</id>
     <content type="html"><![CDATA[<p>I had a great time at <a href="http://nodepdx.org/">NodePDX</a> last week.  There were many talks
 packed into a short span of time and I saw many exciting ideas
@@ -4574,7 +5907,7 @@ documentation and more examples.</p>
   <entry>
     <title type="html"><![CDATA[Monkey patching document.write()]]></title>
     <link href="http://sitr.us/2012/09/04/monkey-patching-document-write.html"/>
-    <updated>2012-09-04T00:00:00-07:00</updated>
+    <updated>2012-09-04T00:00:00-04:00</updated>
     <id>http://sitr.us/2012/09/04/monkey-patching-document-write</id>
     <content type="html"><![CDATA[<p>This is one of the crazier workarounds that I have implemented.  I was
 working on a web page that embeds third-party widgets.  The widgets are
@@ -4674,7 +6007,7 @@ far it is working nicely.</p>
   <entry>
     <title type="html"><![CDATA[Promise Pipelines in JavaScript]]></title>
     <link href="http://sitr.us/2012/07/31/promise-pipelines-in-javascript.html"/>
-    <updated>2012-07-31T00:00:00-07:00</updated>
+    <updated>2012-07-31T00:00:00-04:00</updated>
     <id>http://sitr.us/2012/07/31/promise-pipelines-in-javascript</id>
     <content type="html"><![CDATA[<aside class="translations"><p>This page has been translated into <a href="http://www.webhostinghub.com/support/es/misc/las-bases-de">Spanish</a>
 language by Maria Ramos  from <a href="http://www.webhostinghub.com/">Webhostinghub.com</a>.</p></aside>
@@ -5106,7 +6439,7 @@ inner and outer promises before the result is passed to <code>$.join()</code>.</
   <entry>
     <title type="html"><![CDATA[Installing a custom ROM on the Transformer Prime: A start-to-finish guide]]></title>
     <link href="http://sitr.us/2012/05/12/installing-a-custom-rom-on-the-transformer-prime.html"/>
-    <updated>2012-05-12T00:00:00-07:00</updated>
+    <updated>2012-05-12T00:00:00-04:00</updated>
     <id>http://sitr.us/2012/05/12/installing-a-custom-rom-on-the-transformer-prime</id>
     <content type="html"><![CDATA[<p>This guide provides step-by-step instructions for installing the <a href="http://www.virtuousrom.com/p/prime.html">Virtuous Prime</a>
 community ROM on your Asus Transformer Prime TF201 tablet.  This guide will
@@ -5508,7 +6841,7 @@ I could not fix.  Also, having root access to my tablet is excellent.</p>
   <entry>
     <title type="html"><![CDATA[Cookies are bad for you: Improving web application security]]></title>
     <link href="http://sitr.us/2011/08/26/cookies-are-bad-for-you.html"/>
-    <updated>2011-08-26T00:00:00-07:00</updated>
+    <updated>2011-08-26T00:00:00-04:00</updated>
     <id>http://sitr.us/2011/08/26/cookies-are-bad-for-you</id>
     <content type="html"><![CDATA[<p>Most web applications today use browser cookies to keep a user logged in
 while she is using the application.  Cookies are a decades-old device
@@ -5956,7 +7289,7 @@ are in the public domain.</p>
   <entry>
     <title type="html"><![CDATA[How Mobile Safari emulates mouse events]]></title>
     <link href="http://sitr.us/2011/07/28/how-mobile-safari-emulates-mouse-events.html"/>
-    <updated>2011-07-28T00:00:00-07:00</updated>
+    <updated>2011-07-28T00:00:00-04:00</updated>
     <id>http://sitr.us/2011/07/28/how-mobile-safari-emulates-mouse-events</id>
     <content type="html"><![CDATA[<p>When you are adapting web apps to touchscreen devices particular
 challenges come up around events like <code>mouseover</code> and <code>mouseout</code>.
@@ -6035,7 +7368,7 @@ and <a href="http://jsfiddle.net/hallettj/m5EXk/">a third that makes no changes 
   <entry>
     <title type="html"><![CDATA[CouchDB Notes]]></title>
     <link href="http://sitr.us/2009/09/13/couchdb-notes.html"/>
-    <updated>2009-09-13T00:00:00-07:00</updated>
+    <updated>2009-09-13T00:00:00-04:00</updated>
     <id>http://sitr.us/2009/09/13/couchdb-notes</id>
     <content type="html"><![CDATA[<p>Recently I gave a talk at <a href="http://pdxruby.org/" title="Portland Ruby Brigade">Portland Ruby Brigade</a> meeting on
 <a href="http://couchdb.apache.org/" title="CouchDB">CouchDB</a>, a document-oriented database.  I thought I would share my notes
@@ -6202,7 +7535,7 @@ updated accordingly.</p>
   <entry>
     <title type="html"><![CDATA[How to install Haskell "Batteries Included" Platform on Ubuntu Jaunty]]></title>
     <link href="http://sitr.us/2009/07/02/how-to-install-haskell-platform-on-ubuntu-jaunty.html"/>
-    <updated>2009-07-02T00:00:00-07:00</updated>
+    <updated>2009-07-02T00:00:00-04:00</updated>
     <id>http://sitr.us/2009/07/02/how-to-install-haskell-platform-on-ubuntu-jaunty</id>
     <content type="html"><![CDATA[<p>Just for kicks I thought I would take another shot at some Haskell programming.
 To get all of the common libraries and the automated package installer, cabal,
@@ -6276,7 +7609,7 @@ you can install Haskell libraries with <code>cabal</code>.</p>
   <entry>
     <title type="html"><![CDATA[Database Queries the CouchDB Way]]></title>
     <link href="http://sitr.us/2009/06/30/database-queries-the-couchdb-way.html"/>
-    <updated>2009-06-30T00:00:00-07:00</updated>
+    <updated>2009-06-30T00:00:00-04:00</updated>
     <id>http://sitr.us/2009/06/30/database-queries-the-couchdb-way</id>
     <content type="html"><![CDATA[<p><a href="http://couchdb.apache.org/">CouchDB</a> is a document-oriented database. It has no rows or tables. Instead
 CouchDB is a collection of JSON documents. It uses a map-reduce pattern to
@@ -6636,166 +7969,6 @@ from the original array removed.</p>
 <span class="p">}</span>
 </code></pre></div>
 
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[How to use RSpec to describe a Sinatra application]]></title>
-    <link href="http://sitr.us/2008/07/29/how-to-use-rspec-to-describe-a-sinatra-application.html"/>
-    <updated>2008-07-29T00:00:00-07:00</updated>
-    <id>http://sitr.us/2008/07/29/how-to-use-rspec-to-describe-a-sinatra-application</id>
-    <content type="html"><![CDATA[<p>This information was written a long time ago and has become pretty outdated.</p>
-
-<p><a href="http://sinatrarb.com/">Sinatra</a> is a fun little web application microframework. Recently I
-started working on an application using Sinatra - and since I am
-working on good programming habits, before I dove into any coding I
-sat down to work out how to write specs for a Sinatra application.</p>
-
-<p>Sinatra comes bundled with support for <a href="http://chneukirchen.org/repos/testspec/README">test/spec</a>: a spec framework
-that builds on top of Rail’s own Test::Unit to provide support for
-writing specs. Which is a really neat idea. But I have been using
-<a href="http://rspec.info/">RSpec</a> for my other work, and I wanted to continue doing so.</p>
-
-<p>It turns out that RSpec takes a little bit of manual work to get
-going with Sinatra. I read a <a href="http://www.gittr.com/index.php/archive/sinatra-rspec-integration-without-a-patch-with-examples/">helpful article on gittr.com</a> that
-pointed me in the right direction. The article advised me to add these
-lines to my spec files:</p>
-
-<div class="highlight"><pre><code class="ruby"><span class="nb">require</span> <span class="no">File</span><span class="o">.</span><span class="n">expand_path</span><span class="p">(</span><span class="no">File</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">__FILE__</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;/your_application&#39;</span><span class="p">)</span>
-<span class="nb">require</span> <span class="s1">&#39;spec&#39;</span>
-<span class="nb">require</span> <span class="s1">&#39;spec/interop/test&#39;</span>
-<span class="nb">require</span> <span class="s1">&#39;sinatra/test/unit&#39;</span>
-</code></pre></div>
-
-<p>The first line loads your application; the second line loads RSpec;
-the third loads an RSpec-Test::Unit compatibility layer; and the
-fourth loads Sinatra’s test helpers, which are written for
-Test::Unit.</p>
-
-<!-- more -->
-
-<p>Contrary to Sinatra’s instructions for writing tests, you
-want to avoid loading ‘sinatra/test/spec’, which defines Sinatra’s
-helper methods for test/spec, because that would load test/spec itself
-which conflicts with RSpec.</p>
-
-<p>Those instructions mostly worked. I could write and run specs. But I
-had trouble with matchers. For example, this example:</p>
-
-<div class="highlight"><pre><code class="ruby"><span class="n">it</span> <span class="s2">&quot;should not have a cookie&quot;</span>
-  <span class="n">instance</span><span class="o">.</span><span class="n">cookie</span><span class="o">.</span><span class="n">should</span> <span class="n">be_nil</span>
-<span class="k">end</span>
-</code></pre></div>
-
-<p>Would give an error message like this:</p>
-
-<pre><code>undefined method `be_nil' for nil:NilClass
-</code></pre>
-
-<p>Which I’m sure you can imagine is pretty annoying.</p>
-
-<p>It was easy enough to identify ‘sinatra/test/unit’ as the root of the
-problem. When I removed that line RSpec’s matchers worked fine; but
-then I didn’t get Sinatra’s test helpers, which make spec-writing much
-easier. So that wasn’t a great solution either.</p>
-
-<p>Examining Sinatra’s code, I found that all ‘sinatra/test/unit’ does is
-to load ‘sinatra/test/methods’ - the actual helper methods - and mixes
-them into Test::Unit::TestCase. So I bypassed ‘sinatra/test/unit’ by
-copying and adapting some code from it to make the top of my spec file
-look like this:</p>
-
-<div class="highlight"><pre><code class="ruby"><span class="nb">require</span> <span class="no">File</span><span class="o">.</span><span class="n">expand_path</span><span class="p">(</span><span class="no">File</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">__FILE__</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;/your_application&#39;</span><span class="p">)</span>
-<span class="nb">require</span> <span class="s1">&#39;spec&#39;</span>
-<span class="nb">require</span> <span class="s1">&#39;spec/interop/test&#39;</span>
-<span class="nb">require</span> <span class="s1">&#39;sinatra/test/methods&#39;</span>
-
-<span class="kp">include</span> <span class="ss">Sinatra</span><span class="p">:</span><span class="ss">:Test</span><span class="o">::</span><span class="no">Methods</span>
-
-<span class="ss">Sinatra</span><span class="p">:</span><span class="ss">:Application</span><span class="o">.</span><span class="n">default_options</span><span class="o">.</span><span class="n">merge!</span><span class="p">(</span>
-  <span class="ss">:env</span> <span class="o">=&gt;</span> <span class="ss">:test</span><span class="p">,</span>
-  <span class="ss">:run</span> <span class="o">=&gt;</span> <span class="kp">false</span><span class="p">,</span>
-  <span class="ss">:raise_errors</span> <span class="o">=&gt;</span> <span class="kp">true</span><span class="p">,</span>
-  <span class="ss">:logging</span> <span class="o">=&gt;</span> <span class="kp">false</span>
-<span class="p">)</span>
-
-<span class="no">Sinatra</span><span class="o">.</span><span class="n">application</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="kp">nil</span>
-</code></pre></div>
-
-<p>Since that is a fair amount of setup, I moved all of it into a
-separate file called spec_helper.rb, which I loaded into my actual
-spec files. Because I am weird enough to write a Sinatra application
-that is split into multiple files and multiple spec files.</p>
-
-<p>Anyway, now my specs run just as they should, with Sinatra’s helpers
-and everything:</p>
-
-<div class="highlight"><pre><code class="ruby"><span class="n">it</span> <span class="s2">&quot;should deliver a cookie&quot;</span> <span class="k">do</span>
-  <span class="n">get_it</span> <span class="s1">&#39;/cookie&#39;</span>
-  <span class="vi">@response</span><span class="o">.</span><span class="n">should</span> <span class="n">be_ok</span>
-  <span class="vi">@response</span><span class="o">.</span><span class="n">headers</span><span class="o">[</span><span class="s1">&#39;Content-Type&#39;</span><span class="o">].</span><span class="n">should</span> <span class="o">==</span> <span class="s1">&#39;application/x-baked-goods&#39;</span>
-  <span class="vi">@response</span><span class="o">.</span><span class="n">body</span><span class="o">.</span><span class="n">should_not</span> <span class="n">be_empty</span>
-<span class="k">end</span>
-</code></pre></div>
-
-<p>The next challenge was to write specs for Sinatra helpers. Although
-Sinatra actions and helpers generally appear in the outermost
-namespace, the DSL methods that define them actually bind the helpers
-to Sinatra::EventContext. You can’t invoke helper methods directly
-from an example context; you have to create an instance of
-Sinatra::EventContext and send the method call to that - much the same
-way Rails instantiates a subclass of ActionController::Base to handle a
-controller action. Here is the code you will want in your example
-groups:</p>
-
-<div class="highlight"><pre><code class="ruby"><span class="n">before</span> <span class="ss">:all</span> <span class="k">do</span>
-  <span class="n">request</span> <span class="o">=</span> <span class="n">mock</span><span class="p">(</span><span class="s2">&quot;request&quot;</span><span class="p">)</span>
-  <span class="n">response</span> <span class="o">=</span> <span class="n">mock</span><span class="p">(</span><span class="s2">&quot;response&quot;</span><span class="p">,</span> <span class="ss">:body</span><span class="o">=</span> <span class="o">=&gt;</span> <span class="kp">nil</span><span class="p">)</span>
-  <span class="n">route_params</span> <span class="o">=</span> <span class="n">mock</span><span class="p">(</span><span class="s2">&quot;route_params&quot;</span><span class="p">)</span>
-  <span class="vi">@event_context</span> <span class="o">=</span> <span class="ss">Sinatra</span><span class="p">:</span><span class="ss">:EventContext</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">route_params</span><span class="p">)</span>
-<span class="k">end</span>
-</code></pre></div>
-
-<p>A <code>body=</code> method has to be defined on the response mock to prevent an
-error. But it doesn’t have to actually do anything. With that setup
-code in place, you can do this:</p>
-
-<div class="highlight"><pre><code class="ruby"><span class="n">it</span> <span class="s2">&quot;should use a helper to make cookies&quot;</span> <span class="k">do</span>
-  <span class="vi">@event_context</span><span class="o">.</span><span class="n">bake_a_cookie</span><span class="o">.</span><span class="n">should</span> <span class="n">be_an_instance_of</span><span class="p">(</span><span class="no">Cookie</span><span class="p">)</span>
-<span class="k">end</span>
-</code></pre></div>
-
-<p>and write something like this in your application:</p>
-
-<div class="highlight"><pre><code class="ruby"><span class="n">helper</span> <span class="k">do</span>
-  <span class="k">def</span> <span class="nf">bake_a_cookie</span>
-    <span class="no">Cookie</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">:kind</span> <span class="o">=&gt;</span> <span class="ss">:chocolate_chip</span><span class="p">)</span>
-  <span class="k">end</span>
-<span class="k">end</span>
-</code></pre></div>
-
-<p>And now you have a reasonably complete speccing setup. There are still
-a couple of issues though. For one thing, the spec helpers are missing
-a much needed <code>assigns[]</code> method. As it stands there is no good way to
-pry apart the behavior of an action if there is no convenient method
-call to stub. You can only define the parameters that are passed to
-it, and read response. On the upside, this does help to enforce good
-behavior-driven development.</p>
-
-<p>The other issue is more of an annoyance than a serious problem. It
-seems that somewhere in all of this there are one or two
-<code>method_missing</code> definitions that bounce calls back and forth. If call
-a method that is not defined, you generally won’t get an “undefined
-method” error, you will get a “stack level too deep” error
-instead. This is particularly unhelpful because it does not tell you
-what class received the undefined method, or which method is
-undefined. So a little extra manual stack tracing is required when
-this happens.</p>
-
-<p><em>Update</em> 10/11/08:
-The Sinatra application that led to this article is now open source and is available at <a href="http://github.com/hallettj/restful_captcha">http://github.com/hallettj/restful_captcha</a>. If you want to see the RSpec techniques that I used in context, check out the code there.</p>
-
-<p><em>Updated 2009-08-09</em>: This article is pretty outdated.  Added a note to that effect.  </p>
 ]]></content>
   </entry>
   

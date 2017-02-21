@@ -2,144 +2,148 @@
 <urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
     <url>
         <loc>http://sitr.us/2007/09/17/deixis.html</loc>
-        <lastmod>2014-12-11T14:03:37-08:00</lastmod>
+        <lastmod>2017-02-20T17:46:00-04:00</lastmod>
     </url>
     <url>
         <loc>http://sitr.us/2007/09/24/anatomy-of-a-syllable.html</loc>
-        <lastmod>2014-12-11T14:03:37-08:00</lastmod>
+        <lastmod>2017-02-20T17:46:00-04:00</lastmod>
     </url>
     <url>
         <loc>http://sitr.us/2007/10/02/international-phonetic-alphabet.html</loc>
-        <lastmod>2014-12-11T14:03:37-08:00</lastmod>
+        <lastmod>2017-02-20T17:46:00-04:00</lastmod>
     </url>
     <url>
         <loc>
             http://sitr.us/2008/07/29/how-to-use-rspec-to-describe-a-sinatra-application.html
         </loc>
-        <lastmod>2014-12-11T14:03:37-08:00</lastmod>
+        <lastmod>2017-02-20T17:46:00-04:00</lastmod>
     </url>
     <url>
         <loc>http://sitr.us/2009/06/30/database-queries-the-couchdb-way.html</loc>
-        <lastmod>2014-12-11T14:03:37-08:00</lastmod>
+        <lastmod>2017-02-20T17:46:00-04:00</lastmod>
     </url>
     <url>
         <loc>http://sitr.us/2009/07/02/how-to-install-haskell-platform-on-ubuntu-jaunty.html</loc>
-        <lastmod>2014-12-11T14:03:37-08:00</lastmod>
+        <lastmod>2017-02-20T17:46:00-04:00</lastmod>
     </url>
     <url>
         <loc>http://sitr.us/2009/09/13/couchdb-notes.html</loc>
-        <lastmod>2014-12-11T14:03:37-08:00</lastmod>
+        <lastmod>2017-02-20T17:46:00-04:00</lastmod>
     </url>
     <url>
         <loc>http://sitr.us/2011/07/28/how-mobile-safari-emulates-mouse-events.html</loc>
-        <lastmod>2014-12-11T14:03:37-08:00</lastmod>
+        <lastmod>2017-02-20T17:46:00-04:00</lastmod>
     </url>
     <url>
         <loc>http://sitr.us/2011/08/26/cookies-are-bad-for-you.html</loc>
-        <lastmod>2014-12-11T14:03:37-08:00</lastmod>
+        <lastmod>2017-02-20T17:46:00-04:00</lastmod>
     </url>
     <url>
         <loc>http://sitr.us/2012/05/12/installing-a-custom-rom-on-the-transformer-prime.html</loc>
-        <lastmod>2014-12-11T14:03:37-08:00</lastmod>
+        <lastmod>2017-02-20T17:46:00-04:00</lastmod>
     </url>
     <url>
         <loc>http://sitr.us/2012/07/31/promise-pipelines-in-javascript.html</loc>
-        <lastmod>2014-12-11T14:03:37-08:00</lastmod>
+        <lastmod>2017-02-20T17:46:00-04:00</lastmod>
     </url>
     <url>
         <loc>http://sitr.us/2012/09/04/monkey-patching-document-write.html</loc>
-        <lastmod>2014-12-11T14:03:37-08:00</lastmod>
+        <lastmod>2017-02-20T17:46:00-04:00</lastmod>
     </url>
     <url>
         <loc>http://sitr.us/2013/05/22/functional-reactive-programming-in-javascript.html</loc>
-        <lastmod>2014-12-11T14:03:37-08:00</lastmod>
+        <lastmod>2017-02-20T17:46:00-04:00</lastmod>
     </url>
     <url>
         <loc>http://sitr.us/2013/11/04/functional-data-structures.html</loc>
-        <lastmod>2014-12-11T14:03:37-08:00</lastmod>
+        <lastmod>2017-02-20T17:46:00-04:00</lastmod>
     </url>
     <url>
         <loc>http://sitr.us/2014/05/05/category-theory-proofs-in-idris.html</loc>
-        <lastmod>2014-12-11T14:03:37-08:00</lastmod>
+        <lastmod>2017-02-20T17:46:00-04:00</lastmod>
     </url>
     <url>
         <loc>http://sitr.us/2014/05/19/kinesis-advantage-with-dsa-keycaps.html</loc>
-        <lastmod>2014-12-11T14:03:37-08:00</lastmod>
+        <lastmod>2017-02-20T17:46:00-04:00</lastmod>
     </url>
     <url>
         <loc>
             http://sitr.us/2014/08/02/javascript-generators-and-functional-reactive-programming.html
         </loc>
-        <lastmod>2014-12-11T14:03:37-08:00</lastmod>
+        <lastmod>2017-02-20T17:46:00-04:00</lastmod>
     </url>
     <url>
         <loc>
             http://sitr.us/2014/11/21/flow-is-the-javascript-type-checker-i-have-been-waiting-for.html
         </loc>
-        <lastmod>2016-08-21T15:16:47-07:00</lastmod>
+        <lastmod>2017-02-20T17:46:00-04:00</lastmod>
     </url>
     <url>
         <loc>http://sitr.us/2015/05/31/advanced-features-in-flow.html</loc>
-        <lastmod>2015-06-08T19:23:47-07:00</lastmod>
+        <lastmod>2017-02-20T17:46:00-04:00</lastmod>
     </url>
     <url>
         <loc>http://sitr.us/2015/05/31/type-checking-react-with-flow.html</loc>
-        <lastmod>2017-01-03T10:32:50-08:00</lastmod>
+        <lastmod>2017-02-20T17:46:00-04:00</lastmod>
     </url>
     <url>
         <loc>http://sitr.us/2016/12/20/flow-cookbook.html</loc>
-        <lastmod>2017-01-07T15:15:30-08:00</lastmod>
+        <lastmod>2017-02-20T17:46:00-04:00</lastmod>
     </url>
     <url>
         <loc>http://sitr.us/2016/12/20/flow-cookbook-unpacking-json.html</loc>
-        <lastmod>2016-12-20T17:28:40-08:00</lastmod>
+        <lastmod>2017-02-20T17:46:00-04:00</lastmod>
     </url>
     <url>
         <loc>http://sitr.us/2017/01/03/flow-cookbook-react.html</loc>
-        <lastmod>2017-01-07T18:08:29-08:00</lastmod>
+        <lastmod>2017-02-20T17:46:00-04:00</lastmod>
+    </url>
+    <url>
+        <loc>http://sitr.us/2017/02/20/changes-i-would-make-to-go.html</loc>
+        <lastmod>2017-02-21T10:44:38-04:00</lastmod>
     </url>
     <url>
         <loc>http://sitr.us/todo.html</loc>
-        <lastmod>2017-01-02T13:04:05-08:00</lastmod>
+        <lastmod>2017-02-20T17:46:00-04:00</lastmod>
     </url>
     <url>
         <loc>http://sitr.us/robots.txt</loc>
-        <lastmod>2014-05-05T00:50:26-07:00</lastmod>
+        <lastmod>2017-02-20T17:46:01-04:00</lastmod>
     </url>
     <url>
         <loc>http://sitr.us/blog/archives/</loc>
-        <lastmod>2017-01-07T18:08:29-08:00</lastmod>
+        <lastmod>2017-02-21T10:44:38-04:00</lastmod>
     </url>
     <url>
         <loc>http://sitr.us/Cat.lidr</loc>
-        <lastmod>2014-12-11T14:03:37-08:00</lastmod>
+        <lastmod>2017-02-20T17:46:00-04:00</lastmod>
     </url>
     <url>
         <loc>http://sitr.us/tumbles/</loc>
-        <lastmod>2017-01-07T18:08:29-08:00</lastmod>
+        <lastmod>2017-02-21T10:44:38-04:00</lastmod>
     </url>
     <url>
         <loc>http://sitr.us/</loc>
-        <lastmod>2017-01-07T18:08:29-08:00</lastmod>
+        <lastmod>2017-02-21T10:44:38-04:00</lastmod>
     </url>
     <url>
         <loc>http://sitr.us/talks/oo-patterns/</loc>
-        <lastmod>2017-01-07T18:08:29-08:00</lastmod>
+        <lastmod>2017-02-21T10:44:38-04:00</lastmod>
     </url>
     <url>
         <loc>http://sitr.us/talks/emberjs/</loc>
-        <lastmod>2017-01-07T18:08:29-08:00</lastmod>
+        <lastmod>2017-02-21T10:44:38-04:00</lastmod>
     </url>
     <url>
         <loc>http://sitr.us/talks/js-type-classes/</loc>
-        <lastmod>2017-01-07T18:08:29-08:00</lastmod>
+        <lastmod>2017-02-21T10:44:38-04:00</lastmod>
     </url>
     <url>
         <loc>http://sitr.us/talks/javascript-modules/</loc>
-        <lastmod>2017-01-07T18:08:29-08:00</lastmod>
+        <lastmod>2017-02-21T10:44:38-04:00</lastmod>
     </url>
     <url>
         <loc>http://sitr.us/talks/monadic-promises/</loc>
-        <lastmod>2017-01-07T18:08:29-08:00</lastmod>
+        <lastmod>2017-02-21T10:44:38-04:00</lastmod>
     </url>
 </urlset>

@@ -9,9 +9,7 @@
   <meta name="author" content="Jesse Hallett">
 
   
-  <meta name="description" content="In last week’s post I provided phonetic
-transcriptions of some example words using the International Phonetic
-Alphabet, or IPA for short. I thought &hellip;">
+  <meta name="description" content="This information was written a long time ago and has become pretty outdated. Sinatra is a fun little web application microframework. Recently I &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -90,6 +88,73 @@ Alphabet, or IPA for short. I thought &hellip;">
       
   <header>
     
+      <h1 class="entry-title"><a href="/2008/07/29/how-to-use-rspec-to-describe-a-sinatra-application.html">How to use RSpec to describe a Sinatra application</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2008-07-29T00:00:00-04:00" pubdate data-updated="true"></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>This information was written a long time ago and has become pretty outdated.</p>
+
+<p><a href="http://sinatrarb.com/">Sinatra</a> is a fun little web application microframework. Recently I
+started working on an application using Sinatra - and since I am
+working on good programming habits, before I dove into any coding I
+sat down to work out how to write specs for a Sinatra application.</p>
+
+<p>Sinatra comes bundled with support for <a href="http://chneukirchen.org/repos/testspec/README">test/spec</a>: a spec framework
+that builds on top of Rail’s own Test::Unit to provide support for
+writing specs. Which is a really neat idea. But I have been using
+<a href="http://rspec.info/">RSpec</a> for my other work, and I wanted to continue doing so.</p>
+
+<p>It turns out that RSpec takes a little bit of manual work to get
+going with Sinatra. I read a <a href="http://www.gittr.com/index.php/archive/sinatra-rspec-integration-without-a-patch-with-examples/">helpful article on gittr.com</a> that
+pointed me in the right direction. The article advised me to add these
+lines to my spec files:</p>
+
+<div class="highlight"><pre><code class="ruby"><span class="nb">require</span> <span class="no">File</span><span class="o">.</span><span class="n">expand_path</span><span class="p">(</span><span class="no">File</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">__FILE__</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;/your_application&#39;</span><span class="p">)</span>
+<span class="nb">require</span> <span class="s1">&#39;spec&#39;</span>
+<span class="nb">require</span> <span class="s1">&#39;spec/interop/test&#39;</span>
+<span class="nb">require</span> <span class="s1">&#39;sinatra/test/unit&#39;</span>
+</code></pre></div>
+
+<p>The first line loads your application; the second line loads RSpec;
+the third loads an RSpec-Test::Unit compatibility layer; and the
+fourth loads Sinatra’s test helpers, which are written for
+Test::Unit.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/2008/07/29/how-to-use-rspec-to-describe-a-sinatra-application.html">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
       <h1 class="entry-title"><a href="/2007/10/02/international-phonetic-alphabet.html">International Phonetic Alphabet</a></h1>
     
     
@@ -106,7 +171,7 @@ Alphabet, or IPA for short. I thought &hellip;">
   
 
 
-<time datetime="2007-10-02T00:00:00-07:00" pubdate data-updated="true"></time>
+<time datetime="2007-10-02T00:00:00-04:00" pubdate data-updated="true"></time>
         
       </p>
     
@@ -174,7 +239,7 @@ represented by “y”.</p>
   
 
 
-<time datetime="2007-09-24T00:00:00-07:00" pubdate data-updated="true"></time>
+<time datetime="2007-09-24T00:00:00-04:00" pubdate data-updated="true"></time>
         
       </p>
     
@@ -240,7 +305,7 @@ nucleus of the second syllable.</p>
   
 
 
-<time datetime="2007-09-17T00:00:00-07:00" pubdate data-updated="true"></time>
+<time datetime="2007-09-17T00:00:00-04:00" pubdate data-updated="true"></time>
         
       </p>
     
@@ -296,6 +361,10 @@ discourse to change too.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/2017/02/20/changes-i-would-make-to-go.html">Changes I would make to Go</a>
+      </li>
+    
+      <li class="post">
         <a href="/2017/01/03/flow-cookbook-react.html">Flow Cookbook: Flow & React</a>
       </li>
     
@@ -309,10 +378,6 @@ discourse to change too.</p>
     
       <li class="post">
         <a href="/2015/05/31/type-checking-react-with-flow.html">Type checking React with Flow v0.11</a>
-      </li>
-    
-      <li class="post">
-        <a href="/2015/05/31/advanced-features-in-flow.html">Advanced features in Flow</a>
       </li>
     
   </ul>
