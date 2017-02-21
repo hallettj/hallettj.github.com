@@ -2,7 +2,7 @@
 layout: post
 title: Changes I would make to Go
 author: Jesse Hallett
-date: 2017-02-20
+date: 2017-02-21
 comments: true
 ---
 
