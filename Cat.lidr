@@ -828,7 +828,7 @@ as I continue to explore Category theory.
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/2017/02/20/changes-i-would-make-to-go.html">Changes I would make to Go</a>
+        <a href="/2017/02/21/changes-i-would-make-to-go.html">Changes I would make to Go</a>
       </li>
     
       <li class="post">
