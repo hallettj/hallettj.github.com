@@ -6,6 +6,8 @@ date: 2017-02-21
 comments: true
 ---
 
+_Last updated 2017-03-16_
+
 I have been programming primarily in Go for about six months.
 I find it frustrating.
 There are two reasons for this:
@@ -147,25 +149,139 @@ These are features of Go that I find especially frustrating.
 I am disappointed by the decision to include null pointers in a new language
 when safer solutions have been in use for decades.
 Or to be more precise: I think it is a bad idea for a language to use `nil` as
-a bottom type,
-where `nil` can be used in place of any pointer type.
-Some newer languages have a `null`, but treat it as a distinct type
-(e.g., [Fantom][], [Flow][]).
+a bottom-ish type,
+where `nil` is type-compatible with every pass-by-reference type.
+
+I understand that `nil` is not technically a `null` pointer -
+but its behavior is close enough that at least some of the criticisms that
+apply to null pointers also apply to `nil`.
+I have read [Understanding Nil][],
+and I understand that it is possible to implement methods where the receiver is
+`nil`,
+and that `nil` can be useful.
+Go does some nice things to make `nil` less bad than it could be.
+But the fact remains:
+`nil` is type-compatible with every pass-by-reference type,
+whether or not methods on that type have sensible behavior for `nil` receivers,
+and that leads to lots of opportunities for runtime errors.
+To me that seems like an opportunity to make language changes so that it is
+easier for the type checker to catch problems.
+
+[Understanding Nil]: https://speakerdeck.com/campoy/understanding-nil
+
+Some newer languages have a `null`, but treat it as a distinct type that is
+generally not compatible with other types.
+(For example, [Fantom][] and [Flow][] do this.)
 In those languages values are non-nullable by default.
-Without that feature, uses of `nil` are contradictions of what is stated in
-your types,
-and every type comes with the implied ambiguity, "or it might be `nil`".
-Checking for `nil` or `null` at compile time can prevent a lot of problems!
+Here is how I might declare and use a nullable variable in Flow when writing
+React code:
+
+```js
+function LoginForm(props) {
+  // The `?` in front of `HTMLInputElement` indicates that `emailInput` might be
+  // `null`.
+  let emailInput: ?HTMLInputElement
+
+  // JSX syntax permits HTML-like tags in code
+  return <form onSubmit={event => props.onLogin(event, emailInput)}>
+    <input type="email" ref={thisElement => emailInput = thisElement} />
+    <input type="submit" />
+  </form>
+}
+
+function onLoginTake1(event: Event, emailInput: ?HTMLInputElement) {
+  event.preventDefault()
+
+  // Type error! Cannot read property `value` on possibly `null` or `undefined`
+  // value.
+  dispatch(loginEvent(emailInput.value))
+}
+
+function onLoginTake2(event: Event, emailInput: ?HTMLInputElement) {
+  event.preventDefault()
+
+  if (emailInput) {
+    // This is ok because Flow infers that `emailInput` cannot be `null` or
+    // `undefined` in this block.
+    dispatch(loginEvent(emailInput.value))
+  }
+}
+```
+
+Without a concept of nullability,
+uses of `nil` are contradictions of what is stated in
+your type signatures.
+In Go every variable with a pass-by-reference type comes with the implied
+ambiguity,
+"...or it might be `nil`".
+Support for nullable types makes a language expressive enough to avoid that
+ambiguity.
 
 [Fantom]: http://fantom.org/
 [Flow]: https://flowtype.org/
 
 The problem with `nil` in Go is exacerbated by the fact that `nil` checks
 sometimes fail.
-If an interface value has a type but its value is `nil`,
+If an interface value has a concrete type but its value is `nil`,
 [a `nil` check will not return `true`][3].
+The purist explanation for this is that the value is not really `nil`:
+it is an interface value that happens to have `nil` in its value slot.
+I don't find that explanation to be satisfactory.
+When a method is dispatched on that not-really-nil value,
+the receiver value will really be `nil` in the method body.
 
 [3]: http://devs.cloudimmunity.com/gotchas-and-common-mistakes-in-go-golang/index.html#nil_in_nil_in_vals
+
+But what about zero values?
+What would the zero value be for a function type or an interface type
+without `nil`?
+Well, I think that zero values are also a bad idea.
+
+One of the design decisions in Go is that every type must have
+a zero value.
+This can be convenient because it means you do not have to write constructors
+by hand when all you need is a default value.
+But I suspect that the real reason why zero values are a part of Go is that
+they provide well-defined behavior for what happens when you use uninitialized
+variables.
+C and C++ are notorious for [undefined behaviors][],
+which lead to traps for programmers, and problems making code portable between
+compiler implementations.
+Use of uninitialized variables is one notable example of undefined behavior in
+both languages.[^changing-specs]
+I imagine that the designers of Go learned from C and C++,
+and set out to clearly define as much of Go's behavior as possible.
+I think that is a great attitude for language designers to adopt!
+But there is a simpler option:
+Rust, Flow, and other languages use control-flow analysis to detect uses of
+uninitialized variables,
+and fail type-checking if any such uses are found.
+
+[undefined behaviors]: http://blog.llvm.org/2011/05/what-every-c-programmer-should-know.html
+
+[^changing-specs]: This may have changed over time; the C and C++ language specifications are evolving, and I am not very familiar with the details.
+
+The zero-value requirement introduces a constraint that `nil` must exist and
+must be assignable to a variety of types.
+A lot of types have no sensible default value,
+so `nil` is the only choice.
+
+Another problem with zero values is that the language does not have,
+and cannot have,
+enough information to produce sensible default values for domain-specific types.
+The fact that it tries anyway undermines soundness in code.
+The zero values for functions and interface values
+(i.e., interface values with no runtime type tag)
+are not going to be useful under any circumstances.
+Pointer types can implement methods with `nil` receivers -
+but that is not useful for types that do not have sensible behavior for
+uninitialized values.
+Default struct values can be useful in some cases -
+but in other cases the default value violates invariants that would have been
+enforced by a hand-written constructor.
+
+
+### How Rust does it differently
 
 Rust does not have a `null` or `nil` value.
 Rust uses enums, which are types whose values come in multiple variants,
@@ -393,8 +509,8 @@ but without generics it would not be very useful.
 ### List manipulation cannot be abstracted
 
 There is a special slap-in-the-face for functional programmers built into Go:
-A value of type `[]interface{}` cannot be easily coerced to another slice type -
-e.g. `[]string` or `[]MyStructType`.
+A value of type `[]interface{}` cannot be coerced to another slice type
+(e.g., `[]string` or `[]MyStructType`).
 The only way to do that conversion is to create a new slice,
 and copy values one-at-a-time in a `for` loop.
 But any polymorphic function that acts on lists *must* operate on the
@@ -416,11 +532,15 @@ func Map(f func(x interface{}) interface{}, xs []interface{}) []interface{} {
 But then I end up with some bad choices:
 
 - I can precede and follow every invocation of `Map` with custom `for` loops to
-fix up types;
+fix up types, and lose some compile-time type safety;
 - or instead of one polymorphic implementation I can write a custom `Map` for
 every pair of types that I want to map from and to;
-- or I can give up on type safety and write programs using mostly `interface{}`
-values.
+- or I can use a variant of `Map` that uses runtime reflection to coerce types
+as described in [Writing type parametric functions in Go][],
+lose all compile-time type safety,
+and take a big performance hit.
+
+[Writing type parametric functions in Go]: http://blog.burntsushi.net/type-parametric-functions-golang/
 
 The same problem applies to other list manipulation functions:
 `Filter`, `Take`, `Reduce`, etc.
@@ -731,8 +851,8 @@ impl <T> Make for (Sender<T>, Receiver<T>) {
 
 #[test]
 fn makes_a_vec() {
-    // We specify a type for the variable to instruct the compiler with
-    // implementation of `make` to use.
+    // We specify a type for the variable that holds the output of `make`.
+    // This instructs the compiler which implementation of `make` to call.
     let mut v: Vec<&str> = Make::make();
     v.push("some string");
     assert_eq!("some string", v[0]);
@@ -761,6 +881,10 @@ as either the type or the trait.
 (A "crate" is a distributable Rust package.)
 So if Rust itself or a Rust library implemented `make`,
 then any third-party library could define their own custom implementations.
+
+I had to implement `make` and `make_with_capacity` as separate methods because
+Rust does not support method overloading.
+But in theory neither does Go.
 
 
 ## The Ugly
@@ -1108,3 +1232,8 @@ I hope it is an interest in taking a look beyond the imperative
 I encourage you to pick one of the languages above,
 and take some time to learn about it and to get a good feel for its strengths.
 I think you will be glad that you did.
+
+
+## Changes
+
+- *2017-03-16:* Corrected inaccuracies regarding `nil` and slice type manipulation; added discussion of zero values
