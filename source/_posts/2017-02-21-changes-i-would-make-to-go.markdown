@@ -448,6 +448,14 @@ fn fetch_all_by_same_author(post_id: &str) -> Result<Vec<Post>, io::Error> {
 }
 ```
 
+The `try!` macro was used so often that Rust's designers decided to extend the
+language a bit to better support the pattern:
+putting the `?` postfix operator at the end of an expression has the same effect.
+For example,
+the line `let post = try!(fetch_post(post_id));` can be equivalently written as
+`let post = fetch_post(post_id)?;`
+And type-checking will fail appropriately if you forget the `?`.
+
 But Go does not support macros.
 Thankfully, the Result pattern does not require macros to be concise.
 For the more functionally-inclined,
