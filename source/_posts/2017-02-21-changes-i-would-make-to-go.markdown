@@ -72,12 +72,11 @@ Go aims to be accessible to people who are familiar with imperative programming.
 That said, Rust is not necessarily a replacement for Go,
 and I do not mean to say that everyone using Go should switch to Rust.
 Rust supports real-time operation,
-can operate in stack-only mode if necessary,
+can operate with stack-only allocation if necessary,
 and has a sophisticated type system that can, for example,
 detect problems due to concurrent access to shared data at compile time.
 Those requirements add to the complexity of Rust programs.
 The [borrow-checker][] in particular has a reputation for its learning curve.
-
 My purpose for making comparisons to Rust is to provide context for specific
 ways in which I think Go could be better.
 There are some good ideas in Rust that are not tied to borrow-checking,
@@ -153,8 +152,8 @@ a bottom-ish type,
 where `nil` is type-compatible with every pass-by-reference type.
 
 I understand that `nil` is not technically a `null` pointer -
-but its behavior is close enough that at least some of the criticisms that
-apply to null pointers also apply to `nil`.
+but its behavior is close enough that criticisms that apply to null pointers
+also apply to `nil`.
 I have read [Understanding Nil][],
 and I understand that it is possible to implement methods where the receiver is
 `nil`,
@@ -165,7 +164,7 @@ But the fact remains:
 whether or not methods on that type have sensible behavior for `nil` receivers,
 and that leads to lots of opportunities for runtime errors.
 To me that seems like an opportunity to make language changes so that it is
-easier for the type checker to catch problems.
+easier for the type checker to catch problems at compile time.
 
 [Understanding Nil]: https://speakerdeck.com/campoy/understanding-nil
 
@@ -211,6 +210,16 @@ function onLoginTake2(event: Event, emailInput: ?HTMLInputElement) {
 Without a concept of nullability,
 uses of `nil` are contradictions of what is stated in
 your type signatures.
+This Go signature claims that the argument is a pointer to a `User` struct -
+but if I take that claim at face value I am likely to get a `nil pointer
+dereference` error:
+
+```go
+func validate(user *User) bool {
+	return user.Name != ""
+}
+```
+
 In Go every variable with a pass-by-reference type comes with the implied
 ambiguity,
 "...or it might be `nil`".
@@ -238,26 +247,27 @@ without `nil`?
 Well, I think that zero values are also a bad idea.
 
 One of the design decisions in Go is that every type must have
-a zero value.
+a well-defined default value, which is called the zero value.
 This can be convenient because it means you do not have to write constructors
 by hand when all you need is a default value.
 But I suspect that the real reason why zero values are a part of Go is that
 they provide well-defined behavior for what happens when you use uninitialized
 variables.
 C and C++ are notorious for [undefined behaviors][],
-which lead to traps for programmers, and problems making code portable between
-compiler implementations.
+which lead to traps for programmers, and to problems making code portable
+between compiler implementations.
 Use of uninitialized variables is one notable example of undefined behavior in
 both languages.[^changing-specs]
 I imagine that the designers of Go learned from C and C++,
 and set out to clearly define as much of Go's behavior as possible.
 I think that is a great attitude for language designers to adopt!
-But there is a simpler option:
-Rust, Flow, and other languages use control-flow analysis to detect uses of
+But there is another option that I think leads to better code safety:
+Rust, Flow, and other languages use [data-flow analysis][] to detect uses of
 uninitialized variables,
 and fail type-checking if any such uses are found.
 
 [undefined behaviors]: http://blog.llvm.org/2011/05/what-every-c-programmer-should-know.html
+[data-flow analysis]: https://en.wikipedia.org/wiki/Data-flow_analysis
 
 [^changing-specs]: This may have changed over time; the C and C++ language specifications are evolving, and I am not very familiar with the details.
 
@@ -265,10 +275,9 @@ The zero-value requirement introduces a constraint that `nil` must exist and
 must be assignable to a variety of types.
 A lot of types have no sensible default value,
 so `nil` is the only choice.
-
-Another problem with zero values is that the language does not have,
-and cannot have,
-enough information to produce sensible default values for domain-specific types.
+So that is one problem.
+Another problem is that the language does not have enough information to
+produce sensible default values for domain-specific types.
 The fact that it tries anyway undermines soundness in code.
 The zero values for functions and interface values
 (i.e., interface values with no runtime type tag)
@@ -283,7 +292,8 @@ enforced by a hand-written constructor.
 
 ### How Rust does it differently
 
-Rust does not have a `null` or `nil` value.
+Rust goes a step beyond nullable types:
+it does not have a `null` or `nil` value.
 Rust uses enums, which are types whose values come in multiple variants,
 where each variant is effectively a distinct struct.
 If you want to represent an absence of a value you use an enum variant that
@@ -332,6 +342,14 @@ fn divides_a_number() {
 }
 ```
 
+An advantage of the option pattern over nullable types is that you can
+distinguish between values like `None` versus `Some(None)`.
+If you are looking up values in a cache (for example),
+a `None` result might indicate that there is no entry in the cache for a given
+key;
+and a `Some(None)` result might indicate that there is an entry,
+and the value of the entry is `None`.
+
 I once advocated for use of the Option pattern at a Java company -
 but at least one of my coworkers was put off by the idea of allocating an extra
 object on the heap just to distinguish between a value and an absence of
@@ -342,14 +360,14 @@ If the type parameter for `Option<T>` is a reference type,
 then the `None` case can be safely represented at runtime as a null pointer.
 So the `Some` or `None` wrapper often disappears at compile time.
 In those cases the code is just as efficient as it would have been if the
-language used unsafe `null` values.
+language allowed uses of unsafe `null` values in source code.
 
 In the example above since neither `Option<i32>` nor the `i32` parameter are
 reference types, the compiler allocates contiguous space on the stack for the
 numeric result, and for a tag to distinguish between `Some` and `None`.
 There is no extra heap allocation, and no added pointer indirection.
 
-The Rust Book has [a lot more detail][error handling].
+The Rust Book has [a lot more detail][error handling] on error handling.
 
 [error handling]: https://doc.rust-lang.org/book/error-handling.html
 
@@ -362,13 +380,13 @@ But without generics there would be no type safety for values wrapped in an
 [go-option]: https://github.com/hallettj/comparing-go-and-rust/tree/master/go/option
 
 
-### Error-handling boilerplate & lack of compile-time checks for error handling
+### Error-handling boilerplate & lack of compile-time checks unhandled errors
 
 Error handling in Go has two related problems:
 there is a lot of boilerplate required;
 and if the programmer neglects to check for an error,
 or makes a small mistake such as checking the wrong error variable,
-the compiler will not report the problem.
+the compiler will not detect the problem.
 
 Rust has a type, `Result<T,E>`,
 that is quite similar to `Option<T>`.
@@ -385,7 +403,7 @@ pub enum Result<T, E> {
 }
 ```
 
-A common complaint about the Option / Result Pattern is that unwrapping
+A common complaint about the Option and Result patterns is that unwrapping
 success values is a pain.
 But a language with support for pattern matching makes unwrapping painless,
 and first-class result values permit combinators that can handle a series of
@@ -430,7 +448,23 @@ fn fetch_all_by_same_author(post_id: &str) -> Result<Vec<Post>, io::Error> {
 }
 ```
 
-That is no less verbose than the Go version -
+The `match` keyword introduces a pattern-match block.
+The block includes a pattern for each possible variant of the type of the
+expression in the head of the `match` paired with an expression to evaluate if
+that pattern matches.
+This is somewhat like the [type switch][] feature in Go,
+where the code that runs depends on the type of the variable in the head of the
+`switch` block.
+But the Rust version comes with a compile-time check that a pattern is given
+for every possible variant of the given type,
+which avoids potential runtime errors.
+This is especially helpful when a custom type is updated to add new variants:
+the compiler will immediately point out any uses of the type that need to be
+updated.
+
+[type switch]: https://golang.org/doc/effective_go.html#type_switch
+
+Anyway, that Rust code is no less verbose than the Go version -
 but it demonstrates that unwrapping `Result<T,E>` or `Option<T>` values does
 not have to be any more onerous than `nil` checks;
 and if we had left out a failure check in the Rust version Rust would have
@@ -447,6 +481,11 @@ fn fetch_all_by_same_author(post_id: &str) -> Result<Vec<Post>, io::Error> {
     fetch_posts(&author.posts)
 }
 ```
+
+`try!` rewrites an expression at compile time.
+For example, `try!(fetch_post(post_id))` is expanded to put the `fetch_post`
+call inside a `match`,
+and inserts the boilerplate pattern matches for the `Ok` and `Err` match cases.
 
 The `try!` macro was used so often that Rust's designers decided to extend the
 language a bit to better support the pattern:
@@ -487,7 +526,8 @@ let post = fetch_post(post_id)
 
 The idea is that failure checks are almost always the same:
 check for an error, return the error if it exists, otherwise continue.
-It is more [DRY][] to abstract that into a helper method or a macro.
+The [DRY][] thing to do is to abstract the common pattern into a helper method
+or a macro.
 And again,
 a common theme in all of these Rust implementations is that there is
 a compile-time guarantee that every error is handled.
@@ -507,28 +547,47 @@ plus a tag to distinguish between an `Ok(value)` value and an `Err(err)` value.
 A nice thing about the generality of Rust enums is that if `Result<T,E>` did
 not exist,
 it would be easy to implement it as a library.
-So what about using the Result or Option pattern in Go?
+So what about using the Result pattern in Go?
 Well, we can't put methods on Go tuples (a.k.a, multiple return values),
 because they are not first-class values.
+It is not possible to define a function that that accepts a tuple and a callback:
+a Go function that takes a tuple cannot accept additional arguments
+(because Go tuples are not first-class values).
+Those constraints make the combinator pattern difficult.
 We could implement a custom struct type -
 but without generics it would not be very useful.
 
 
-### List manipulation cannot be abstracted
+### List manipulation is not practical
 
 There is a special slap-in-the-face for functional programmers built into Go:
-A value of type `[]interface{}` cannot be coerced to another slice type
-(e.g., `[]string` or `[]MyStructType`).
-The only way to do that conversion is to create a new slice,
-and copy values one-at-a-time in a `for` loop.
-But any polymorphic function that acts on lists *must* operate on the
-`interface{}` top type because Go does not provide type variables.
+there is no good way to write a polymorphic function that can manipulate slices
+with arbitrary types.
+In Rust I can write a function with a signature that looks like this:
 
-I can implement `Map` (or potentially `ParallelMap`) in Go without too much
-trouble:
+```rust
+pub fn map<A, B, F>(callback: F, xs: &[A]) -> Vec<B>
+    where F: for<'a> Fn(&'a A) -> B
+```
+
+That is a function that takes a callback and an input slice,
+and returns a new array that is computed by accumulating the results of
+applying the callback to each element in the input array.
+Even better, there are built-in methods in Rust's iterator types that do
+exactly this.
+The input slice might hold any type of values;
+type variables allow the type checker to track how the type of the output array
+relates to the type of the input slice,
+and also allow the type checker to check that the callback has the appropriate
+input and output types.
+
+That pattern does not work well in Go.
+Without type variables the only way to express a polymorphic slice type is
+using the top-type: `[]interface{}`.
+For example:
 
 ```go
-func Map(f func(x interface{}) interface{}, xs []interface{}) []interface{} {
+func Map(callback func(x interface{}) interface{}, xs []interface{}) []interface{} {
 	ys := make([]interface{}, len(xs))
 	for i, x := range xs {
 		ys[i] = f(x)
@@ -537,25 +596,53 @@ func Map(f func(x interface{}) interface{}, xs []interface{}) []interface{} {
 }
 ```
 
-But then I end up with some bad choices:
+But that function is not really polymorphic:
+a slice type with a more specific type parameter
+(e.g., `[]int`)
+is not type-compatible with `[]interface{}`.
+So I cannot pass a variable with type `[]int` to that `Map` function.
+I have to create a new slice of type `[]interface{}` first,
+and copy `int` values to the new slice one-by-one in a `for` loop.
+Then after getting a result from `Map` I have to copy result values into yet
+another slice to get the proper final slice type.
+That means two custom loops are required around every invocation of `Map` -
+plus a runtime type assertion or type switch in the callback implementation.
 
-- I can precede and follow every invocation of `Map` with custom `for` loops to
-fix up types, and lose some compile-time type safety;
-- or instead of one polymorphic implementation I can write a custom `Map` for
-every pair of types that I want to map from and to;
-- or I can use a variant of `Map` that uses runtime reflection to coerce types
-as described in [Writing type parametric functions in Go][],
-lose all compile-time type safety,
-and take a big performance hit.
+A slice with an arbitrary type parameter *is* type-compatible with the
+top-type, `interface{}`.
+If I just use `interface{}` type for every polymorphic argument I get
+a signature like this:
+
+```go
+func Map(callback interface{}, xs interface{}) interface{}
+```
+
+With that signature I can pass in any slice type and callback type that I want,
+and assign the result to a variable with the proper type.
+But to make that work it is necessary to use the reflection API to fix up
+runtime type tags for the input slice, the input callback, and the output slice.
+The process is described in [Writing type parametric functions in Go][].
+The reflection code is ugly,
+but can be hidden in implementations of general-purpose functions.
+The unavoidable downsides are that you lose all compile-time type-safety,
+and there is an order-of-magnitude performance cost.
 
 [Writing type parametric functions in Go]: http://blog.burntsushi.net/type-parametric-functions-golang/
 
 The same problem applies to other list manipulation functions:
 `Filter`, `Take`, `Reduce`, etc.
+This is bad because list manipulation is the bread-and-butter of functional
+programming.
+The fact that Go discourages such a basic building block as `Map` means that
+functional programming is not likely to thrive in Go,
+and the Go community will not be able to benefit from the
+[advantages of functional programming][].
+
+[advantages of functional programming]: http://www.cs.kent.ac.uk/people/staff/dat/miranda/whyfp90.pdf
 
 You might have noticed a pattern here:
 Go does not support generics, and that leads to problems.
-
+Except the issue is not just lack of generics.
 Dynamic languages like Javascript, Python, and Ruby do not support generics
 either -
 at least not in the sense of compile-time checking.
@@ -564,7 +651,8 @@ For example,
 in Javascript I can pass any list to a generic list manipulation function,
 and it just works.
 Go occupies an awkward middle ground where it checks types at compile time,
-but does not provide tools to describe relationships between types.
+but does not provide tools to explain to the compiler how input and output
+types relate to each other.
 
 Generics - and type variables in particular -
 are a means to "talk" about types.
@@ -750,18 +838,15 @@ in terms of `Stream` values.
 
 Go has a magical function called `make` that seems to do whatever the standard
 library authors need for a given type.
-It takes a type as an argument, which is unlike other Go functions.
-For custom types `make` just returns an empty value, or `nil` for pointer types.
-But in some cases `make` can take additional arguments to initialize a value.
-For example, when creating a slice you can provide a capacity:
+It takes a type as an argument, which is unlike most other Go functions.
+Called with one argument it initializes a small slice, map, or channel.
+`make` can take one or two integer arguments,
+depending on the choice of the first argument.
+For example, when creating a slice you can provide a length and a capacity:
 
 ```go
-mySlice := make([]int, 32)
+mySlice := make([]int, 16, 32)
 ```
-
-Without the second argument `make` returns `nil` as usual -
-but with that argument `make` has a very different behavior where it allocates
-a backing array to hold the specified number of values.
 
 When creating a channel, you can specify the channel's buffer size with
 a second argument to `make`.
@@ -785,22 +870,21 @@ only standard library types get to be range-able.
 There is no way to make a third-party data type iterable.
 Library authors can implement adapters to output a view of their data structure
 as a slice, or to spit out values over a channel.
-But that puts extra complexity on code that uses third-party data structures;
+But that puts extra complexity on code that uses third-party data structures,
 and requires programmers to use non-standard idioms.
 
 Yet another privilege is that only standard types can be compared using `==`,
 `>`, etc.
 
-The biggest problem is that only standard libraries are allowed to define
-generic types.
+And of course only standard libraries are allowed to define generic types.
 This is severely limiting to the library ecosystem around Go.
 It means that, for example,
 a third-party functional data structures library,
 or a third-party futures library
 will never be as usable as the standard library collection types.
 
-Rust supports generics for third-party code.
-And Rust implements iteration, equality, and comparison via traits that any
+Rust supports generics for third-party code;
+and Rust implements iteration, equality, and comparison via traits that any
 third-party type can implement.
 Third-party Rust types are nearly indistinguishable from standard library
 types,
@@ -811,12 +895,14 @@ Incidentally,
 support in Rust:
 functions that are polymorphic in their return type.
 Rust traits are more flexible than typical object-oriented interfaces:
-the choice of implementation of an interface method is determined solely by the
-receiver of the method.
+when an interface method is dispatched the choice of the method implementation
+to execute is determined solely by the type of the receiver of the method.
 But a trait method implementation can be selected based on
 the type of the receiver,
 the type of any argument position,
-the types of multiple argument positions (e.g., for an equality trait),
+the combination of types of multiple argument positions
+(e.g., an equality trait can require that the two polymorphic arguments to an
+`equals` method have the same type),
 or by the expected return type.
 An implementation of `make` in Rust might look like this:
 
@@ -829,9 +915,9 @@ trait Make {
     fn make_with_capacity(capacity: usize) -> Self;
 }
 
-// An `impl` provides implementations for trait methods for given concrete types.
+// An `impl` provides implementations of trait methods for given concrete types.
 // Note that we can implement `Make` for the standard `Vec<T>` type right here.
-// It is not necessary to change the implementation of `Vec<T>`.
+// It is not necessary to change the original implementation of `Vec<T>`.
 impl <T> Make for Vec<T> {
     fn make() -> Vec<T> {
         Vec::new()
@@ -905,7 +991,7 @@ or that could be worked around if some of the bad parts were fixed.
 ### No tagged unions, limited pattern matching
 
 Some older languages that make heavy use of channels
-(e.g. Erlang and Scala)
+(e.g., Erlang and Scala)
 support tagged-union types in combination with pattern matching.
 These features make great companions for channels:
 a tagged union describes a fixed set of message types that a channel can accept
@@ -922,7 +1008,7 @@ use std::thread;
 // compile-time error.
 #[derive(Clone, Copy, Debug)]
 pub enum CounterInstruction {
-    Increment(isize),
+    Increment(isize),  // `isize` is an integer type that matches the platform word size
     Reset,
     Terminate,
 }
@@ -932,9 +1018,11 @@ pub type CounterResponse = isize;
 use self::CounterInstruction::*;
 
 pub fn new_counter() -> (Sender<CounterInstruction>, Receiver<CounterResponse>) {
+    // Creating a channel produces a connected sender / receiver pair
     let (instr_tx, instr_rx) = channel::<CounterInstruction>();
     let (resp_tx,  resp_rx)  = channel::<CounterResponse>();
 
+    // Run the counter in a background thread
     thread::spawn(move || {
         let mut count: isize = 0;
 
@@ -961,6 +1049,7 @@ pub fn new_counter() -> (Sender<CounterInstruction>, Receiver<CounterResponse>) 
 
     });
 
+    // Return the instruction sender, and the response receiver
     (instr_tx, resp_rx)
 }
 
@@ -979,6 +1068,30 @@ fn runs_a_counter() {
     assert_eq!(2, latest_count);
 }
 ```
+
+Rust does not require channels to be closed explicitly.
+Channel senders and receivers implement a `Drop` trait;
+any type can implement `Drop` to schedule some cleanup code to run when a value
+goes out of scope.
+In this example when the background thread terminates `resp_tx` goes out of
+scope,
+and closes automatically.
+
+This block is the pattern matching code from the example above:
+
+```rust
+match instr {
+    Increment(amount) => count += amount,
+    Reset             => count = 0,
+    Terminate         => return
+}
+```
+
+The block matches against `instr`,
+which has the type `CounterInstruction`.
+There are three variants for `CounterInstruction`;
+each variant is represented by a pattern in the `match` block with code to run
+in case the pattern matches.
 
 Go has type switches, which are similar to pattern matching.
 Comparable Go matching code could look like this:
@@ -1004,7 +1117,7 @@ consumer knows how to handle.
 And what is especially valuable is checking that all pieces of code that send
 or receive on a channel are consistent in the types of values that the they
 produce or consume.
-If we make a change to the set of possible messages,
+If you make a change to the set of possible messages in a Rust program,
 but forget to update some critical code to accommodate the change,
 the type checker will report an error at compile time.
 
@@ -1012,44 +1125,89 @@ Because Go does not support tagged unions,
 messages over polymorphic channels are dynamically typed.
 You can use an interface as the type parameter for a channel,
 which does limit the types of messages that are sent over the channel.
-But a Go interface is not sealed;
-when a new type is created that implements the given interface,
+But a Go interface is not sealed:
+when a new type is created that implements the interface
 there is no compile-time check to ensure that all consumers of the channel are
 updated to handle the new type.
-If you use a type switch to unpack channel messages
+Unpacking channel messages with a type switch
 (as opposed to using exclusively interface methods)
-then you may end up introducing bugs that a different type system would have
-caught.
+can lead to bugs that a different type system would have caught.
 
 
 ### Dynamic typing
 
-Go uses a mixture of static and dynamic type checking.
+Go makes heavy use of dynamic type-checking.
 Any use of `interface{}`, any type assertion or type switch,
 is dynamic typing.
-This leads to reduced compile-time type safety.
+This is good and bad:
+without generics, it is often necessary to coerce a value to a different type;
+dynamic type assertions are a safer way to do this than unchecked type casts.
+Either way the program will (probably) crash at runtime if a value ends up
+having an unexpected type.
+But with an unchecked cast the program might corrupt memory or leak information
+to attackers before crashing.
+
+The fact that errors are reported at runtime means that problems are likely to
+go unnoticed without good test coverage.
+That does not just mean 100% code coverage -
+there might be different combinations of conditions that lead to a code path
+and a type error might not manifest under every combination.
+
+A type checker that can detect errors at compile time is like an extra test
+suite that always tests every combination of conditions.
+Dynamic type tests are nearly unheard of in Rust because the compiler resolves
+types at compile time.
+Pattern matches on enum variants looks a bit like a dynamic type test -
+but pattern matching is qualitatively different because enums are sealed.
+There is a compile-time guarantee that pattern matching will not fail.
+
+There are two caveats:
+
+- `unsafe` blocks, functions, and traits in Rust do make unchecked type casts -
+especially when interacting with the foreign function interface.
+But `unsafe` implementations are delimited regions where the normal rules do
+not apply.
+The best practice is to keep unsafe code to a minimum;
+and [most libraries][] do not use any `unsafe` code.
+- Rust supports [trait objects][],
+which is are cases where the compiler does not resolve a concrete type for
+a value at compile time.
+But the compiler does verify at compile-time that the value implements a given
+trait.
+A trait object is a lot like a Go interface value -
+except that a trait object cannot have a `nil` value.
+Despite the lack of a compile-time concrete type,
+it is safe to dispatch trait methods on a trait object because there is
+compile-time verification that whatever value is in the object implements the
+given trait and therefore implements the appropriate methods.
+
+[most libraries]: https://alex-ozdemir.github.io/rust/unsafe/unsafe-in-rust-syntactic-patterns/#how-many-crates-use-unsafe
 
 
-### Dynamic dispatch, stuck in an old object-oriented mindset
+### Dynamic dispatch, reinventing the wheel
 
-In general Rust resolves every value to a concrete type at compile time.[^trait-objects]
+In general Rust resolves every value to a concrete type at compile time.
 That means that Rust can use static dispatch when invoking trait methods.
-Compile-time resolution also means that there is no top type
-(like `interface{}`)
-that has to be refined at runtime.
 
-[^trait-objects]: The exception is [trait objects][]. My understanding is that idiomatic Rust code uses these sparingly. Most uses of traits in Rust use the trait as a type bound on a type variable, which permits static resolution to a concrete type. For details see the Rust book sections on [traits][] and [trait objects][].
+(As I mentioned,
+the exception is [trait objects][],
+which do use dynamic dispatch much like Go interface values.
+My understanding is that idiomatic Rust code uses trait objects sparingly.
+Most uses of traits in Rust use the trait as a bound on a type variable,
+which leads to compile-time resolution to a concrete type.
+For details see the Rust book sections on [traits][] and [trait objects][].)
 
 [traits]: https://doc.rust-lang.org/book/traits.html
 [trait objects]: https://doc.rust-lang.org/book/trait-objects.html
 
 In Go every invocation of an interface method uses dynamic dispatch.
-Dynamic dispatch, and runtime reflection relating to type assertions
-add some runtime overhead.
+Dynamic dispatch, type assertions, and type switches require runtime reflection,
+which adds some runtime overhead.
 
 The technique of resolving concrete types at compile-time is not new to Rust,
 and it has nothing to do with borrow-checking.
 Haskell was doing the same thing at least ten years before work began on Go.
+And Haskell has just as much polymorphic flexibility as Rust or Go.
 (Rust traits are an adaptation of Haskell [type classes][].)
 
 [type classes]: http://learnyouahaskell.com/types-and-typeclasses
@@ -1058,7 +1216,7 @@ The designers of Go wanted a model for polymorphism that is simpler and more
 flexible than what other object-oriented languages provide.
 In particular they wanted composition over inheritance,
 and an ability to implement interfaces after-the-fact
-(so that new interfaces can be applied to pre-existing types).
+so that new interfaces can be applied to pre-existing types.
 This is *exactly* what traits and type classes do.
 The solution that Go introduced feels to me like a less-capable reinvented wheel.
 
@@ -1073,17 +1231,20 @@ can be stored in data structures,
 and can be passed over channels.
 Multiple-values in Go cannot do any of those things.
 
-We already saw a tuple return value in the implementation of the `Make` trait.
+We already saw tuple return values in the implementation of the `Make` trait,
+and in the `new_counter` example.
 Here is a smaller example:
 
 ```rust
 // Returns a tuple
+// (`isize` is an integer type that matches the platform word size)
 fn min_and_max(xs: &[isize]) -> (isize, isize) {
     let init = (xs[0], xs[0]);
     xs.iter()
         .fold(init, |(min, max), &x| (cmp::min(min, x), cmp::max(max, x)))
 }
 
+#[test]
 fn consume_tuple() {
     let xs = vec![1, 2, 3, 4, 5];
     let (min, max) = min_and_max(&xs); // unpack tuple with destructuring assignment
@@ -1102,9 +1263,11 @@ results := make(chan (*models.Document, error))
 ```
 
 As far as I know the best options for doing this are to define a custom
-`struct` type,
-to make type assertions on values from channels,
-or to send success values and errors over separate channels.
+`struct` type;
+to coerce both success and error values to `interface{}`,
+and use a type switch to distinguish success and error on the other end of the
+channel;
+or to send success and error values over two parallel channels.
 
 Another consequence is that there is no good way to define methods on multiple
 return values,
@@ -1185,7 +1348,7 @@ For example, Rayon transparently splits work into batches,
 which provides better performance than queueing up every invocation of the
 `map` callback separately.
 (The default batch size is 5000 items, but that value is tunable.)
-The `sum` method (which is the Reduce step in this example) is also part of Rayon,
+The `sum` method (which is the Reduce step in this example) is also part of Rayon -
 which means that it is optimized for consuming batches of results from worker
 threads.
 
@@ -1200,8 +1363,9 @@ Usually you do not actually want both at the same time.
 How do I think Go could be better?
 Generics.
 Nearly all of my complaints boil down to lack of support for generics.
-But I think that Rust-style traits, and getting rid of `nil` would also be
-useful changes.
+But I think that Rust-style traits,
+getting rid of `nil`,
+and getting rid of zero values would also be useful changes.
 
 In its current form, I prefer not to use Go.
 It is not that Go is bad - it is just that there are lots of languages
@@ -1215,9 +1379,10 @@ but has none of the "bad parts" that I called out.
 
 Javascript is (like Go) easy to learn,
 and has wonderful support for concurrency (if not parallelism).
-When paired with Flow or Typescript you get (in my opinion) more robust
-type safety than Go provides.
-Javascript with Flow in particular has none of the "bad parts" from this post.
+When paired with Flow or Typescript you get more robust type safety than Go
+provides.
+The combination of Javascript and Flow in particular has none of the "bad
+parts" from this post.
 
 Erlang and Scala both support lightweight concurrency in the same style that Go
 does,
@@ -1225,6 +1390,7 @@ and they are both great for functional programming.
 
 Clojure is not type-safe - but it does fantastic things!
 My favorite functional data structure implementations are the ones in Clojure.
+And Clojure encourages functional programming.
 
 Haskell has amazing type safety,
 some of the best concurrency and parallelism features that I have seen in any
