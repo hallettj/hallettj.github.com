@@ -9,9 +9,9 @@
   <meta name="author" content="Jesse Hallett">
 
   
-  <meta name="description" content="I have been programming primarily in Go for about six months.
+  <meta name="description" content="Last updated 2017-03-19 I have been programming primarily in Go for about six months.
 I find it frustrating.
-There are two reasons for this: First, functional programming is &hellip;">
+There are two reasons for this: First, &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -110,7 +110,9 @@ There are two reasons for this: First, functional programming is &hellip;">
   </header>
 
 
-<div class="entry-content"><p>I have been programming primarily in Go for about six months.
+<div class="entry-content"><p><em>Last updated 2017-03-19</em></p>
+
+<p>I have been programming primarily in Go for about six months.
 I find it frustrating.
 There are two reasons for this:</p>
 
@@ -133,6 +135,7 @@ Here are other posts that echo my feelings:</p>
 <ul>
   <li><a href="http://yager.io/programming/go.html">Why Go Is Not Good</a></li>
   <li><a href="http://crufter.com/@crufter/everyday-hassles-in-go">Everyday hassles in Go</a></li>
+  <li><a href="https://www.barrucadu.co.uk/posts/etc/2016-08-25-three-months-of-go.html">Three Months of Go (from a Haskeller’s perspective)</a></li>
 </ul>
 
 <p>I will add to those with some of my own opinions.
@@ -171,13 +174,12 @@ Go aims to be accessible to people who are familiar with imperative programming.
 <p>That said, Rust is not necessarily a replacement for Go,
 and I do not mean to say that everyone using Go should switch to Rust.
 Rust supports real-time operation,
-can operate in stack-only mode if necessary,
+can operate with stack-only allocation if necessary,
 and has a sophisticated type system that can, for example,
 detect problems due to concurrent access to shared data at compile time.
 Those requirements add to the complexity of Rust programs.
-The <a href="https://doc.rust-lang.org/book/ownership.html">borrow-checker</a> in particular has a reputation for its learning curve.</p>
-
-<p>My purpose for making comparisons to Rust is to provide context for specific
+The <a href="https://doc.rust-lang.org/book/ownership.html">borrow-checker</a> in particular has a reputation for its learning curve.
+My purpose for making comparisons to Rust is to provide context for specific
 ways in which I think Go could be better.
 There are some good ideas in Rust that are not tied to borrow-checking,
 and I think that Go could be a better language if it adopted some of those ideas.</p>
@@ -242,22 +244,176 @@ But there are also:</p>
 <p>I am disappointed by the decision to include null pointers in a new language
 when safer solutions have been in use for decades.
 Or to be more precise: I think it is a bad idea for a language to use <code>nil</code> as
-a bottom type,
-where <code>nil</code> can be used in place of any pointer type.
-Some newer languages have a <code>null</code>, but treat it as a distinct type
-(e.g., <a href="http://fantom.org/">Fantom</a>, <a href="https://flowtype.org/">Flow</a>).
+a bottom-ish type,
+where <code>nil</code> is type-compatible with every pass-by-reference type.</p>
+
+<p>I understand that <code>nil</code> is not technically a <code>null</code> pointer -
+but its behavior is close enough that criticisms that apply to null pointers
+also apply to <code>nil</code>.
+I have read <a href="https://speakerdeck.com/campoy/understanding-nil">Understanding Nil</a>,
+and I understand that it is possible to implement methods where the receiver is
+<code>nil</code>,
+and that <code>nil</code> can be useful.
+Go does some nice things to make <code>nil</code> less bad than it could be.
+But the fact remains:
+<code>nil</code> is type-compatible with every pass-by-reference type,
+whether or not methods on that type have sensible behavior for <code>nil</code> receivers,
+and that leads to lots of opportunities for runtime errors.
+To me that seems like an opportunity to make language changes so that it is
+easier for the type checker to catch problems at compile time.</p>
+
+<p>Some newer languages have a <code>null</code>, but treat it as a distinct type that is
+generally not compatible with other types.
+(For example, <a href="http://fantom.org/">Fantom</a> and <a href="https://flowtype.org/">Flow</a> do this.)
 In those languages values are non-nullable by default.
-Without that feature, uses of <code>nil</code> are contradictions of what is stated in
-your types,
-and every type comes with the implied ambiguity, “or it might be <code>nil</code>”.
-Checking for <code>nil</code> or <code>null</code> at compile time can prevent a lot of problems!</p>
+Here is how one might declare and use a nullable variable in Flow when writing
+React code:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="kd">function</span> <span class="nx">LoginForm</span><span class="p">(</span><span class="nx">props</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">  <span class="c1">// The `?` in front of `HTMLInputElement` indicates that `emailInput` might be</span>
+</span><span class="line">  <span class="c1">// `null`.</span>
+</span><span class="line">  <span class="kd">let</span> <span class="nx">emailInput</span><span class="o">:</span> <span class="o">?</span><span class="nx">HTMLInputElement</span>
+</span><span class="line">
+</span><span class="line">  <span class="c1">// JSX syntax permits HTML-like tags in code</span>
+</span><span class="line">  <span class="k">return</span> <span class="o">&lt;</span><span class="nx">form</span> <span class="nx">onSubmit</span><span class="o">=</span><span class="p">{</span><span class="nx">event</span> <span class="o">=&gt;</span> <span class="nx">props</span><span class="p">.</span><span class="nx">onLogin</span><span class="p">(</span><span class="nx">event</span><span class="p">,</span> <span class="nx">emailInput</span><span class="p">)}</span><span class="o">&gt;</span>
+</span><span class="line">    <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">type</span><span class="o">=</span><span class="s2">&quot;email&quot;</span> <span class="nx">ref</span><span class="o">=</span><span class="p">{</span><span class="nx">thisElement</span> <span class="o">=&gt;</span> <span class="nx">emailInput</span> <span class="o">=</span> <span class="nx">thisElement</span><span class="p">}</span> <span class="o">/&gt;</span>
+</span><span class="line">    <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">type</span><span class="o">=</span><span class="s2">&quot;submit&quot;</span> <span class="o">/&gt;</span>
+</span><span class="line">  <span class="o">&lt;</span><span class="err">/form&gt;</span>
+</span><span class="line"><span class="p">}</span>
+</span><span class="line">
+</span><span class="line"><span class="kd">function</span> <span class="nx">onLoginTake1</span><span class="p">(</span><span class="nx">event</span><span class="o">:</span> <span class="nx">Event</span><span class="p">,</span> <span class="nx">emailInput</span><span class="o">:</span> <span class="o">?</span><span class="nx">HTMLInputElement</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">  <span class="nx">event</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">()</span>
+</span><span class="line">
+</span><span class="line">  <span class="c1">// Type error! Cannot read property `value` on possibly `null` or `undefined`</span>
+</span><span class="line">  <span class="c1">// value.</span>
+</span><span class="line">  <span class="nx">dispatch</span><span class="p">(</span><span class="nx">loginEvent</span><span class="p">(</span><span class="nx">emailInput</span><span class="p">.</span><span class="nx">value</span><span class="p">))</span>
+</span><span class="line"><span class="p">}</span>
+</span><span class="line">
+</span><span class="line"><span class="kd">function</span> <span class="nx">onLoginTake2</span><span class="p">(</span><span class="nx">event</span><span class="o">:</span> <span class="nx">Event</span><span class="p">,</span> <span class="nx">emailInput</span><span class="o">:</span> <span class="o">?</span><span class="nx">HTMLInputElement</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">  <span class="nx">event</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">()</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">if</span> <span class="p">(</span><span class="nx">emailInput</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">    <span class="c1">// This is ok because Flow infers that `emailInput` cannot be `null` or</span>
+</span><span class="line">    <span class="c1">// `undefined` in this block.</span>
+</span><span class="line">    <span class="nx">dispatch</span><span class="p">(</span><span class="nx">loginEvent</span><span class="p">(</span><span class="nx">emailInput</span><span class="p">.</span><span class="nx">value</span><span class="p">))</span>
+</span><span class="line">  <span class="p">}</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Without a concept of nullability,
+uses of <code>nil</code> are contradictions of what is stated in
+your type signatures.
+This Go signature claims that the argument is a pointer to a <code>User</code> struct -
+but if you take that claim at face value you are likely to get a <code>nil pointer
+dereference</code> error:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class="go"><span class="line"><span class="kd">func</span> <span class="nx">validate</span><span class="p">(</span><span class="nx">user</span> <span class="o">*</span><span class="nx">User</span><span class="p">)</span> <span class="kt">bool</span> <span class="p">{</span>
+</span><span class="line">	<span class="k">return</span> <span class="nx">user</span><span class="p">.</span><span class="nx">Name</span> <span class="o">!=</span> <span class="s">&quot;&quot;</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>In Go every variable with a pass-by-reference type comes with the implied
+ambiguity,
+“…or it might be <code>nil</code>”.
+Support for nullable types makes a language expressive enough to avoid that
+ambiguity.</p>
 
 <p>The problem with <code>nil</code> in Go is exacerbated by the fact that <code>nil</code> checks
 sometimes fail.
-If an interface value has a type but its value is <code>nil</code>,
-<a href="http://devs.cloudimmunity.com/gotchas-and-common-mistakes-in-go-golang/index.html#nil_in_nil_in_vals">a <code>nil</code> check will not return <code>true</code></a>.</p>
+If an interface value has a concrete type but its value is <code>nil</code>,
+<a href="http://devs.cloudimmunity.com/gotchas-and-common-mistakes-in-go-golang/index.html#nil_in_nil_in_vals">a <code>nil</code> check will not return <code>true</code></a>.
+The purist explanation for this is that the value is not really <code>nil</code>:
+it is an interface value that happens to have <code>nil</code> in its value slot.
+I don’t find that explanation to be satisfactory.
+When a method is dispatched on that not-really-nil value,
+the receiver value will really be <code>nil</code> in the method body.</p>
 
-<p>Rust does not have a <code>null</code> or <code>nil</code> value.
+<p>But what about zero values?
+What would the zero value be for a function type or an interface type
+without <code>nil</code>?
+Well, I think that zero values are also a bad idea.</p>
+
+<p>One of the design decisions in Go is that every type must have
+a well-defined default value, which is called the zero value.
+This can be convenient because it means you do not have to write constructors
+by hand when all you need is a default value.
+But I suspect that the real reason why zero values are a part of Go is that
+they provide well-defined behavior for what happens when you use uninitialized
+variables.
+C and C++ are notorious for <a href="http://blog.llvm.org/2011/05/what-every-c-programmer-should-know.html">undefined behaviors</a>,
+which lead to traps for programmers, and to problems making code portable
+between compiler implementations.
+Use of uninitialized variables is one notable example of undefined behavior in
+both languages.<sup id="fnref:changing-specs"><a href="#fn:changing-specs" rel="footnote">1</a></sup>
+I imagine that the designers of Go learned from C and C++,
+and set out to clearly define as much of Go’s behavior as possible.
+I think that is a great attitude for language designers to adopt!
+But there is another option that I think leads to better code safety:
+Rust, Flow, and other languages use <a href="https://en.wikipedia.org/wiki/Data-flow_analysis">data-flow analysis</a> to detect uses of
+uninitialized variables,
+and fail type-checking if any such uses are found.</p>
+
+<p>The zero-value requirement introduces a constraint that <code>nil</code> must exist and
+must be assignable to a variety of types.
+A lot of types have no sensible default value,
+so <code>nil</code> is the only choice.
+So that is one problem.
+Another problem is that the language does not have enough information to
+produce sensible default values for domain-specific types.
+The fact that it tries anyway undermines soundness in code.
+The zero values for functions and interface values
+(i.e., interface values with no runtime type tag)
+are not going to be useful under any circumstances.
+Pointer types can implement methods with <code>nil</code> receivers -
+but that is not useful for types that do not have sensible behavior for
+uninitialized values.
+Default struct values can be useful in some cases -
+but in other cases the default value violates invariants that would have been
+enforced by a hand-written constructor.</p>
+
+<p>The author of <a href="https://www.barrucadu.co.uk/posts/etc/2016-08-25-three-months-of-go.html">Three Months of Go</a> called out problems with zero values in
+work at Pusher:</p>
+
+<blockquote>
+  <p>Zero values caused so many problems over the summer, because everything would appear to be fine, then it suddenly breaks because the zero value wasn’t sensible for its context of use. Perhaps it’s an unrelated change that causes things to break (like a struct getting an extra field).</p>
+</blockquote>
+
+<h3 id="how-rust-does-it-differently">How Rust does it differently</h3>
+
+<p>Rust goes a step beyond nullable types:
+it does not have a <code>null</code> or <code>nil</code> value.
 Rust uses enums, which are types whose values come in multiple variants,
 where each variant is effectively a distinct struct.
 If you want to represent an absence of a value you use an enum variant that
@@ -326,6 +482,14 @@ pattern matching lets you get access to that <code>x</code> value.)</p>
 </span><span class="line"><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
+<p>An advantage of the option pattern over nullable types is that you can
+distinguish between values like <code>None</code> versus <code>Some(None)</code>.
+If you are looking up values in a cache (for example),
+a <code>None</code> result might indicate that there is no entry in the cache for a given
+key;
+and a <code>Some(None)</code> result might indicate that there is an entry,
+and the value of the entry is <code>None</code>.</p>
+
 <p>I once advocated for use of the Option pattern at a Java company -
 but at least one of my coworkers was put off by the idea of allocating an extra
 object on the heap just to distinguish between a value and an absence of
@@ -336,14 +500,14 @@ If the type parameter for <code>Option&lt;T&gt;</code> is a reference type,
 then the <code>None</code> case can be safely represented at runtime as a null pointer.
 So the <code>Some</code> or <code>None</code> wrapper often disappears at compile time.
 In those cases the code is just as efficient as it would have been if the
-language used unsafe <code>null</code> values.</p>
+language allowed uses of unsafe <code>null</code> values in source code.</p>
 
 <p>In the example above since neither <code>Option&lt;i32&gt;</code> nor the <code>i32</code> parameter are
 reference types, the compiler allocates contiguous space on the stack for the
 numeric result, and for a tag to distinguish between <code>Some</code> and <code>None</code>.
 There is no extra heap allocation, and no added pointer indirection.</p>
 
-<p>The Rust Book has <a href="https://doc.rust-lang.org/book/error-handling.html">a lot more detail</a>.</p>
+<p>The Rust Book has <a href="https://doc.rust-lang.org/book/error-handling.html">a lot more detail</a> on error handling.</p>
 
 <p>It is possible to implement the Option pattern in Go with similar efficiency;
 and one could even get a compile-time check that errors are handled by
@@ -351,13 +515,13 @@ implementing a <code>match</code> method that uses the visitor pattern (<a href=
 But without generics there would be no type safety for values wrapped in an
 <code>Option</code> type.</p>
 
-<h3 id="error-handling-boilerplate--lack-of-compile-time-checks-for-error-handling">Error-handling boilerplate &amp; lack of compile-time checks for error handling</h3>
+<h3 id="error-handling-boilerplate--lack-of-compile-time-checks-unhandled-errors">Error-handling boilerplate &amp; lack of compile-time checks unhandled errors</h3>
 
 <p>Error handling in Go has two related problems:
 there is a lot of boilerplate required;
 and if the programmer neglects to check for an error,
 or makes a small mistake such as checking the wrong error variable,
-the compiler will not report the problem.</p>
+the compiler will not detect the problem.</p>
 
 <p>Rust has a type, <code>Result&lt;T,E&gt;</code>,
 that is quite similar to <code>Option&lt;T&gt;</code>.
@@ -377,7 +541,7 @@ A returned value of type <code>Result&lt;T,E&gt;</code> may be either
 </span><span class="line"><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>A common complaint about the Option / Result Pattern is that unwrapping
+<p>A common complaint about the Option and Result patterns is that unwrapping
 success values is a pain.
 But a language with support for pattern matching makes unwrapping painless,
 and first-class result values permit combinators that can handle a series of
@@ -446,7 +610,21 @@ not have prior experience with the Option or Result Pattern:</p>
 </span><span class="line"><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>That is no less verbose than the Go version -
+<p>The <code>match</code> keyword introduces a pattern-match block.
+The block includes a pattern for each possible variant of the type of the
+expression in the head of the <code>match</code> paired with an expression to evaluate if
+that pattern matches.
+This is somewhat like the <a href="https://golang.org/doc/effective_go.html#type_switch">type switch</a> feature in Go,
+where the code that runs depends on the type of the variable in the head of the
+<code>switch</code> block.
+But the Rust version comes with a compile-time check that a pattern is given
+for every possible variant of the given type,
+which avoids potential runtime errors.
+This is especially helpful when a custom type is updated to add new variants:
+the compiler will immediately point out any uses of the type that need to be
+updated.</p>
+
+<p>Anyway, that Rust code is no less verbose than the Go version -
 but it demonstrates that unwrapping <code>Result&lt;T,E&gt;</code> or <code>Option&lt;T&gt;</code> values does
 not have to be any more onerous than <code>nil</code> checks;
 and if we had left out a failure check in the Rust version Rust would have
@@ -467,6 +645,19 @@ So this is an equivalent function:</p>
 </span><span class="line">    <span class="n">fetch_posts</span><span class="p">(</span><span class="o">&amp;</span><span class="n">author</span><span class="p">.</span><span class="n">posts</span><span class="p">)</span>
 </span><span class="line"><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p><code>try!</code> rewrites an expression at compile time.
+For example, <code>try!(fetch_post(post_id))</code> is expanded to put the <code>fetch_post</code>
+call inside a <code>match</code>,
+and inserts the boilerplate pattern matches for the <code>Ok</code> and <code>Err</code> match cases.</p>
+
+<p>The <code>try!</code> macro was used so often that Rust’s designers decided to extend the
+language a bit to better support the pattern:
+putting the <code>?</code> postfix operator at the end of an expression has the same effect.
+For example,
+the line <code>let post = try!(fetch_post(post_id));</code> can be equivalently written as
+<code>let post = fetch_post(post_id)?;</code>
+And type-checking will fail appropriately if you forget the <code>?</code>.</p>
 
 <p>But Go does not support macros.
 Thankfully, the Result pattern does not require macros to be concise.
@@ -504,7 +695,8 @@ There is a combinator for that to:
 
 <p>The idea is that failure checks are almost always the same:
 check for an error, return the error if it exists, otherwise continue.
-It is more <a href="http://deviq.com/don-t-repeat-yourself/">DRY</a> to abstract that into a helper method or a macro.
+The <a href="http://deviq.com/don-t-repeat-yourself/">DRY</a> thing to do is to abstract the common pattern into a helper method
+or a macro.
 And again,
 a common theme in all of these Rust implementations is that there is
 a compile-time guarantee that every error is handled.
@@ -522,24 +714,44 @@ plus a tag to distinguish between an <code>Ok(value)</code> value and an <code>E
 <p>A nice thing about the generality of Rust enums is that if <code>Result&lt;T,E&gt;</code> did
 not exist,
 it would be easy to implement it as a library.
-So what about using the Result or Option pattern in Go?
+So what about using the Result pattern in Go?
 Well, we can’t put methods on Go tuples (a.k.a, multiple return values),
 because they are not first-class values.
+It is not possible to define a function that that accepts a tuple and a callback:
+a Go function that takes a tuple cannot accept additional arguments
+(because Go tuples are not first-class values).
+Those constraints make the combinator pattern difficult.
 We could implement a custom struct type -
 but without generics it would not be very useful.</p>
 
-<h3 id="list-manipulation-cannot-be-abstracted">List manipulation cannot be abstracted</h3>
+<h3 id="list-manipulation-is-not-practical">List manipulation is not practical</h3>
 
 <p>There is a special slap-in-the-face for functional programmers built into Go:
-A value of type <code>[]interface{}</code> cannot be easily coerced to another slice type -
-e.g. <code>[]string</code> or <code>[]MyStructType</code>.
-The only way to do that conversion is to create a new slice,
-and copy values one-at-a-time in a <code>for</code> loop.
-But any polymorphic function that acts on lists <em>must</em> operate on the
-<code>interface{}</code> top type because Go does not provide type variables.</p>
+there is no good way to write a polymorphic function that can manipulate slices
+with arbitrary types.
+In Rust you can write a function with a signature that looks like this:</p>
 
-<p>I can implement <code>Map</code> (or potentially <code>ParallelMap</code>) in Go without too much
-trouble:</p>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="rust"><span class="line"><span class="n">pub</span> <span class="k">fn</span> <span class="n">map</span><span class="o">&lt;</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">F</span><span class="o">&gt;</span><span class="p">(</span><span class="n">callback</span><span class="o">:</span> <span class="n">F</span><span class="p">,</span> <span class="n">xs</span><span class="o">:</span> <span class="o">&amp;</span><span class="p">[</span><span class="n">A</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Vec</span><span class="o">&lt;</span><span class="n">B</span><span class="o">&gt;</span>
+</span><span class="line">    <span class="n">where</span> <span class="n">F</span><span class="o">:</span> <span class="k">for</span><span class="o">&lt;</span><span class="err">&#39;</span><span class="n">a</span><span class="o">&gt;</span> <span class="n">Fn</span><span class="p">(</span><span class="o">&amp;</span><span class="err">&#39;</span><span class="n">a</span> <span class="n">A</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">B</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>That is a function that takes a callback and an input slice,
+and returns a new array that is computed by accumulating the results of
+applying the callback to each element in the input array.
+Even better, there are built-in methods in Rust’s iterator types that do
+exactly this.
+The input slice might hold any type of values;
+type variables allow the type checker to track how the type of the output array
+relates to the type of the input slice,
+and also allow the type checker to check that the callback has the appropriate
+input and output types.</p>
+
+<p>That pattern does not work well in Go.
+Without type variables the only way to express a polymorphic slice type is
+using the top-type: <code>[]interface{}</code>.
+For example:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
@@ -548,7 +760,7 @@ trouble:</p>
 <span class="line-number">5</span>
 <span class="line-number">6</span>
 <span class="line-number">7</span>
-</pre></td><td class="code"><pre><code class="go"><span class="line"><span class="kd">func</span> <span class="nx">Map</span><span class="p">(</span><span class="nx">f</span> <span class="kd">func</span><span class="p">(</span><span class="nx">x</span> <span class="kd">interface</span><span class="p">{})</span> <span class="kd">interface</span><span class="p">{},</span> <span class="nx">xs</span> <span class="p">[]</span><span class="kd">interface</span><span class="p">{})</span> <span class="p">[]</span><span class="kd">interface</span><span class="p">{}</span> <span class="p">{</span>
+</pre></td><td class="code"><pre><code class="go"><span class="line"><span class="kd">func</span> <span class="nx">Map</span><span class="p">(</span><span class="nx">callback</span> <span class="kd">func</span><span class="p">(</span><span class="nx">x</span> <span class="kd">interface</span><span class="p">{})</span> <span class="kd">interface</span><span class="p">{},</span> <span class="nx">xs</span> <span class="p">[]</span><span class="kd">interface</span><span class="p">{})</span> <span class="p">[]</span><span class="kd">interface</span><span class="p">{}</span> <span class="p">{</span>
 </span><span class="line">	<span class="nx">ys</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([]</span><span class="kd">interface</span><span class="p">{},</span> <span class="nb">len</span><span class="p">(</span><span class="nx">xs</span><span class="p">))</span>
 </span><span class="line">	<span class="k">for</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">x</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">xs</span> <span class="p">{</span>
 </span><span class="line">		<span class="nx">ys</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="p">=</span> <span class="nx">f</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span>
@@ -557,32 +769,59 @@ trouble:</p>
 </span><span class="line"><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>But then I end up with some bad choices:</p>
+<p>But that function is not really polymorphic:
+a slice type with a more specific type parameter
+(e.g., <code>[]int</code>)
+is not type-compatible with <code>[]interface{}</code>.
+So you cannot pass a variable with type <code>[]int</code> to that <code>Map</code> function.
+You have to create a new slice of type <code>[]interface{}</code> first,
+and copy <code>int</code> values to the new slice one-by-one in a <code>for</code> loop.
+Then after getting a result from <code>Map</code> you have to copy result values into yet
+another slice to get the proper final slice type.
+That means two custom loops are required around every invocation of <code>Map</code> -
+plus a runtime type assertion or type switch in the callback implementation.</p>
 
-<ul>
-  <li>I can precede and follow every invocation of <code>Map</code> with custom <code>for</code> loops to
-fix up types;</li>
-  <li>or instead of one polymorphic implementation I can write a custom <code>Map</code> for
-every pair of types that I want to map from and to;</li>
-  <li>or I can give up on type safety and write programs using mostly <code>interface{}</code>
-values.</li>
-</ul>
+<p>A slice with an arbitrary type parameter <em>is</em> type-compatible with the
+top-type, <code>interface{}</code>.
+If you just use <code>interface{}</code> type for every polymorphic argument you get
+a signature like this:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="go"><span class="line"><span class="kd">func</span> <span class="nx">Map</span><span class="p">(</span><span class="nx">callback</span> <span class="kd">interface</span><span class="p">{},</span> <span class="nx">xs</span> <span class="kd">interface</span><span class="p">{})</span> <span class="kd">interface</span><span class="p">{}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>With that signature you can pass in any slice type and callback type that you want,
+and assign the result to a variable with the proper type.
+But to make that work it is necessary to use the reflection API to fix up
+runtime type tags for the input slice, the input callback, and the output slice.
+The process is described in <a href="http://blog.burntsushi.net/type-parametric-functions-golang/">Writing type parametric functions in Go</a>.
+The reflection code is ugly,
+but can be hidden in implementations of general-purpose functions.
+The unavoidable downsides are that you lose all compile-time type-safety,
+and there is an order-of-magnitude performance cost.</p>
 
 <p>The same problem applies to other list manipulation functions:
-<code>Filter</code>, <code>Take</code>, <code>Reduce</code>, etc.</p>
+<code>Filter</code>, <code>Take</code>, <code>Reduce</code>, etc.
+This is bad because list manipulation is the bread-and-butter of functional
+programming.
+The fact that Go discourages such a basic building block as <code>Map</code> means that
+functional programming is not likely to thrive in Go,
+and the Go community will not be able to benefit from the
+<a href="http://www.cs.kent.ac.uk/people/staff/dat/miranda/whyfp90.pdf">advantages of functional programming</a>.</p>
 
 <p>You might have noticed a pattern here:
-Go does not support generics, and that leads to problems.</p>
-
-<p>Dynamic languages like Javascript, Python, and Ruby do not support generics
+Go does not support generics, and that leads to problems.
+Except the issue is not just lack of generics.
+Dynamic languages like Javascript, Python, and Ruby do not support generics
 either -
 at least not in the sense of compile-time checking.
 But functional idioms work just fine in those languages.
 For example,
-in Javascript I can pass any list to a generic list manipulation function,
+in Javascript you can pass any list to a generic list manipulation function,
 and it just works.
 Go occupies an awkward middle ground where it checks types at compile time,
-but does not provide tools to describe relationships between types.</p>
+but does not provide tools to explain to the compiler how input and output
+types relate to each other.</p>
 
 <p>Generics - and type variables in particular -
 are a means to “talk” about types.
@@ -645,9 +884,9 @@ Here is an equivalent Rust implementation:</p>
 </span><span class="line"><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>The Rust version lets me say what I mean.
+<p>The Rust version lets you say what you mean.
 In other words, the Rust function is “declarative”.
-And the difference becomes more pronounced if I want to process values
+And the difference becomes more pronounced if you want to process values
 concurrently -
 for example to make network requests in parallel.
 More on that in a bit.</p>
@@ -807,18 +1046,15 @@ in terms of <code>Stream</code> values.</p>
 
 <p>Go has a magical function called <code>make</code> that seems to do whatever the standard
 library authors need for a given type.
-It takes a type as an argument, which is unlike other Go functions.
-For custom types <code>make</code> just returns an empty value, or <code>nil</code> for pointer types.
-But in some cases <code>make</code> can take additional arguments to initialize a value.
-For example, when creating a slice you can provide a capacity:</p>
+It takes a type as an argument, which is unlike most other Go functions.
+Called with one argument it initializes a small slice, map, or channel.
+<code>make</code> can take one or two integer arguments,
+depending on the choice of the first argument.
+For example, when creating a slice you can provide a length and a capacity:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class="go"><span class="line"><span class="nx">mySlice</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([]</span><span class="kt">int</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span>
+</pre></td><td class="code"><pre><code class="go"><span class="line"><span class="nx">mySlice</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([]</span><span class="kt">int</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>Without the second argument <code>make</code> returns <code>nil</code> as usual -
-but with that argument <code>make</code> has a very different behavior where it allocates
-a backing array to hold the specified number of values.</p>
 
 <p>When creating a channel, you can specify the channel’s buffer size with
 a second argument to <code>make</code>.
@@ -843,22 +1079,21 @@ only standard library types get to be range-able.
 There is no way to make a third-party data type iterable.
 Library authors can implement adapters to output a view of their data structure
 as a slice, or to spit out values over a channel.
-But that puts extra complexity on code that uses third-party data structures;
+But that puts extra complexity on code that uses third-party data structures,
 and requires programmers to use non-standard idioms.</p>
 
 <p>Yet another privilege is that only standard types can be compared using <code>==</code>,
 <code>&gt;</code>, etc.</p>
 
-<p>The biggest problem is that only standard libraries are allowed to define
-generic types.
+<p>And of course only standard libraries are allowed to define generic types.
 This is severely limiting to the library ecosystem around Go.
 It means that, for example,
 a third-party functional data structures library,
 or a third-party futures library
 will never be as usable as the standard library collection types.</p>
 
-<p>Rust supports generics for third-party code.
-And Rust implements iteration, equality, and comparison via traits that any
+<p>Rust supports generics for third-party code;
+and Rust implements iteration, equality, and comparison via traits that any
 third-party type can implement.
 Third-party Rust types are nearly indistinguishable from standard library
 types,
@@ -869,12 +1104,14 @@ which promotes innovation in Rust’s library ecosystem.</p>
 support in Rust:
 functions that are polymorphic in their return type.
 Rust traits are more flexible than typical object-oriented interfaces:
-the choice of implementation of an interface method is determined solely by the
-receiver of the method.
+when an interface method is dispatched the choice of the method implementation
+to execute is determined solely by the type of the receiver of the method.
 But a trait method implementation can be selected based on
 the type of the receiver,
 the type of any argument position,
-the types of multiple argument positions (e.g., for an equality trait),
+the combination of types of multiple argument positions
+(e.g., an equality trait can require that the two polymorphic arguments to an
+<code>equals</code> method have the same type),
 or by the expected return type.
 An implementation of <code>make</code> in Rust might look like this:</p>
 
@@ -946,9 +1183,9 @@ An implementation of <code>make</code> in Rust might look like this:</p>
 </span><span class="line">    <span class="k">fn</span> <span class="n">make_with_capacity</span><span class="p">(</span><span class="n">capacity</span><span class="o">:</span> <span class="n">usize</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">;</span>
 </span><span class="line"><span class="p">}</span>
 </span><span class="line">
-</span><span class="line"><span class="c1">// An `impl` provides implementations for trait methods for given concrete types.</span>
+</span><span class="line"><span class="c1">// An `impl` provides implementations of trait methods for given concrete types.</span>
 </span><span class="line"><span class="c1">// Note that we can implement `Make` for the standard `Vec&lt;T&gt;` type right here.</span>
-</span><span class="line"><span class="c1">// It is not necessary to change the implementation of `Vec&lt;T&gt;`.</span>
+</span><span class="line"><span class="c1">// It is not necessary to change the original implementation of `Vec&lt;T&gt;`.</span>
 </span><span class="line"><span class="k">impl</span> <span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">Make</span> <span class="k">for</span> <span class="n">Vec</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="p">{</span>
 </span><span class="line">    <span class="k">fn</span> <span class="n">make</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Vec</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="p">{</span>
 </span><span class="line">        <span class="n">Vec</span><span class="o">::</span><span class="n">new</span><span class="p">()</span>
@@ -976,8 +1213,8 @@ An implementation of <code>make</code> in Rust might look like this:</p>
 </span><span class="line">
 </span><span class="line"><span class="cp">#[test]</span>
 </span><span class="line"><span class="k">fn</span> <span class="n">makes_a_vec</span><span class="p">()</span> <span class="p">{</span>
-</span><span class="line">    <span class="c1">// We specify a type for the variable to instruct the compiler with</span>
-</span><span class="line">    <span class="c1">// implementation of `make` to use.</span>
+</span><span class="line">    <span class="c1">// We specify a type for the variable that holds the output of `make`.</span>
+</span><span class="line">    <span class="c1">// This instructs the compiler which implementation of `make` to call.</span>
 </span><span class="line">    <span class="k">let</span> <span class="k">mut</span> <span class="n">v</span><span class="o">:</span> <span class="n">Vec</span><span class="o">&lt;&amp;</span><span class="n">str</span><span class="o">&gt;</span> <span class="o">=</span> <span class="n">Make</span><span class="o">::</span><span class="n">make</span><span class="p">();</span>
 </span><span class="line">    <span class="n">v</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="s">&quot;some string&quot;</span><span class="p">);</span>
 </span><span class="line">    <span class="n">assert_eq</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;some string&quot;</span><span class="p">,</span> <span class="n">v</span><span class="p">[</span><span class="m">0</span><span class="p">]);</span>
@@ -1007,6 +1244,10 @@ as either the type or the trait.
 So if Rust itself or a Rust library implemented <code>make</code>,
 then any third-party library could define their own custom implementations.</p>
 
+<p>I had to implement <code>make</code> and <code>make_with_capacity</code> as separate methods because
+Rust does not support method overloading.
+But in theory neither does Go.</p>
+
 <h2 id="the-ugly">The Ugly</h2>
 
 <p>These are some features of Go that I dislike on what I think are more
@@ -1016,7 +1257,7 @@ or that could be worked around if some of the bad parts were fixed.</p>
 <h3 id="no-tagged-unions-limited-pattern-matching">No tagged unions, limited pattern matching</h3>
 
 <p>Some older languages that make heavy use of channels
-(e.g. Erlang and Scala)
+(e.g., Erlang and Scala)
 support tagged-union types in combination with pattern matching.
 These features make great companions for channels:
 a tagged union describes a fixed set of message types that a channel can accept
@@ -1088,6 +1329,9 @@ or produce.</p>
 <span class="line-number">62</span>
 <span class="line-number">63</span>
 <span class="line-number">64</span>
+<span class="line-number">65</span>
+<span class="line-number">66</span>
+<span class="line-number">67</span>
 </pre></td><td class="code"><pre><code class="rust"><span class="line"><span class="k">use</span> <span class="n">std</span><span class="o">::</span><span class="n">sync</span><span class="o">::</span><span class="n">mpsc</span><span class="o">::</span><span class="p">{</span><span class="n">Receiver</span><span class="p">,</span> <span class="n">Sender</span><span class="p">,</span> <span class="n">channel</span><span class="p">};</span>
 </span><span class="line"><span class="k">use</span> <span class="n">std</span><span class="o">::</span><span class="n">thread</span><span class="p">;</span>
 </span><span class="line">
@@ -1096,7 +1340,7 @@ or produce.</p>
 </span><span class="line"><span class="c1">// compile-time error.</span>
 </span><span class="line"><span class="cp">#[derive(Clone, Copy, Debug)]</span>
 </span><span class="line"><span class="n">pub</span> <span class="k">enum</span> <span class="n">CounterInstruction</span> <span class="p">{</span>
-</span><span class="line">    <span class="n">Increment</span><span class="p">(</span><span class="n">isize</span><span class="p">),</span>
+</span><span class="line">    <span class="n">Increment</span><span class="p">(</span><span class="n">isize</span><span class="p">),</span>  <span class="c1">// `isize` is an integer type that matches the platform word size</span>
 </span><span class="line">    <span class="n">Reset</span><span class="p">,</span>
 </span><span class="line">    <span class="n">Terminate</span><span class="p">,</span>
 </span><span class="line"><span class="p">}</span>
@@ -1106,9 +1350,11 @@ or produce.</p>
 </span><span class="line"><span class="k">use</span> <span class="n">self</span><span class="o">::</span><span class="n">CounterInstruction</span><span class="o">::*</span><span class="p">;</span>
 </span><span class="line">
 </span><span class="line"><span class="n">pub</span> <span class="k">fn</span> <span class="n">new_counter</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">Sender</span><span class="o">&lt;</span><span class="n">CounterInstruction</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">Receiver</span><span class="o">&lt;</span><span class="n">CounterResponse</span><span class="o">&gt;</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">    <span class="c1">// Creating a channel produces a connected sender / receiver pair</span>
 </span><span class="line">    <span class="k">let</span> <span class="p">(</span><span class="n">instr_tx</span><span class="p">,</span> <span class="n">instr_rx</span><span class="p">)</span> <span class="o">=</span> <span class="n">channel</span><span class="o">::&lt;</span><span class="n">CounterInstruction</span><span class="o">&gt;</span><span class="p">();</span>
 </span><span class="line">    <span class="k">let</span> <span class="p">(</span><span class="n">resp_tx</span><span class="p">,</span>  <span class="n">resp_rx</span><span class="p">)</span>  <span class="o">=</span> <span class="n">channel</span><span class="o">::&lt;</span><span class="n">CounterResponse</span><span class="o">&gt;</span><span class="p">();</span>
 </span><span class="line">
+</span><span class="line">    <span class="c1">// Run the counter in a background thread</span>
 </span><span class="line">    <span class="n">thread</span><span class="o">::</span><span class="n">spawn</span><span class="p">(</span><span class="n">move</span> <span class="o">||</span> <span class="p">{</span>
 </span><span class="line">        <span class="k">let</span> <span class="k">mut</span> <span class="n">count</span><span class="o">:</span> <span class="n">isize</span> <span class="o">=</span> <span class="m">0</span><span class="p">;</span>
 </span><span class="line">
@@ -1135,6 +1381,7 @@ or produce.</p>
 </span><span class="line">
 </span><span class="line">    <span class="p">});</span>
 </span><span class="line">
+</span><span class="line">    <span class="c1">// Return the instruction sender, and the response receiver</span>
 </span><span class="line">    <span class="p">(</span><span class="n">instr_tx</span><span class="p">,</span> <span class="n">resp_rx</span><span class="p">)</span>
 </span><span class="line"><span class="p">}</span>
 </span><span class="line">
@@ -1153,6 +1400,34 @@ or produce.</p>
 </span><span class="line">    <span class="n">assert_eq</span><span class="o">!</span><span class="p">(</span><span class="m">2</span><span class="p">,</span> <span class="n">latest_count</span><span class="p">);</span>
 </span><span class="line"><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Rust does not require channels to be closed explicitly.
+Channel senders and receivers implement a <code>Drop</code> trait;
+any type can implement <code>Drop</code> to schedule some cleanup code to run when a value
+goes out of scope.
+In this example when the background thread terminates <code>resp_tx</code> goes out of
+scope,
+and closes automatically.</p>
+
+<p>This block is the pattern matching code from the example above:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class="rust"><span class="line"><span class="n">match</span> <span class="n">instr</span> <span class="p">{</span>
+</span><span class="line">    <span class="n">Increment</span><span class="p">(</span><span class="n">amount</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="n">count</span> <span class="o">+=</span> <span class="n">amount</span><span class="p">,</span>
+</span><span class="line">    <span class="n">Reset</span>             <span class="o">=&gt;</span> <span class="n">count</span> <span class="o">=</span> <span class="m">0</span><span class="p">,</span>
+</span><span class="line">    <span class="n">Terminate</span>         <span class="o">=&gt;</span> <span class="n">return</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The block matches against <code>instr</code>,
+which has the type <code>CounterInstruction</code>.
+There are three variants for <code>CounterInstruction</code>;
+each variant is represented by a pattern in the <code>match</code> block with code to run
+in case the pattern matches.</p>
 
 <p>Go has type switches, which are similar to pattern matching.
 Comparable Go matching code could look like this:</p>
@@ -1187,7 +1462,7 @@ consumer knows how to handle.
 And what is especially valuable is checking that all pieces of code that send
 or receive on a channel are consistent in the types of values that the they
 produce or consume.
-If we make a change to the set of possible messages,
+If you make a change to the set of possible messages in a Rust program,
 but forget to update some critical code to accommodate the change,
 the type checker will report an error at compile time.</p>
 
@@ -1195,44 +1470,91 @@ the type checker will report an error at compile time.</p>
 messages over polymorphic channels are dynamically typed.
 You can use an interface as the type parameter for a channel,
 which does limit the types of messages that are sent over the channel.
-But a Go interface is not sealed;
-when a new type is created that implements the given interface,
+But a Go interface is not sealed:
+when a new type is created that implements the interface
 there is no compile-time check to ensure that all consumers of the channel are
 updated to handle the new type.
-If you use a type switch to unpack channel messages
+Unpacking channel messages with a type switch
 (as opposed to using exclusively interface methods)
-then you may end up introducing bugs that a different type system would have
-caught.</p>
+can lead to bugs that a different type system would have caught.</p>
 
 <h3 id="dynamic-typing">Dynamic typing</h3>
 
-<p>Go uses a mixture of static and dynamic type checking.
+<p>Go makes heavy use of dynamic type-checking.
 Any use of <code>interface{}</code>, any type assertion or type switch,
 is dynamic typing.
-This leads to reduced compile-time type safety.</p>
+This is good and bad:
+without generics, it is often necessary to coerce a value to a different type;
+dynamic type assertions are a safer way to do this than unchecked type casts.
+Either way the program will (probably) crash at runtime if a value ends up
+having an unexpected type.
+But with an unchecked cast the program might corrupt memory or leak information
+to attackers before crashing.</p>
 
-<h3 id="dynamic-dispatch-stuck-in-an-old-object-oriented-mindset">Dynamic dispatch, stuck in an old object-oriented mindset</h3>
+<p>The fact that errors are reported at runtime means that problems are likely to
+go unnoticed without good test coverage.
+That does not just mean 100% code coverage -
+there might be different combinations of conditions that lead to a code path
+and a type error might not manifest under every combination.</p>
 
-<p>In general Rust resolves every value to a concrete type at compile time.<sup id="fnref:trait-objects"><a href="#fn:trait-objects" rel="footnote">1</a></sup>
-That means that Rust can use static dispatch when invoking trait methods.
-Compile-time resolution also means that there is no top type
-(like <code>interface{}</code>)
-that has to be refined at runtime.</p>
+<p>A type checker that can detect errors at compile time is like an extra test
+suite that always tests every combination of conditions.
+Dynamic type tests are nearly unheard of in Rust because the compiler resolves
+types at compile time.
+Pattern matches on enum variants looks a bit like a dynamic type test -
+but pattern matching is qualitatively different because enums are sealed.
+There is a compile-time guarantee that pattern matching will not fail.</p>
+
+<p>There are two caveats:</p>
+
+<ul>
+  <li><code>unsafe</code> blocks, functions, and traits in Rust do make unchecked type casts -
+especially when interacting with the foreign function interface.
+But <code>unsafe</code> implementations are delimited regions where the normal rules do
+not apply.
+The best practice is to keep unsafe code to a minimum;
+and <a href="https://alex-ozdemir.github.io/rust/unsafe/unsafe-in-rust-syntactic-patterns/#how-many-crates-use-unsafe">most libraries</a> do not use any <code>unsafe</code> code.</li>
+  <li>Rust supports <a href="https://doc.rust-lang.org/book/trait-objects.html">trait objects</a>,
+which is are cases where the compiler does not resolve a concrete type for
+a value at compile time.
+But the compiler does verify at compile-time that the value implements a given
+trait.
+A trait object is a lot like a Go interface value -
+except that a trait object cannot have a <code>nil</code> value.
+Despite the lack of a compile-time concrete type,
+it is safe to dispatch trait methods on a trait object because there is
+compile-time verification that whatever value is in the object implements the
+given trait and therefore implements the appropriate methods.</li>
+</ul>
+
+<h3 id="dynamic-dispatch-reinventing-the-wheel">Dynamic dispatch, reinventing the wheel</h3>
+
+<p>In general Rust resolves every value to a concrete type at compile time.
+That means that Rust can use static dispatch when invoking trait methods.</p>
+
+<p>(As I mentioned,
+the exception is <a href="https://doc.rust-lang.org/book/trait-objects.html">trait objects</a>,
+which do use dynamic dispatch much like Go interface values.
+My understanding is that idiomatic Rust code uses trait objects sparingly.
+Most uses of traits in Rust use the trait as a bound on a type variable,
+which leads to compile-time resolution to a concrete type.
+For details see the Rust book sections on <a href="https://doc.rust-lang.org/book/traits.html">traits</a> and <a href="https://doc.rust-lang.org/book/trait-objects.html">trait objects</a>.)</p>
 
 <p>In Go every invocation of an interface method uses dynamic dispatch.
-Dynamic dispatch, and runtime reflection relating to type assertions
-add some runtime overhead.</p>
+Dynamic dispatch, type assertions, and type switches require runtime reflection,
+which adds some runtime overhead.</p>
 
 <p>The technique of resolving concrete types at compile-time is not new to Rust,
 and it has nothing to do with borrow-checking.
 Haskell was doing the same thing at least ten years before work began on Go.
+And Haskell has just as much polymorphic flexibility as Rust or Go.
 (Rust traits are an adaptation of Haskell <a href="http://learnyouahaskell.com/types-and-typeclasses">type classes</a>.)</p>
 
 <p>The designers of Go wanted a model for polymorphism that is simpler and more
 flexible than what other object-oriented languages provide.
 In particular they wanted composition over inheritance,
 and an ability to implement interfaces after-the-fact
-(so that new interfaces can be applied to pre-existing types).
+so that new interfaces can be applied to pre-existing types.
 This is <em>exactly</em> what traits and type classes do.
 The solution that Go introduced feels to me like a less-capable reinvented wheel.</p>
 
@@ -1246,7 +1568,8 @@ can be stored in data structures,
 and can be passed over channels.
 Multiple-values in Go cannot do any of those things.</p>
 
-<p>We already saw a tuple return value in the implementation of the <code>Make</code> trait.
+<p>We already saw tuple return values in the implementation of the <code>Make</code> trait,
+and in the <code>new_counter</code> example.
 Here is a smaller example:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
@@ -1262,13 +1585,17 @@ Here is a smaller example:</p>
 <span class="line-number">11</span>
 <span class="line-number">12</span>
 <span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
 </pre></td><td class="code"><pre><code class="rust"><span class="line"><span class="c1">// Returns a tuple</span>
+</span><span class="line"><span class="c1">// (`isize` is an integer type that matches the platform word size)</span>
 </span><span class="line"><span class="k">fn</span> <span class="n">min_and_max</span><span class="p">(</span><span class="n">xs</span><span class="o">:</span> <span class="o">&amp;</span><span class="p">[</span><span class="n">isize</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">isize</span><span class="p">,</span> <span class="n">isize</span><span class="p">)</span> <span class="p">{</span>
 </span><span class="line">    <span class="k">let</span> <span class="n">init</span> <span class="o">=</span> <span class="p">(</span><span class="n">xs</span><span class="p">[</span><span class="m">0</span><span class="p">],</span> <span class="n">xs</span><span class="p">[</span><span class="m">0</span><span class="p">]);</span>
 </span><span class="line">    <span class="n">xs</span><span class="p">.</span><span class="n">iter</span><span class="p">()</span>
 </span><span class="line">        <span class="p">.</span><span class="n">fold</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="o">|</span><span class="p">(</span><span class="n">min</span><span class="p">,</span> <span class="n">max</span><span class="p">),</span> <span class="o">&amp;</span><span class="n">x</span><span class="o">|</span> <span class="p">(</span><span class="n">cmp</span><span class="o">::</span><span class="n">min</span><span class="p">(</span><span class="n">min</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> <span class="n">cmp</span><span class="o">::</span><span class="n">max</span><span class="p">(</span><span class="n">max</span><span class="p">,</span> <span class="n">x</span><span class="p">)))</span>
 </span><span class="line"><span class="p">}</span>
 </span><span class="line">
+</span><span class="line"><span class="cp">#[test]</span>
 </span><span class="line"><span class="k">fn</span> <span class="n">consume_tuple</span><span class="p">()</span> <span class="p">{</span>
 </span><span class="line">    <span class="k">let</span> <span class="n">xs</span> <span class="o">=</span> <span class="n">vec</span><span class="o">!</span><span class="p">[</span><span class="m">1</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="m">3</span><span class="p">,</span> <span class="m">4</span><span class="p">,</span> <span class="m">5</span><span class="p">];</span>
 </span><span class="line">    <span class="k">let</span> <span class="p">(</span><span class="n">min</span><span class="p">,</span> <span class="n">max</span><span class="p">)</span> <span class="o">=</span> <span class="n">min_and_max</span><span class="p">(</span><span class="o">&amp;</span><span class="n">xs</span><span class="p">);</span> <span class="c1">// unpack tuple with destructuring assignment</span>
@@ -1288,9 +1615,11 @@ It seems like this should work, but it does not:</p>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>As far as I know the best options for doing this are to define a custom
-<code>struct</code> type,
-to make type assertions on values from channels,
-or to send success values and errors over separate channels.</p>
+<code>struct</code> type;
+to coerce both success and error values to <code>interface{}</code>,
+and use a type switch to distinguish success and error on the other end of the
+channel;
+or to send success and error values over two parallel channels.</p>
 
 <p>Another consequence is that there is no good way to define methods on multiple
 return values,
@@ -1374,7 +1703,7 @@ For example, Rayon transparently splits work into batches,
 which provides better performance than queueing up every invocation of the
 <code>map</code> callback separately.
 (The default batch size is 5000 items, but that value is tunable.)
-The <code>sum</code> method (which is the Reduce step in this example) is also part of Rayon,
+The <code>sum</code> method (which is the Reduce step in this example) is also part of Rayon -
 which means that it is optimized for consuming batches of results from worker
 threads.</p>
 
@@ -1388,8 +1717,9 @@ Usually you do not actually want both at the same time.</p>
 <p>How do I think Go could be better?
 Generics.
 Nearly all of my complaints boil down to lack of support for generics.
-But I think that Rust-style traits, and getting rid of <code>nil</code> would also be
-useful changes.</p>
+But I think that Rust-style traits,
+getting rid of <code>nil</code>,
+and getting rid of zero values would also be useful changes.</p>
 
 <p>In its current form, I prefer not to use Go.
 It is not that Go is bad - it is just that there are lots of languages
@@ -1403,16 +1733,18 @@ but has none of the “bad parts” that I called out.</p>
 
 <p>Javascript is (like Go) easy to learn,
 and has wonderful support for concurrency (if not parallelism).
-When paired with Flow or Typescript you get (in my opinion) more robust
-type safety than Go provides.
-Javascript with Flow in particular has none of the “bad parts” from this post.</p>
+When paired with Flow or Typescript you get more robust type safety than Go
+provides.
+The combination of Javascript and Flow in particular has none of the “bad
+parts” from this post.</p>
 
 <p>Erlang and Scala both support lightweight concurrency in the same style that Go
 does,
 and they are both great for functional programming.</p>
 
 <p>Clojure is not type-safe - but it does fantastic things!
-My favorite functional data structure implementations are the ones in Clojure.</p>
+My favorite functional data structure implementations are the ones in Clojure.
+And Clojure encourages functional programming.</p>
 
 <p>Haskell has amazing type safety,
 some of the best concurrency and parallelism features that I have seen in any
@@ -1428,10 +1760,16 @@ I hope it is an interest in taking a look beyond the imperative
 I encourage you to pick one of the languages above,
 and take some time to learn about it and to get a good feel for its strengths.
 I think you will be glad that you did.</p>
+
+<h2 id="changes">Changes</h2>
+
+<ul>
+  <li><em>2017-03-19:</em> Corrected inaccuracies regarding <code>nil</code>, slice type manipulation, and <code>make</code>; added discussion of zero values; lots of edits</li>
+</ul>
 <div class="footnotes">
   <ol>
-    <li id="fn:trait-objects">
-      <p>The exception is <a href="https://doc.rust-lang.org/book/trait-objects.html">trait objects</a>. My understanding is that idiomatic Rust code uses these sparingly. Most uses of traits in Rust use the trait as a type bound on a type variable, which permits static resolution to a concrete type. For details see the Rust book sections on <a href="https://doc.rust-lang.org/book/traits.html">traits</a> and <a href="https://doc.rust-lang.org/book/trait-objects.html">trait objects</a>.<a href="#fnref:trait-objects" rel="reference">&#8617;</a></p>
+    <li id="fn:changing-specs">
+      <p>This may have changed over time; the C and C++ language specifications are evolving, and I am not very familiar with the details.<a href="#fnref:changing-specs" rel="reference">&#8617;</a></p>
     </li>
   </ol>
 </div>
