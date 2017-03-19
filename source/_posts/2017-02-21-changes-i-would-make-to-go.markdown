@@ -32,6 +32,7 @@ Here are other posts that echo my feelings:
 
 - [Why Go Is Not Good](http://yager.io/programming/go.html)
 - [Everyday hassles in Go](http://crufter.com/@crufter/everyday-hassles-in-go)
+- [Three Months of Go (from a Haskeller's perspective)](https://www.barrucadu.co.uk/posts/etc/2016-08-25-three-months-of-go.html)
 
 I will add to those with some of my own opinions.
 To highlight exactly how I think Go could be better,
@@ -288,6 +289,13 @@ uninitialized values.
 Default struct values can be useful in some cases -
 but in other cases the default value violates invariants that would have been
 enforced by a hand-written constructor.
+
+The author of [Three Months of Go][] called out problems with zero values in
+work at Pusher:
+
+> Zero values caused so many problems over the summer, because everything would appear to be fine, then it suddenly breaks because the zero value wasn't sensible for its context of use. Perhaps it's an unrelated change that causes things to break (like a struct getting an extra field).
+
+[Three Months of Go]: https://www.barrucadu.co.uk/posts/etc/2016-08-25-three-months-of-go.html
 
 
 ### How Rust does it differently
