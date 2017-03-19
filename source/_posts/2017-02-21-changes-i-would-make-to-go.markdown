@@ -6,7 +6,7 @@ date: 2017-02-21
 comments: true
 ---
 
-_Last updated 2017-03-16_
+_Last updated 2017-03-19_
 
 I have been programming primarily in Go for about six months.
 I find it frustrating.
@@ -1418,4 +1418,4 @@ I think you will be glad that you did.
 
 ## Changes
 
-- *2017-03-16:* Corrected inaccuracies regarding `nil` and slice type manipulation; added discussion of zero values
+- *2017-03-19:* Corrected inaccuracies regarding `nil`, slice type manipulation, and `make`; added discussion of zero values; lots of edits
