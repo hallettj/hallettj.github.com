@@ -173,7 +173,7 @@ Some newer languages have a `null`, but treat it as a distinct type that is
 generally not compatible with other types.
 (For example, [Fantom][] and [Flow][] do this.)
 In those languages values are non-nullable by default.
-Here is how I might declare and use a nullable variable in Flow when writing
+Here is how one might declare and use a nullable variable in Flow when writing
 React code:
 
 ```js
@@ -212,7 +212,7 @@ Without a concept of nullability,
 uses of `nil` are contradictions of what is stated in
 your type signatures.
 This Go signature claims that the argument is a pointer to a `User` struct -
-but if I take that claim at face value I am likely to get a `nil pointer
+but if you take that claim at face value you are likely to get a `nil pointer
 dereference` error:
 
 ```go
@@ -571,7 +571,7 @@ but without generics it would not be very useful.
 There is a special slap-in-the-face for functional programmers built into Go:
 there is no good way to write a polymorphic function that can manipulate slices
 with arbitrary types.
-In Rust I can write a function with a signature that looks like this:
+In Rust you can write a function with a signature that looks like this:
 
 ```rust
 pub fn map<A, B, F>(callback: F, xs: &[A]) -> Vec<B>
@@ -608,24 +608,24 @@ But that function is not really polymorphic:
 a slice type with a more specific type parameter
 (e.g., `[]int`)
 is not type-compatible with `[]interface{}`.
-So I cannot pass a variable with type `[]int` to that `Map` function.
-I have to create a new slice of type `[]interface{}` first,
+So you cannot pass a variable with type `[]int` to that `Map` function.
+You have to create a new slice of type `[]interface{}` first,
 and copy `int` values to the new slice one-by-one in a `for` loop.
-Then after getting a result from `Map` I have to copy result values into yet
+Then after getting a result from `Map` you have to copy result values into yet
 another slice to get the proper final slice type.
 That means two custom loops are required around every invocation of `Map` -
 plus a runtime type assertion or type switch in the callback implementation.
 
 A slice with an arbitrary type parameter *is* type-compatible with the
 top-type, `interface{}`.
-If I just use `interface{}` type for every polymorphic argument I get
+If you just use `interface{}` type for every polymorphic argument you get
 a signature like this:
 
 ```go
 func Map(callback interface{}, xs interface{}) interface{}
 ```
 
-With that signature I can pass in any slice type and callback type that I want,
+With that signature you can pass in any slice type and callback type that you want,
 and assign the result to a variable with the proper type.
 But to make that work it is necessary to use the reflection API to fix up
 runtime type tags for the input slice, the input callback, and the output slice.
@@ -656,7 +656,7 @@ either -
 at least not in the sense of compile-time checking.
 But functional idioms work just fine in those languages.
 For example,
-in Javascript I can pass any list to a generic list manipulation function,
+in Javascript you can pass any list to a generic list manipulation function,
 and it just works.
 Go occupies an awkward middle ground where it checks types at compile time,
 but does not provide tools to explain to the compiler how input and output
@@ -705,9 +705,9 @@ fn latest_titles(docs: &[Document], count: usize) -> Vec<&str> {
 }
 ```
 
-The Rust version lets me say what I mean.
+The Rust version lets you say what you mean.
 In other words, the Rust function is "declarative".
-And the difference becomes more pronounced if I want to process values
+And the difference becomes more pronounced if you want to process values
 concurrently -
 for example to make network requests in parallel.
 More on that in a bit.
