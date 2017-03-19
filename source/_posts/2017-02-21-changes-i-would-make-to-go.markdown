@@ -65,10 +65,10 @@ replacement for the Gecko HTML rendering engine, which is written in C++.
 [Servo]: https://servo.org/
 
 As I see it the key difference is that
-Rust aims for [soundness][], and powerful abstractions;
+Rust aims for soundness,[^soundness] and powerful abstractions;
 Go aims to be accessible to people who are familiar with imperative programming.
 
-[soundness]: http://logan.tw/posts/2014/11/12/soundness-and-completeness-of-the-type-system/
+[^soundness]: Soundness is the idea that incorrect programs should not compile. A language that is completely sound will never produce code that leads to runtime errors. No language is completely sound; but Rust aims to get as close as it reasonably can.
 
 That said, Rust is not necessarily a replacement for Go,
 and I do not mean to say that everyone using Go should switch to Rust.
