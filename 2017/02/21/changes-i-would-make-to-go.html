@@ -168,7 +168,7 @@ One of Mozilla’s prominent applications for Rust is <a href="https://servo.org
 replacement for the Gecko HTML rendering engine, which is written in C++.</p>
 
 <p>As I see it the key difference is that
-Rust aims for <a href="http://logan.tw/posts/2014/11/12/soundness-and-completeness-of-the-type-system/">soundness</a>, and powerful abstractions;
+Rust aims for soundness,<sup id="fnref:soundness"><a href="#fn:soundness" rel="footnote">1</a></sup> and powerful abstractions;
 Go aims to be accessible to people who are familiar with imperative programming.</p>
 
 <p>That said, Rust is not necessarily a replacement for Go,
@@ -376,7 +376,7 @@ C and C++ are notorious for <a href="http://blog.llvm.org/2011/05/what-every-c-p
 which lead to traps for programmers, and to problems making code portable
 between compiler implementations.
 Use of uninitialized variables is one notable example of undefined behavior in
-both languages.<sup id="fnref:changing-specs"><a href="#fn:changing-specs" rel="footnote">1</a></sup>
+both languages.<sup id="fnref:changing-specs"><a href="#fn:changing-specs" rel="footnote">2</a></sup>
 I imagine that the designers of Go learned from C and C++,
 and set out to clearly define as much of Go’s behavior as possible.
 I think that is a great attitude for language designers to adopt!
@@ -1768,6 +1768,9 @@ I think you will be glad that you did.</p>
 </ul>
 <div class="footnotes">
   <ol>
+    <li id="fn:soundness">
+      <p>Soundness is the idea that incorrect programs should not compile. A language that is completely sound will never produce code that leads to runtime errors. No language is completely sound; but Rust aims to get as close as it reasonably can.<a href="#fnref:soundness" rel="reference">&#8617;</a></p>
+    </li>
     <li id="fn:changing-specs">
       <p>This may have changed over time; the C and C++ language specifications are evolving, and I am not very familiar with the details.<a href="#fnref:changing-specs" rel="reference">&#8617;</a></p>
     </li>
