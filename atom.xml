@@ -4,7 +4,7 @@
   <title><![CDATA[sitr.us]]></title>
   <link href="http://sitr.us/atom.xml" rel="self"/>
   <link href="http://sitr.us/"/>
-  <updated>2017-03-20T10:14:18-04:00</updated>
+  <updated>2017-03-20T10:33:56-04:00</updated>
   <id>http://sitr.us/</id>
   <author>
     <name><![CDATA[Jesse Hallett]]></name>
@@ -256,7 +256,7 @@ dereference</code> error:</p>
 <p>In Go every variable with a pass-by-reference type comes with the implied
 ambiguity,
 “…or it might be <code>nil</code>”.
-Support for nullable types makes a language expressive enough to avoid that
+Support for non-nullable types makes a language expressive enough to avoid that
 ambiguity.</p>
 
 <p>The problem with <code>nil</code> in Go is exacerbated by the fact that <code>nil</code> checks
@@ -1623,12 +1623,15 @@ Usually you do not actually want both at the same time.</p>
 
 <h2 id="conclusion">Conclusion</h2>
 
-<p>How do I think Go could be better?
+<p>How do I think Go 2.0 could be better?
 Generics.
 Nearly all of my complaints boil down to lack of support for generics.
-But I think that Rust-style traits,
-getting rid of <code>nil</code>,
-and getting rid of zero values would also be useful changes.</p>
+But I think that support for non-nil-able types,
+and getting rid of zero values would also be useful changes.
+Even Rust-style traits might be workable.
+Traits would require support for receiver-less methods;
+bit it might be possible to make traits work with Go’s implicit implementation
+feature.</p>
 
 <p>In its current form, I prefer not to use Go.
 It is not that Go is bad - it is just that there are lots of languages
@@ -1673,8 +1676,9 @@ I think you will be glad that you did.</p>
 <h2 id="changes">Changes</h2>
 
 <ul>
-  <li><em>2017-03-19:</em> Corrected inaccuracies regarding <code>nil</code>, slice type manipulation, and <code>make</code>; added discussion of zero values; lots of edits</li>
+  <li><em>2017-03-19:</em> Correct inaccuracies regarding <code>nil</code>, slice type manipulation, and <code>make</code>; add discussion of zero values; lots of edits</li>
   <li><em>2017-03-20:</em> Add link to The Language I Wish Go Was</li>
+  <li><em>2017-03-20:</em> Change one instance of “nullable” to “non-nullable”; edit to conclusion section</li>
 </ul>
 <div class="footnotes">
   <ol>
