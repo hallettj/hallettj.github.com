@@ -225,7 +225,7 @@ func validate(user *User) bool {
 In Go every variable with a pass-by-reference type comes with the implied
 ambiguity,
 "...or it might be `nil`".
-Support for nullable types makes a language expressive enough to avoid that
+Support for non-nullable types makes a language expressive enough to avoid that
 ambiguity.
 
 [Fantom]: http://fantom.org/
@@ -1369,12 +1369,15 @@ Usually you do not actually want both at the same time.
 
 ## Conclusion
 
-How do I think Go could be better?
+How do I think Go 2.0 could be better?
 Generics.
 Nearly all of my complaints boil down to lack of support for generics.
-But I think that Rust-style traits,
-getting rid of `nil`,
+But I think that support for non-nil-able types,
 and getting rid of zero values would also be useful changes.
+Even Rust-style traits might be workable.
+Traits would require support for receiver-less methods;
+bit it might be possible to make traits work with Go's implicit implementation
+feature.
 
 In its current form, I prefer not to use Go.
 It is not that Go is bad - it is just that there are lots of languages
@@ -1419,5 +1422,6 @@ I think you will be glad that you did.
 
 ## Changes
 
-- *2017-03-19:* Corrected inaccuracies regarding `nil`, slice type manipulation, and `make`; added discussion of zero values; lots of edits
+- *2017-03-19:* Correct inaccuracies regarding `nil`, slice type manipulation, and `make`; add discussion of zero values; lots of edits
 - *2017-03-20:* Add link to The Language I Wish Go Was
+- *2017-03-20:* Change one instance of "nullable" to "non-nullable"; edit to conclusion section
