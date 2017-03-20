@@ -4,7 +4,7 @@
   <title><![CDATA[sitr.us]]></title>
   <link href="http://sitr.us/atom.xml" rel="self"/>
   <link href="http://sitr.us/"/>
-  <updated>2017-03-19T13:13:15-04:00</updated>
+  <updated>2017-03-20T10:14:18-04:00</updated>
   <id>http://sitr.us/</id>
   <author>
     <name><![CDATA[Jesse Hallett]]></name>
@@ -18,7 +18,7 @@
     <link href="http://sitr.us/2017/02/21/changes-i-would-make-to-go.html"/>
     <updated>2017-02-21T00:00:00-04:00</updated>
     <id>http://sitr.us/2017/02/21/changes-i-would-make-to-go</id>
-    <content type="html"><![CDATA[<p><em>Last updated 2017-03-19</em></p>
+    <content type="html"><![CDATA[<p><em>Last updated 2017-03-20</em></p>
 
 <p>I have been programming primarily in Go for about six months.
 I find it frustrating.
@@ -44,6 +44,7 @@ Here are other posts that echo my feelings:</p>
   <li><a href="http://yager.io/programming/go.html">Why Go Is Not Good</a></li>
   <li><a href="http://crufter.com/@crufter/everyday-hassles-in-go">Everyday hassles in Go</a></li>
   <li><a href="https://www.barrucadu.co.uk/posts/etc/2016-08-25-three-months-of-go.html">Three Months of Go (from a Haskeller’s perspective)</a></li>
+  <li><a href="http://journal.stuffwithstuff.com/2010/10/21/the-language-i-wish-go-was/">The Language I Wish Go Was</a></li>
 </ul>
 
 <p>I will add to those with some of my own opinions.
@@ -1673,6 +1674,7 @@ I think you will be glad that you did.</p>
 
 <ul>
   <li><em>2017-03-19:</em> Corrected inaccuracies regarding <code>nil</code>, slice type manipulation, and <code>make</code>; added discussion of zero values; lots of edits</li>
+  <li><em>2017-03-20:</em> Add link to The Language I Wish Go Was</li>
 </ul>
 <div class="footnotes">
   <ol>
