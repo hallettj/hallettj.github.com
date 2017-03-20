@@ -6,7 +6,7 @@ date: 2017-02-21
 comments: true
 ---
 
-_Last updated 2017-03-19_
+_Last updated 2017-03-20_
 
 I have been programming primarily in Go for about six months.
 I find it frustrating.
@@ -33,6 +33,7 @@ Here are other posts that echo my feelings:
 - [Why Go Is Not Good](http://yager.io/programming/go.html)
 - [Everyday hassles in Go](http://crufter.com/@crufter/everyday-hassles-in-go)
 - [Three Months of Go (from a Haskeller's perspective)](https://www.barrucadu.co.uk/posts/etc/2016-08-25-three-months-of-go.html)
+- [The Language I Wish Go Was](http://journal.stuffwithstuff.com/2010/10/21/the-language-i-wish-go-was/)
 
 I will add to those with some of my own opinions.
 To highlight exactly how I think Go could be better,
@@ -1419,3 +1420,4 @@ I think you will be glad that you did.
 ## Changes
 
 - *2017-03-19:* Corrected inaccuracies regarding `nil`, slice type manipulation, and `make`; added discussion of zero values; lots of edits
+- *2017-03-20:* Add link to The Language I Wish Go Was
