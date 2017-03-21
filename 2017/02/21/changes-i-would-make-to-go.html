@@ -152,7 +152,6 @@ There is a lot of overlap in their philosophies;
 both languages:</p>
 
 <ul>
-  <li>aim for a simple core language</li>
   <li>compile to fast, native binaries</li>
   <li>eschew inheritance in favor of composition</li>
   <li>support imperative programming</li>
@@ -168,9 +167,9 @@ dislike of the complexity of C++.
 One of Mozilla’s prominent applications for Rust is <a href="https://servo.org/">Servo</a>, a potential
 replacement for the Gecko HTML rendering engine, which is written in C++.</p>
 
-<p>As I see it the key difference is that
-Rust aims for soundness,<sup id="fnref:soundness"><a href="#fn:soundness" rel="footnote">1</a></sup> and powerful abstractions;
-Go aims to be accessible to people who are familiar with imperative programming.</p>
+<p>As I see it the key differences are that
+Rust aims for soundness,<sup id="fnref:soundness"><a href="#fn:soundness" rel="footnote">1</a></sup>, powerful abstractions, and high performance;
+Go aims to be accessible, consistently simple, and fast to compile.</p>
 
 <p>That said, Rust is not necessarily a replacement for Go,
 and I do not mean to say that everyone using Go should switch to Rust.
@@ -182,8 +181,11 @@ Those requirements add to the complexity of Rust programs.
 The <a href="https://doc.rust-lang.org/book/ownership.html">borrow-checker</a> in particular has a reputation for its learning curve.
 My purpose for making comparisons to Rust is to provide context for specific
 ways in which I think Go could be better.
-There are some good ideas in Rust that are not tied to borrow-checking,
-and I think that Go could be a better language if it adopted some of those ideas.</p>
+Rust borrows a lot of good ideas from other languages,
+and puts them together in one nice package.
+Most of those ideas are not even tied to borrow-checking.
+I think that Go could be a better language if it adopted some of the same ideas
+that Rust has adopted.</p>
 
 <p>You can grab the <a href="https://github.com/hallettj/comparing-go-and-rust">code examples</a> from this post.
 The examples come with executable tests to encourage experimentation.</p>
@@ -200,29 +202,24 @@ it is clean separation of state (structs), and behavior (methods).
 I think that distinction can become unfortunately blurry in languages that use
 inheritance.</p>
 
-<p>Rust has a similar system,
-where data is described by structs or enums.
-Behavior is separate, in the form of trait methods and standalone functions.</p>
-
 <p>Go is easy to learn.
 Go repurposes object-oriented concepts to make something new in a way that
 makes it approachable to programmers who are familiar with other
-object-oriented languages.
-This is somewhat similar to what Rust does;
-but interfaces in Go match behaviors of object-oriented interfaces more closely
-than Rust’s traits do.</p>
+object-oriented languages.</p>
 
 <p>There is often a pretty clear “Go way” to solve a problem.
 This is also an oft-touted virtue of, for example, Python.
 Encouraging consistent idioms via the languages makes it likely that any Go
 programmer will be able to understand code written by any other Go programmer.
-This is not so much the case in Rust.</p>
+This is part of a philosophy of simplicity that is described in the keynote
+<a href="https://dave.cheney.net/2015/03/08/simplicity-and-collaboration">Simplicity and collaboration</a>.</p>
 
-<p>There are lots of Go APIs that have clearly had a lot of thought put into them.
+<p>There are lots of features in the Go standard libraries that have clearly had
+a lot of thought put into them.
 This is one of my favorites:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class="go"><span class="line"><span class="mi">5</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Seconds</span>
+</pre></td><td class="code"><pre><code class="go"><span class="line"><span class="nx">fiveSeconds</span> <span class="o">:=</span> <span class="mi">5</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Seconds</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>Goroutines are cheap,
@@ -232,6 +229,19 @@ even if that involves spawning large numbers of goroutines.
 Erlang and Scala also implement lightweight actors.
 Rust and other languages have their own solutions for lightweight concurrent
 and parallel programming.)</p>
+
+<p>Since I am using Rust as a point-of-reference I will point out that
+Rust has a separation of behavior and data that is a lot like Go’s,
+and Rust also goes for composition-over inheritance.
+Instead of structs and interfaces,
+Rust uses structs, enums, and traits.
+Rust traits serve the same purpose as interfaces;
+but they are different enough that they might seem a little weird to
+programmers with an object-oriented background.
+Rust and Go differ in that Rust prioritizes expressiveness over simplicity,
+and type safety over fast compile times.
+(Fast compile times are a high priority for the Rust team -
+just not the top priority.)</p>
 
 <p>I could go on - there are plenty of nice features in Go.
 But there are also:</p>
@@ -524,6 +534,34 @@ and if the programmer neglects to check for an error,
 or makes a small mistake such as checking the wrong error variable,
 the compiler will not detect the problem.</p>
 
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+</pre></td><td class="code"><pre><code class="go"><span class="line"><span class="kd">func</span> <span class="nx">doStuff</span><span class="p">()</span> <span class="kt">error</span> <span class="p">{</span>
+</span><span class="line">	<span class="nx">_</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">doThing1</span><span class="p">()</span>
+</span><span class="line">	<span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span><span class="line">		<span class="k">return</span> <span class="nx">err</span>
+</span><span class="line">	<span class="p">}</span>
+</span><span class="line">
+</span><span class="line">	<span class="nx">_</span><span class="p">,</span> <span class="nx">errr</span> <span class="o">:=</span> <span class="nx">doThing2</span><span class="p">()</span>  <span class="c1">// Error not propagated due to a bouncy key</span>
+</span><span class="line">	<span class="k">if</span> <span class="nx">errr</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span><span class="line">		<span class="k">return</span> <span class="nx">err</span>
+</span><span class="line">	<span class="p">}</span>
+</span><span class="line">
+</span><span class="line">	<span class="k">return</span> <span class="kc">nil</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
 <p>Rust has a type, <code>Result&lt;T,E&gt;</code>,
 that is quite similar to <code>Option&lt;T&gt;</code>.
 The difference is that the failure variant of the <code>Result&lt;T,E&gt;</code> enum is not empty -
@@ -734,8 +772,8 @@ In Rust you can write a function with a signature that looks like this:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
-</pre></td><td class="code"><pre><code class="rust"><span class="line"><span class="n">pub</span> <span class="k">fn</span> <span class="n">map</span><span class="o">&lt;</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">F</span><span class="o">&gt;</span><span class="p">(</span><span class="n">callback</span><span class="o">:</span> <span class="n">F</span><span class="p">,</span> <span class="n">xs</span><span class="o">:</span> <span class="o">&amp;</span><span class="p">[</span><span class="n">A</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Vec</span><span class="o">&lt;</span><span class="n">B</span><span class="o">&gt;</span>
-</span><span class="line">    <span class="n">where</span> <span class="n">F</span><span class="o">:</span> <span class="k">for</span><span class="o">&lt;</span><span class="err">&#39;</span><span class="n">a</span><span class="o">&gt;</span> <span class="n">Fn</span><span class="p">(</span><span class="o">&amp;</span><span class="err">&#39;</span><span class="n">a</span> <span class="n">A</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">B</span>
+</pre></td><td class="code"><pre><code class="rust"><span class="line"><span class="k">fn</span> <span class="n">map</span><span class="o">&lt;</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">F</span><span class="o">&gt;</span><span class="p">(</span><span class="n">callback</span><span class="o">:</span> <span class="n">F</span><span class="p">,</span> <span class="n">xs</span><span class="o">:</span> <span class="o">&amp;</span><span class="p">[</span><span class="n">A</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Vec</span><span class="o">&lt;</span><span class="n">B</span><span class="o">&gt;</span>
+</span><span class="line">    <span class="n">where</span> <span class="n">F</span><span class="o">:</span> <span class="n">Fn</span><span class="p">(</span><span class="o">&amp;</span><span class="n">A</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">B</span> <span class="p">{</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>That is a function that takes a callback and an input slice,
@@ -750,8 +788,8 @@ and also allow the type checker to check that the callback has the appropriate
 input and output types.</p>
 
 <p>That pattern does not work well in Go.
-Without type variables the only way to express a polymorphic slice type is
-using the top-type: <code>[]interface{}</code>.
+Without type variables the only way to express a type that is polymorphic
+over all slice types is to use the top-type: <code>[]interface{}</code>.
 For example:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
@@ -878,8 +916,8 @@ Here is an equivalent Rust implementation:</p>
 <span class="line-number">7</span>
 </pre></td><td class="code"><pre><code class="rust"><span class="line"><span class="k">fn</span> <span class="n">latest_titles</span><span class="p">(</span><span class="n">docs</span><span class="o">:</span> <span class="o">&amp;</span><span class="p">[</span><span class="n">Document</span><span class="p">],</span> <span class="n">count</span><span class="o">:</span> <span class="n">usize</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vec</span><span class="o">&lt;&amp;</span><span class="n">str</span><span class="o">&gt;</span> <span class="p">{</span>
 </span><span class="line">    <span class="n">docs</span><span class="p">.</span><span class="n">iter</span><span class="p">()</span>
-</span><span class="line">        <span class="p">.</span><span class="n">filter</span><span class="p">(</span><span class="o">|</span><span class="n">ref</span> <span class="n">doc</span><span class="o">|</span> <span class="o">!</span><span class="n">doc</span><span class="p">.</span><span class="n">is_archived</span><span class="p">)</span>
-</span><span class="line">        <span class="p">.</span><span class="n">map</span><span class="p">(</span><span class="o">|</span><span class="n">ref</span> <span class="n">doc</span><span class="o">|</span> <span class="n">doc</span><span class="p">.</span><span class="n">title</span><span class="p">.</span><span class="n">as_str</span><span class="p">())</span>
+</span><span class="line">        <span class="p">.</span><span class="n">filter</span><span class="p">(</span><span class="o">|</span><span class="n">doc</span><span class="o">|</span> <span class="o">!</span><span class="n">doc</span><span class="p">.</span><span class="n">is_archived</span><span class="p">)</span>
+</span><span class="line">        <span class="p">.</span><span class="n">map</span><span class="p">(</span><span class="o">|</span><span class="n">doc</span><span class="o">|</span> <span class="n">doc</span><span class="p">.</span><span class="n">title</span><span class="p">.</span><span class="n">as_str</span><span class="p">())</span>
 </span><span class="line">        <span class="p">.</span><span class="n">take</span><span class="p">(</span><span class="n">count</span><span class="p">)</span>
 </span><span class="line">        <span class="p">.</span><span class="n">collect</span><span class="p">()</span>
 </span><span class="line"><span class="p">}</span>
@@ -1006,11 +1044,15 @@ library:</p>
 <span class="line-number">3</span>
 <span class="line-number">4</span>
 <span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
 </pre></td><td class="code"><pre><code class="rust"><span class="line"><span class="k">fn</span> <span class="n">fetch_documents</span><span class="p">(</span><span class="n">ids</span><span class="o">:</span> <span class="o">&amp;</span><span class="p">[</span><span class="k">i64</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Result</span><span class="o">&lt;</span><span class="n">Vec</span><span class="o">&lt;</span><span class="n">Document</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">io</span><span class="o">::</span><span class="n">Error</span><span class="o">&gt;</span> <span class="p">{</span>
 </span><span class="line">    <span class="k">let</span> <span class="n">results</span> <span class="o">=</span> <span class="n">ids</span><span class="p">.</span><span class="n">iter</span><span class="p">()</span>
 </span><span class="line">        <span class="p">.</span><span class="n">map</span><span class="p">(</span><span class="o">|&amp;</span><span class="n">id</span><span class="o">|</span> <span class="n">fetch_document_future</span><span class="p">(</span><span class="n">id</span><span class="p">));</span>
 </span><span class="line">    <span class="n">future</span><span class="o">::</span><span class="n">join_all</span><span class="p">(</span><span class="n">results</span><span class="p">).</span><span class="n">wait</span><span class="p">()</span>
 </span><span class="line"><span class="p">}</span>
+</span><span class="line">
+</span><span class="line"><span class="c1">// The implementation of `fetch_document_future` is left as an exercise to the reader.</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>The Rust function works the same way that the Go function does:
@@ -1257,9 +1299,8 @@ or that could be worked around if some of the bad parts were fixed.</p>
 
 <h3 id="no-tagged-unions-limited-pattern-matching">No tagged unions, limited pattern matching</h3>
 
-<p>Some older languages that make heavy use of channels
-(e.g., Erlang and Scala)
-support tagged-union types in combination with pattern matching.
+<p>Scala is another language that encourages passing messages over channels.
+Scala supports tagged-union types in combination with pattern matching.
 These features make great companions for channels:
 a tagged union describes a fixed set of message types that a channel can accept
 or produce.</p>
@@ -1771,11 +1812,12 @@ I think you will be glad that you did.</p>
   <li><em>2017-03-19:</em> Correct inaccuracies regarding <code>nil</code>, slice type manipulation, and <code>make</code>; add discussion of zero values; lots of edits</li>
   <li><em>2017-03-20:</em> Add link to The Language I Wish Go Was</li>
   <li><em>2017-03-20:</em> Change one instance of “nullable” to “non-nullable”; edit to conclusion section</li>
+  <li><em>2017-03-20:</em> Edits based on reader feedback</li>
 </ul>
 <div class="footnotes">
   <ol>
     <li id="fn:soundness">
-      <p>Soundness is the idea that incorrect programs should not compile. A language that is completely sound will never produce code that leads to runtime errors. No language is completely sound; but Rust aims to get as close as it reasonably can.<a href="#fnref:soundness" rel="reference">&#8617;</a></p>
+      <p>Soundness is a property of a type system where any “claims” made by program types are guaranteed to hold at runtime. Runtime type errors will not occur if a language is sound.<a href="#fnref:soundness" rel="reference">&#8617;</a></p>
     </li>
     <li id="fn:changing-specs">
       <p>This may have changed over time; the C and C++ language specifications are evolving, and I am not very familiar with the details.<a href="#fnref:changing-specs" rel="reference">&#8617;</a></p>
