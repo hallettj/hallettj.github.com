@@ -47,7 +47,6 @@ Rust in 2010.
 There is a lot of overlap in their philosophies;
 both languages:
 
-- aim for a simple core language
 - compile to fast, native binaries
 - eschew inheritance in favor of composition
 - support imperative programming
@@ -65,11 +64,11 @@ replacement for the Gecko HTML rendering engine, which is written in C++.
 [2]: https://en.wikipedia.org/wiki/Go_(programming_language)#History
 [Servo]: https://servo.org/
 
-As I see it the key difference is that
-Rust aims for soundness,[^soundness] and powerful abstractions;
-Go aims to be accessible to people who are familiar with imperative programming.
+As I see it the key differences are that
+Rust aims for soundness,[^soundness], powerful abstractions, and high performance;
+Go aims to be accessible, consistently simple, and fast to compile.
 
-[^soundness]: Soundness is the idea that incorrect programs should not compile. A language that is completely sound will never produce code that leads to runtime errors. No language is completely sound; but Rust aims to get as close as it reasonably can.
+[^soundness]: Soundness is a property of a type system where any "claims" made by program types are guaranteed to hold at runtime. Runtime type errors will not occur if a language is sound.
 
 That said, Rust is not necessarily a replacement for Go,
 and I do not mean to say that everyone using Go should switch to Rust.
@@ -81,8 +80,11 @@ Those requirements add to the complexity of Rust programs.
 The [borrow-checker][] in particular has a reputation for its learning curve.
 My purpose for making comparisons to Rust is to provide context for specific
 ways in which I think Go could be better.
-There are some good ideas in Rust that are not tied to borrow-checking,
-and I think that Go could be a better language if it adopted some of those ideas.
+Rust borrows a lot of good ideas from other languages,
+and puts them together in one nice package.
+Most of those ideas are not even tied to borrow-checking.
+I think that Go could be a better language if it adopted some of the same ideas
+that Rust has adopted.
 
 [borrow-checker]: https://doc.rust-lang.org/book/ownership.html
 
@@ -104,29 +106,26 @@ it is clean separation of state (structs), and behavior (methods).
 I think that distinction can become unfortunately blurry in languages that use
 inheritance.
 
-Rust has a similar system,
-where data is described by structs or enums.
-Behavior is separate, in the form of trait methods and standalone functions.
-
 Go is easy to learn.
 Go repurposes object-oriented concepts to make something new in a way that
 makes it approachable to programmers who are familiar with other
 object-oriented languages.
-This is somewhat similar to what Rust does;
-but interfaces in Go match behaviors of object-oriented interfaces more closely
-than Rust's traits do.
 
 There is often a pretty clear "Go way" to solve a problem.
 This is also an oft-touted virtue of, for example, Python.
 Encouraging consistent idioms via the languages makes it likely that any Go
 programmer will be able to understand code written by any other Go programmer.
-This is not so much the case in Rust.
+This is part of a philosophy of simplicity that is described in the keynote
+[Simplicity and collaboration][].
 
-There are lots of Go APIs that have clearly had a lot of thought put into them.
+[Simplicity and collaboration]: https://dave.cheney.net/2015/03/08/simplicity-and-collaboration
+
+There are lots of features in the Go standard libraries that have clearly had
+a lot of thought put into them.
 This is one of my favorites:
 
 ```go
-5 * time.Seconds
+fiveSeconds := 5 * time.Seconds
 ```
 
 Goroutines are cheap,
@@ -136,6 +135,19 @@ even if that involves spawning large numbers of goroutines.
 Erlang and Scala also implement lightweight actors.
 Rust and other languages have their own solutions for lightweight concurrent
 and parallel programming.)
+
+Since I am using Rust as a point-of-reference I will point out that
+Rust has a separation of behavior and data that is a lot like Go's,
+and Rust also goes for composition-over inheritance.
+Instead of structs and interfaces,
+Rust uses structs, enums, and traits.
+Rust traits serve the same purpose as interfaces;
+but they are different enough that they might seem a little weird to
+programmers with an object-oriented background.
+Rust and Go differ in that Rust prioritizes expressiveness over simplicity,
+and type safety over fast compile times.
+(Fast compile times are a high priority for the Rust team -
+just not the top priority.)
 
 I could go on - there are plenty of nice features in Go.
 But there are also:
@@ -397,6 +409,22 @@ and if the programmer neglects to check for an error,
 or makes a small mistake such as checking the wrong error variable,
 the compiler will not detect the problem.
 
+```go
+func doStuff() error {
+	_, err := doThing1()
+	if err != nil {
+		return err
+	}
+
+	_, errr := doThing2()  // Error not propagated due to a bouncy key
+	if errr != nil {
+		return err
+	}
+
+	return nil
+}
+```
+
 Rust has a type, `Result<T,E>`,
 that is quite similar to `Option<T>`.
 The difference is that the failure variant of the `Result<T,E>` enum is not empty -
@@ -575,8 +603,8 @@ with arbitrary types.
 In Rust you can write a function with a signature that looks like this:
 
 ```rust
-pub fn map<A, B, F>(callback: F, xs: &[A]) -> Vec<B>
-    where F: for<'a> Fn(&'a A) -> B
+fn map<A, B, F>(callback: F, xs: &[A]) -> Vec<B>
+    where F: Fn(&A) -> B {
 ```
 
 That is a function that takes a callback and an input slice,
@@ -591,8 +619,8 @@ and also allow the type checker to check that the callback has the appropriate
 input and output types.
 
 That pattern does not work well in Go.
-Without type variables the only way to express a polymorphic slice type is
-using the top-type: `[]interface{}`.
+Without type variables the only way to express a type that is polymorphic
+over all slice types is to use the top-type: `[]interface{}`.
 For example:
 
 ```go
@@ -699,8 +727,8 @@ Here is an equivalent Rust implementation:
 ```rust
 fn latest_titles(docs: &[Document], count: usize) -> Vec<&str> {
     docs.iter()
-        .filter(|ref doc| !doc.is_archived)
-        .map(|ref doc| doc.title.as_str())
+        .filter(|doc| !doc.is_archived)
+        .map(|doc| doc.title.as_str())
         .take(count)
         .collect()
 }
@@ -810,6 +838,8 @@ fn fetch_documents(ids: &[i64]) -> Result<Vec<Document>, io::Error> {
         .map(|&id| fetch_document_future(id));
     future::join_all(results).wait()
 }
+
+// The implementation of `fetch_document_future` is left as an exercise to the reader.
 ```
 
 The Rust function works the same way that the Go function does:
@@ -999,9 +1029,8 @@ or that could be worked around if some of the bad parts were fixed.
 
 ### No tagged unions, limited pattern matching
 
-Some older languages that make heavy use of channels
-(e.g., Erlang and Scala)
-support tagged-union types in combination with pattern matching.
+Scala is another language that encourages passing messages over channels.
+Scala supports tagged-union types in combination with pattern matching.
 These features make great companions for channels:
 a tagged union describes a fixed set of message types that a channel can accept
 or produce.
@@ -1425,3 +1454,4 @@ I think you will be glad that you did.
 - *2017-03-19:* Correct inaccuracies regarding `nil`, slice type manipulation, and `make`; add discussion of zero values; lots of edits
 - *2017-03-20:* Add link to The Language I Wish Go Was
 - *2017-03-20:* Change one instance of "nullable" to "non-nullable"; edit to conclusion section
+- *2017-03-20:* Edits based on reader feedback
