@@ -8,9 +8,9 @@ comments: true
 
 This is a description of my passion project. I plan to publish more detail and motivation when I get to a minimum viable product.
 
-I want to make social collaboration software without walls. 
+I want to make social collaboration software without walls.
 A company can have its private discussions and documents -
-but people in a company should be able to include clients or contractors in discussions seamlessly. 
+but people in a company should be able to include clients or contractors in discussions seamlessly.
 It should not be necessary to require people to join a private account on
 service X just to have a conversation.
 
@@ -31,12 +31,13 @@ A protocol that builds on email instead of attempting to replace it will have a 
 
 [email statistics]: http://www.radicati.com/wp/wp-content/uploads/2015/02/Email-Statistics-Report-2015-2019-Executive-Summary.pdf
 
+<!-- more -->
+
 There is a deeply-set mindset that email messages are text or HTML,
 and that one message corresponds to one reply.
 This is the same way people thought about web pages in the '90s.
 Then AJAX came along and changed everything by decoupling HTTP requests from page views.
 That was the big idea that led to [Web 2.0][].
-Email is capable of transporting any type of data, just like HTTP.
 I want to apply a similar idea:
 decouple email messages from conversation replies,
 and use email to transport structured JSON data representing activities.
@@ -61,12 +62,13 @@ traditional email users see messages that just say "+1"
 (or whatever text the sender has selected for their fallback "like" message).
 This works because email supports multiple data parts,
 including fallback presentation for clients that do not understand a new format.
-Poodle messages contain a JSON part intended to be consumed by Poodle,
-and an HTML view of the same content for other clients.
+Poodle messages contain a JSON part intended to be consumed by Poodle
+(or other interoperable clients),
+and an HTML view of the same content for traditional clients.
 
 Poodle supports interaction modes beyond the traditional "email exchanges are
 discussions" point of view.
-Poodle splits out several activity types that can serve as the starting point of an interaction;
+Poodle splits out several activity types that can serve as the starting point of an interaction -
 for example there is a "share a document" option".
 The document might be HTML edited directly in the client,
 or an uploaded file such as a spreadsheet, presentation, image, or video.
@@ -74,28 +76,29 @@ Anyone who the document is shared with can edit the document.
 What really happens is that their client sends out an "edit" activity to collaborators;
 but what everyone sees is that the document in their client updates with the new changes.
 (And anyone can browse previous revisions of a document at any time,
-because those revisions are really just email messages in their IMAP server.)
+because those revisions are really just email messages on their IMAP server.)
 Once again, people using traditional clients see document edits as follow-up messages
 with the new content in its entirety.
 
-I have a small slide deck of screen shots from an early iteration of Poodle: http://sitr.us/talks/poodle/
+I have a small slide deck of screen shots from an early iteration of Poodle:
+[http://sitr.us/talks/poodle/](http://sitr.us/talks/poodle/)
 
 Keep in mind that all of the features that you see work without any new servers.
 This is all just email.
-The only thing that is new is a special email client (which runs locally, via a downloaded app).
+The only thing that is new is a special email client (which runs locally via a downloaded app).
 And everything gracefully degrades when interacting with people with regular email clients.
 
 Going slide-by-slide:
 
-2. The author of a discussion post can edit their own post after-the-fact; each activity has +1 counts.
+2. Participants can edit their own post after-the-fact; each activity has +1 counts.
 
-3. An exchange might be presented as a collaborative document instead of as a thread. In this case there are calls-to-action to edit, or link to the document. (In this example the document content is markdown; but this concept could work for any type of file: images, videos, slide decks, whatever.)
+3. An interaction might be presented as a collaborative document instead of as a thread. In this case there are calls-to-action to edit, or link to the document. (In this example the document content is markdown; but this concept could work for any type of file: images, videos, slide decks, whatever.)
 
 4. Linking to email messages is a much under-used feature in my opinion. There is actually already an RFC that specifies how to construct a globally-unique URI for any email message.
 
 5. This slide shows an early iteration of the process of linking to a document from another activity. Combining collaborative documents with linking allows for a decentralized wiki that actually lives in copies in the participants' email accounts.
 
-6. I was experimenting with features to make email more usable generally. I tried to design Poodle to make it really obvious who sees what in any exchange. Poodle also uses a reply-to-all form as the default reply option, and the user must go through extra steps to reply to just one person, or to a subset of the people already participating in a discussion.
+6. I was experimenting with features to make email more usable generally. I tried to design Poodle to make it really obvious who sees what in any exchange. Poodle uses a reply-to-all form as the default reply option, and the user must go through extra steps to reply to just one person, or to a subset of the people already participating in a discussion.
 
 7. If someone does reply without including everyone, you get this "private aside" feature. (This works just by examining To:, From:, and Cc: fields in email messages in the discussion.) The private aside acts like a self-contained sub-discussion, interleaved with the original discussion. My hope is that this kind of feature can help to avoid embarrassing information leaks.
 
