@@ -828,6 +828,10 @@ as I continue to explore Category theory.
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/2017/06/20/what-is-poodle.html">What is Poodle</a>
+      </li>
+    
+      <li class="post">
         <a href="/2017/02/21/changes-i-would-make-to-go.html">Changes I would make to Go</a>
       </li>
     
@@ -841,10 +845,6 @@ as I continue to explore Category theory.
     
       <li class="post">
         <a href="/2016/12/20/flow-cookbook.html">Flow Cookbook</a>
-      </li>
-    
-      <li class="post">
-        <a href="/2015/05/31/type-checking-react-with-flow.html">Type checking React with Flow v0.11</a>
       </li>
     
   </ul>

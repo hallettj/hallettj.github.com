@@ -4,7 +4,7 @@
   <title><![CDATA[sitr.us]]></title>
   <link href="http://sitr.us/atom.xml" rel="self"/>
   <link href="http://sitr.us/"/>
-  <updated>2017-03-20T23:25:53-04:00</updated>
+  <updated>2017-06-20T12:53:31-04:00</updated>
   <id>http://sitr.us/</id>
   <author>
     <name><![CDATA[Jesse Hallett]]></name>
@@ -12,6 +12,135 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[What is Poodle]]></title>
+    <link href="http://sitr.us/2017/06/20/what-is-poodle.html"/>
+    <updated>2017-06-20T00:00:00-04:00</updated>
+    <id>http://sitr.us/2017/06/20/what-is-poodle</id>
+    <content type="html"><![CDATA[<p>This is a description of my passion project. I plan to publish more detail and motivation when I get to a minimum viable product.</p>
+
+<p>I want to make social collaboration software without walls.
+A company can have its private discussions and documents -
+but people in a company should be able to include clients or contractors in discussions seamlessly.
+It should not be necessary to require people to join a private account on
+service X just to have a conversation.</p>
+
+<p>The idea is to make a decentralized protocol -
+there is no central server, and no one company that controls everything.
+This has been attempted before by Identi.ca, Diaspora, Google Wave, and others.
+I thought that a decentralized protocol could have more success if it takes a different approach: reinvent as little as possible, and build on top of an existing protocol with a large user base.
+I’m working on a reference client (called <a href="https://github.com/PoodleApp/poodle-electron">Poodle</a>) that implements a new protocol that builds on email.</p>
+
+<p>Email is one of the few decentralized social protocols that has broad adoption
+(<a href="http://www.radicati.com/wp/wp-content/uploads/2015/02/Email-Statistics-Report-2015-2019-Executive-Summary.pdf">2.6 billion users</a>);
+and it has stood the test of time.
+Email is not perfect - but over the years email systems have evolved to address many subtle problems;
+and we have deployed a great deal of email infrastructure and supporting software.
+A protocol that builds on email instead of attempting to replace it will have a massive head start thanks to all of that work.</p>
+
+<!-- more -->
+
+<p>There is a deeply-set mindset that email messages are text or HTML,
+and that one message corresponds to one reply.
+This is the same way people thought about web pages in the ’90s.
+Then AJAX came along and changed everything by decoupling HTTP requests from page views.
+That was the big idea that led to <a href="http://www.cbsnews.com/news/what-is-web-20/">Web 2.0</a>.
+I want to apply a similar idea:
+decouple email messages from conversation replies,
+and use email to transport structured JSON data representing activities.
+A basic activity type would be “post a message” or “post a reply”.
+But there are less obvious activity types,
+such as “make an edit to a message that I sent earlier”,
+or “upvote that other message”.
+Those latter types affect the way that participants see a discussion,
+but are not presented the same way that replies are.
+I think that this idea can lead to many new applications that operate over
+email in ways that we never imagined.</p>
+
+<p>An important feature is that I do not have to get people to switch to a new system <em>en masse</em>.
+These new-style exchanges degrade gracefully when viewed in a traditional email client.
+If someone edits one of their messages after sending it,
+Poodle users see the edited version with a small note that says “edited a few minutes ago”.
+Users on traditional email clients see the edit as a follow-up message with the new content.
+Where Poodle users see +1 counts,
+traditional email users see messages that just say “+1”
+(or whatever text the sender has selected for their fallback “like” message).
+This works because email supports multiple data parts,
+including fallback presentation for clients that do not understand a new format.
+Poodle messages contain a JSON part intended to be consumed by Poodle
+(or other interoperable clients),
+and an HTML view of the same content for traditional clients.</p>
+
+<p>Poodle supports interaction modes beyond the traditional “email exchanges are
+discussions” point of view.
+Poodle splits out several activity types that can serve as the starting point of an interaction -
+for example there is a “share a document” option”.
+The document might be HTML edited directly in the client,
+or an uploaded file such as a spreadsheet, presentation, image, or video.
+Anyone who the document is shared with can edit the document.
+What really happens is that their client sends out an “edit” activity to collaborators;
+but what everyone sees is that the document in their client updates with the new changes.
+(And anyone can browse previous revisions of a document at any time,
+because those revisions are really just email messages on their IMAP server.)
+Once again, people using traditional clients see document edits as follow-up messages
+with the new content in its entirety.</p>
+
+<p>I have a small slide deck of screen shots from an early iteration of Poodle:
+<a href="http://sitr.us/talks/poodle/">http://sitr.us/talks/poodle/</a></p>
+
+<p>Keep in mind that all of the features that you see work without any new servers.
+This is all just email.
+The only thing that is new is a special email client (which runs locally via a downloaded app).
+And everything gracefully degrades when interacting with people with regular email clients.</p>
+
+<p>Going slide-by-slide:</p>
+
+<ol>
+  <li>
+    <p>Participants can edit their own post after-the-fact; each activity has +1 counts.</p>
+  </li>
+  <li>
+    <p>An interaction might be presented as a collaborative document instead of as a thread. In this case there are calls-to-action to edit, or link to the document. (In this example the document content is markdown; but this concept could work for any type of file: images, videos, slide decks, whatever.)</p>
+  </li>
+  <li>
+    <p>Linking to email messages is a much under-used feature in my opinion. There is actually already an RFC that specifies how to construct a globally-unique URI for any email message.</p>
+  </li>
+  <li>
+    <p>This slide shows an early iteration of the process of linking to a document from another activity. Combining collaborative documents with linking allows for a decentralized wiki that actually lives in copies in the participants’ email accounts.</p>
+  </li>
+  <li>
+    <p>I was experimenting with features to make email more usable generally. I tried to design Poodle to make it really obvious who sees what in any exchange. Poodle uses a reply-to-all form as the default reply option, and the user must go through extra steps to reply to just one person, or to a subset of the people already participating in a discussion.</p>
+  </li>
+  <li>
+    <p>If someone does reply without including everyone, you get this “private aside” feature. (This works just by examining To:, From:, and Cc: fields in email messages in the discussion.) The private aside acts like a self-contained sub-discussion, interleaved with the original discussion. My hope is that this kind of feature can help to avoid embarrassing information leaks.</p>
+  </li>
+  <li>
+    <p>Private aside messages are interleaved time-wise with the top-level discussion. And each private aside has its own private reply form after the last message in the aside.</p>
+  </li>
+</ol>
+
+<p>Somehow I missed including a slide showing another feature that I think is useful:
+when someone includes a new person in the recipient list in a reply,
+there is a card that appears in the discussion view that says “so-and-so joined the discussion”.</p>
+
+<p>I think those features work well for small discussions with a fixed set of participants.
+On the roadmap is scaling up via hosted groups.
+Each group has its own email address -
+to start an interaction with the group you send to the group’s address
+(e.g. backyard-goats@raddiscussions.net).
+People who join the group later have access to existing discussions and documents via archives on the group server.
+This is basically just the concept of a mailing list,
+but with some added usability features.
+The combination of social collaboration features and groups produces something
+like subreddits, or Facebook groups, or Jive communities.
+Groups support the philosophy of decentralization:
+anyone can start up their own group servers and have complete control over them;
+anyone can bring people from outside the group into a group interaction by including them in the recipient list;
+an interaction can be shared with multiple groups simultaneously;
+and so on.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Changes I would make to Go]]></title>
@@ -7992,372 +8121,6 @@ you can install Haskell libraries with <code>cabal</code>.</p>
 
 <p><em>Updated 2009-07-23</em>: Added zlib1g-dev to list of build dependencies.  Thanks Jack Siler and Fernand.<br />
 <em>Updated 2009-08-01</em>: Added step for installing checkinstall.  Thanks Paulo.  </p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Database Queries the CouchDB Way]]></title>
-    <link href="http://sitr.us/2009/06/30/database-queries-the-couchdb-way.html"/>
-    <updated>2009-06-30T00:00:00-04:00</updated>
-    <id>http://sitr.us/2009/06/30/database-queries-the-couchdb-way</id>
-    <content type="html"><![CDATA[<p><a href="http://couchdb.apache.org/">CouchDB</a> is a document-oriented database. It has no rows or tables. Instead
-CouchDB is a collection of JSON documents. It uses a map-reduce pattern to
-index data. Queries in CouchDB pull data from what are essentially stored
-procedures called views. A view is made up of a map function and optionally a
-reduce function.  Ninety percent of the time all you need is the map function,
-so I will focus on map-only views here.</p>
-
-<p>A map function is a JavaScript function that takes a single document as an
-argument and emits any number of key/value pairs. Both the key and the value
-can be any JSON value you choose. The map function is run on every document in
-the database individually and the emitted key/value pairs are used to construct
-an index of your data.</p>
-
-<h2 id="a-simple-example">A Simple Example</h2>
-
-<p>Imagine you have a database with user records and you want a view of those
-records using the last name of each user as keys.</p>
-
-<div class="highlight"><pre><code class="js"><span class="kd">function</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">last_name</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">emit</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">last_name</span><span class="p">,</span> <span class="nx">doc</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div>
-
-<p>The above map function will produce and index something like the one below.
-Because <code>doc</code> is used as a value for each entry the entire content of each JSON
-document will be accessible as the indexed values.</p>
-
-<div class="highlight"><pre><code class="js"><span class="p">[</span>
-  <span class="p">...</span>
-  <span class="p">{</span> <span class="nx">key</span><span class="o">:</span> <span class="s2">&quot;Clarke&quot;</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="p">{</span> <span class="nx">last_name</span><span class="o">:</span> <span class="s2">&quot;Clarke&quot;</span><span class="p">,</span> <span class="p">...</span> <span class="p">}</span> <span class="p">},</span>
-  <span class="p">{</span> <span class="nx">key</span><span class="o">:</span> <span class="s2">&quot;Kelly&quot;</span><span class="p">,</span>  <span class="nx">value</span><span class="o">:</span> <span class="p">{</span> <span class="nx">last_name</span><span class="o">:</span> <span class="s2">&quot;Kelly&quot;</span><span class="p">,</span>  <span class="p">...</span> <span class="p">}</span> <span class="p">},</span>
-  <span class="p">{</span> <span class="nx">key</span><span class="o">:</span> <span class="s2">&quot;Smith&quot;</span><span class="p">,</span>  <span class="nx">value</span><span class="o">:</span> <span class="p">{</span> <span class="nx">last_name</span><span class="o">:</span> <span class="s2">&quot;Smith&quot;</span><span class="p">,</span>  <span class="p">...</span> <span class="p">}</span> <span class="p">},</span>
-  <span class="p">...</span>
-<span class="p">]</span>
-</code></pre></div>
-
-<p>Notice that the map function checks each document for a <code>last_name</code> attribute
-before emitting a key/value pair. There may be documents in the database that
-are not user records. By performing that check the view excludes any
-non-user-record documents from the resulting index.</p>
-
-<!-- more -->
-
-<p>If you include the <a href="http://github.com/halorgium/couchdb/blob/2c5f780d8284be5e2cb39f7f61acc5ef8d6fb50d/share/www/script/couch.js">couch.js</a> library in a web page you can create
-client-side queries to pull data from CouchDB over HTTP.  The function below
-will fetch all of the user records from your database by returning the <code>value</code>
-of each key/value pair emitted by the view above.</p>
-
-<div class="highlight"><pre><code class="js"><span class="kd">function</span> <span class="nx">users</span><span class="p">(</span><span class="nx">db</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">db</span><span class="p">.</span><span class="nx">view</span><span class="p">(</span><span class="s1">&#39;users/last_names&#39;</span><span class="p">).</span><span class="nx">rows</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">dot</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">));</span>
-<span class="p">}</span>
-
-<span class="c1">// Run the query and output data to the console.</span>
-<span class="kd">var</span> <span class="nx">db</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">CouchDB</span><span class="p">(</span><span class="s1">&#39;database-with-users&#39;</span><span class="p">);</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">users</span><span class="p">(</span><span class="nx">db</span><span class="p">));</span>
-</code></pre></div>
-
-<p>Map functions operate on one document at a time and cannot access data from
-other documents. The advantage of this is that the functions can process data
-in any order and can run on any piece of a data set independent of the rest of
-the set.  CouchDB builds static indexes from the output of view map functions
-so that queries against those views will run quickly.  When any documents
-change CouchDB can incrementally rebuild the indexes for just those documents
-without having to rebuild entire indexes from scratch.</p>
-
-<p>The CouchDB design gets you great performance on large data sets. But it means
-that you cannot pass dynamic parameters to your map function when you run a
-query. You cannot ask for it to emit only user records with a given last name
-unless you want to maintain a special view for that particular last name. In
-most cases it is not practical to build separate views for every query that you
-might want to run someday. So what you can do is to run a query against the
-general purpose view above and request only key/value pairs that match a
-particular key.</p>
-
-<div class="highlight"><pre><code class="js"><span class="kd">function</span> <span class="nx">find_users_by_last_name</span><span class="p">(</span><span class="nx">db</span><span class="p">,</span> <span class="nx">last_name</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">matches</span><span class="p">;</span>
-    <span class="nx">matches</span> <span class="o">=</span> <span class="nx">db</span><span class="p">.</span><span class="nx">view</span><span class="p">(</span><span class="s1">&#39;users/last_names&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">key</span><span class="o">:</span> <span class="nx">last_name</span> <span class="p">});</span>
-    <span class="k">return</span> <span class="nx">matches</span><span class="p">.</span><span class="nx">rows</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">dot</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">));</span>
-<span class="p">}</span>
-</code></pre></div>
-
-<p>This client code creates a query that requests data from the <code>last_names</code> view
-with a <code>key</code> parameter. CouchDB will only send back key/value pairs with keys
-that match the <code>key</code> parameter. In this case the query will return all user
-records with last names matching the <code>last_name</code> argument.</p>
-
-<p>In a more advanced case you may want to take the first few letters of a last
-name and look up user records that match.</p>
-
-<div class="highlight"><pre><code class="js"><span class="kd">function</span> <span class="nx">find_users_whose_last_names_start_with</span><span class="p">(</span><span class="nx">db</span><span class="p">,</span> <span class="nx">query</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">matches</span><span class="p">;</span>
-    <span class="nx">matches</span> <span class="o">=</span> <span class="nx">db</span><span class="p">.</span><span class="nx">view</span><span class="p">(</span><span class="s1">&#39;users/last_names&#39;</span><span class="p">,</span>
-                      <span class="p">{</span> <span class="nx">startkey</span><span class="o">:</span> <span class="nx">query</span><span class="p">,</span>
-                        <span class="nx">endkey</span><span class="o">:</span>   <span class="nx">query</span> <span class="o">+</span> <span class="s2">&quot;\u9999&quot;</span> <span class="p">});</span>
-    <span class="k">return</span> <span class="nx">matches</span><span class="p">.</span><span class="nx">rows</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">dot</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">));</span>
-<span class="p">}</span>
-</code></pre></div>
-
-<p>Data returned by a query is always sorted by key. In the case where the keys
-are strings the sorting will be lexicographic.  The <code>startkey</code> and <code>endkey</code>
-parameters restrict the results of the query to key/value pairs that fall in
-the given range according to CouchDB’s sort order.</p>
-
-<p>When the above function is given the query string “Ha”, it will fetch documents
-with keys sorted after “Ha” lexicographically, e.g. “Hallett”, “Hathaway”, and
-“Hazzold”. The <code>endkey</code> is created by appending “\u9999” to the <code>startkey</code>.
-“\u9999” is a unicode character that comes after most other characters in
-lexicographic order and that is unlikely to appear in a data set. Effectively
-the string “Ha\u9999” sorts after every other string that begins with “Ha”, but
-before any string that starts with “Hb”.</p>
-
-<p>Note that CouchDB uses the <a href="http://www.unicode.org/unicode/reports/tr10/">Unicode Collation Algorithm</a> to sort strings.
-Sorting comes out differently than you may be used to if your are accustomed to
-the ASCII way. UCA collation is intended to mimic the order of strings you
-would see in a dictionary. For example, two strings that differ only in case
-will appear together in sorted order. The lower-case string will appear
-immediately before the upper-case string. So if you force your <code>startkey</code> to
-lower-case and your <code>endkey</code> to upper-case you will get case-insensitive
-matches. See the <a href="http://wiki.apache.org/couchdb/View_collation">CouchDB wiki</a> for more details.</p>
-
-<h2 id="search-by-keyword">Search by Keyword</h2>
-
-<p>Indexing text content can be a hard problem because you need a large index if
-you want to query data by arbitrary keywords or substrings.  Fortunately
-CouchDB excels at managing large indexes.</p>
-
-<p>Here is a map function that creates an index of all the words that appear in
-the text field of every document in a database.</p>
-
-<div class="highlight"><pre><code class="js"><span class="kd">function</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">tokens</span><span class="p">;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">text</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">tokens</span> <span class="o">=</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">text</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="sr">/[^A-Z0-9\-_]+/i</span><span class="p">).</span><span class="nx">uniq</span><span class="p">();</span>
-        <span class="nx">tokens</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">token</span><span class="p">)</span> <span class="p">{</span>
-            <span class="nx">emit</span><span class="p">(</span><span class="nx">token</span><span class="p">,</span> <span class="nx">doc</span><span class="p">);</span>
-        <span class="p">});</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div>
-
-<p>The code splits text on word boundaries stripping out non-alphanumeric
-characters. It runs the resulting list of tokens through a unique filter so
-that only one index key is produced for each word in the text of a single
-document.</p>
-
-<p>This is an example of a view that emits more than one key/value pair for each
-document. The values in each pair are the same for the same document. But a
-different key is recorded for each word in the document’s text attribute. The
-index that would be created by this view for a document with the text “Live
-long and prosper” is below.</p>
-
-<div class="highlight"><pre><code class="js"><span class="p">[</span>
-  <span class="p">{</span> <span class="nx">key</span><span class="o">:</span> <span class="s2">&quot;and&quot;</span><span class="p">,</span>     <span class="nx">value</span><span class="o">:</span> <span class="p">{</span> <span class="nx">text</span><span class="o">:</span> <span class="s2">&quot;Live long and prosper.&quot;</span> <span class="p">}</span> <span class="p">},</span>
-  <span class="p">{</span> <span class="nx">key</span><span class="o">:</span> <span class="s2">&quot;Live&quot;</span><span class="p">,</span>    <span class="nx">value</span><span class="o">:</span> <span class="p">{</span> <span class="nx">text</span><span class="o">:</span> <span class="s2">&quot;Live long and prosper.&quot;</span> <span class="p">}</span> <span class="p">},</span>
-  <span class="p">{</span> <span class="nx">key</span><span class="o">:</span> <span class="s2">&quot;long&quot;</span><span class="p">,</span>    <span class="nx">value</span><span class="o">:</span> <span class="p">{</span> <span class="nx">text</span><span class="o">:</span> <span class="s2">&quot;Live long and prosper.&quot;</span> <span class="p">}</span> <span class="p">},</span>
-  <span class="p">{</span> <span class="nx">key</span><span class="o">:</span> <span class="s2">&quot;prosper&quot;</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="p">{</span> <span class="nx">text</span><span class="o">:</span> <span class="s2">&quot;Live long and prosper.&quot;</span> <span class="p">}</span> <span class="p">}</span>
-<span class="p">]</span>
-</code></pre></div>
-
-<p>To look up documents that contain a given keyword you just need to create a
-query with that keyword as the <code>key</code> parameter. But what if you want to look
-for documents that contain a list of keywords? You could create index keys for
-every combination of words in each document. But that index would grow
-exponentially and might get to be unreasonably large. A better way might be to
-pick one keyword to perform your query and then to use client code to select
-the documents that match all of the keywords out of the results returned by
-CouchDB.</p>
-
-<div class="highlight"><pre><code class="js"><span class="kd">function</span> <span class="nx">find_documents_by_keywords</span><span class="p">(</span><span class="nx">db</span><span class="p">,</span> <span class="nx">keywords</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">possible_matches</span><span class="p">;</span>
-
-    <span class="c1">// Query documents that include the first keyword.</span>
-    <span class="nx">possible_matches</span> <span class="o">=</span> <span class="nx">db</span><span class="p">.</span><span class="nx">view</span><span class="p">(</span><span class="s1">&#39;documents/keywords&#39;</span><span class="p">,</span> 
-                               <span class="p">{</span> <span class="nx">key</span><span class="o">:</span> <span class="nx">keywords</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">});</span>
-
-    <span class="c1">// Pull the value attribute out of each returned key/value</span>
-    <span class="c1">// pair.</span>
-    <span class="nx">possible_matches</span> <span class="o">=</span> <span class="nx">possible_matches</span><span class="p">.</span><span class="nx">rows</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">dot</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">));</span>
-
-    <span class="c1">// Pick out the documents that include all of the given</span>
-    <span class="c1">// keywords.</span>
-    <span class="k">return</span> <span class="nx">possible_matches</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">m</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="nx">keywords</span><span class="p">.</span><span class="nx">reduce</span><span class="p">(</span><span class="kc">true</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">match</span><span class="p">,</span> <span class="nx">keyword</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">return</span> <span class="nx">m</span><span class="p">.</span><span class="nx">text</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="nx">keyword</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nx">match</span><span class="p">;</span>
-        <span class="p">});</span>
-    <span class="p">});</span>
-<span class="p">}</span>
-</code></pre></div>
-
-<p>When you want more dynamic data processing than you can get with pure-CouchDB
-views, some client-side processing can make up the difference nicely. From a
-perspective of deploying applications leveraging your users’ CPU cycles for
-data processing can really help getting your application to scale.</p>
-
-<p>There is another approach to full text search documented <a href="http://wiki.apache.org/couchdb/Full_text_index_with_view">on the CouchDB
-wiki</a>.</p>
-
-<h2 id="search-by-substring">Search by Substring</h2>
-
-<p>Maybe keyword search isn’t good enough. Maybe you need to be able to search for
-occurrences of any substring in a data set.</p>
-
-<div class="highlight"><pre><code class="js"><span class="kd">function</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">i</span><span class="p">;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">text</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">for</span> <span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">text</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-            <span class="nx">emit</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">text</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="nx">i</span><span class="p">),</span> <span class="nx">doc</span><span class="p">);</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div>
-
-<p>For each document, this map function emits a key/value pair for every possible
-substring that runs to the end of the document’s text. The idea is that the
-beginning of any substring in the data set can be lined up with the beginning
-of one of these keys.  Here is an example of the index created for a document
-with the text “Hello, world!”:</p>
-
-<div class="highlight"><pre><code class="js"><span class="p">[</span>
-  <span class="p">{</span> <span class="nx">key</span><span class="o">:</span> <span class="s2">&quot; world!&quot;</span><span class="p">,</span>       <span class="nx">value</span><span class="o">:</span> <span class="p">{</span> <span class="nx">text</span><span class="o">:</span> <span class="s2">&quot;Hello, world!&quot;</span> <span class="p">}</span> <span class="p">},</span>
-  <span class="p">{</span> <span class="nx">key</span><span class="o">:</span> <span class="s2">&quot;, world!&quot;</span><span class="p">,</span>      <span class="nx">value</span><span class="o">:</span> <span class="p">{</span> <span class="nx">text</span><span class="o">:</span> <span class="s2">&quot;Hello, world!&quot;</span> <span class="p">}</span> <span class="p">},</span>
-  <span class="p">{</span> <span class="nx">key</span><span class="o">:</span> <span class="s2">&quot;!&quot;</span><span class="p">,</span>             <span class="nx">value</span><span class="o">:</span> <span class="p">{</span> <span class="nx">text</span><span class="o">:</span> <span class="s2">&quot;Hello, world!&quot;</span> <span class="p">}</span> <span class="p">},</span>
-  <span class="p">{</span> <span class="nx">key</span><span class="o">:</span> <span class="s2">&quot;d!&quot;</span><span class="p">,</span>            <span class="nx">value</span><span class="o">:</span> <span class="p">{</span> <span class="nx">text</span><span class="o">:</span> <span class="s2">&quot;Hello, world!&quot;</span> <span class="p">}</span> <span class="p">},</span>
-  <span class="p">{</span> <span class="nx">key</span><span class="o">:</span> <span class="s2">&quot;ello, world!&quot;</span><span class="p">,</span>  <span class="nx">value</span><span class="o">:</span> <span class="p">{</span> <span class="nx">text</span><span class="o">:</span> <span class="s2">&quot;Hello, world!&quot;</span> <span class="p">}</span> <span class="p">},</span>
-  <span class="p">{</span> <span class="nx">key</span><span class="o">:</span> <span class="s2">&quot;Hello, world!&quot;</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="p">{</span> <span class="nx">text</span><span class="o">:</span> <span class="s2">&quot;Hello, world!&quot;</span> <span class="p">}</span> <span class="p">},</span>
-  <span class="p">{</span> <span class="nx">key</span><span class="o">:</span> <span class="s2">&quot;ld!&quot;</span><span class="p">,</span>           <span class="nx">value</span><span class="o">:</span> <span class="p">{</span> <span class="nx">text</span><span class="o">:</span> <span class="s2">&quot;Hello, world!&quot;</span> <span class="p">}</span> <span class="p">},</span>
-  <span class="p">{</span> <span class="nx">key</span><span class="o">:</span> <span class="s2">&quot;llo, world!&quot;</span><span class="p">,</span>   <span class="nx">value</span><span class="o">:</span> <span class="p">{</span> <span class="nx">text</span><span class="o">:</span> <span class="s2">&quot;Hello, world!&quot;</span> <span class="p">}</span> <span class="p">},</span>
-  <span class="p">{</span> <span class="nx">key</span><span class="o">:</span> <span class="s2">&quot;lo, world!&quot;</span><span class="p">,</span>    <span class="nx">value</span><span class="o">:</span> <span class="p">{</span> <span class="nx">text</span><span class="o">:</span> <span class="s2">&quot;Hello, world!&quot;</span> <span class="p">}</span> <span class="p">},</span>
-  <span class="p">{</span> <span class="nx">key</span><span class="o">:</span> <span class="s2">&quot;o, world!&quot;</span><span class="p">,</span>     <span class="nx">value</span><span class="o">:</span> <span class="p">{</span> <span class="nx">text</span><span class="o">:</span> <span class="s2">&quot;Hello, world!&quot;</span> <span class="p">}</span> <span class="p">},</span>
-  <span class="p">{</span> <span class="nx">key</span><span class="o">:</span> <span class="s2">&quot;orld!&quot;</span><span class="p">,</span>         <span class="nx">value</span><span class="o">:</span> <span class="p">{</span> <span class="nx">text</span><span class="o">:</span> <span class="s2">&quot;Hello, world!&quot;</span> <span class="p">}</span> <span class="p">},</span>
-  <span class="p">{</span> <span class="nx">key</span><span class="o">:</span> <span class="s2">&quot;rld!&quot;</span><span class="p">,</span>          <span class="nx">value</span><span class="o">:</span> <span class="p">{</span> <span class="nx">text</span><span class="o">:</span> <span class="s2">&quot;Hello, world!&quot;</span> <span class="p">}</span> <span class="p">},</span>
-  <span class="p">{</span> <span class="nx">key</span><span class="o">:</span> <span class="s2">&quot;world!&quot;</span><span class="p">,</span>        <span class="nx">value</span><span class="o">:</span> <span class="p">{</span> <span class="nx">text</span><span class="o">:</span> <span class="s2">&quot;Hello, world!&quot;</span> <span class="p">}</span> <span class="p">}</span>
-<span class="p">]</span>
-</code></pre></div>
-
-<p>The substring that you want to search for can begin at any character within
-some document’s text. It may or may not run until the end of that document’s
-text field. We have an index with the beginning characters for every possible
-substring. So we can create a query that asks for a key range that encompasses
-both the given substring and a substring that runs all the way to the end of
-the document text.</p>
-
-<div class="highlight"><pre><code class="js"><span class="kd">function</span> <span class="nx">find_all_by_substring</span><span class="p">(</span><span class="nx">db</span><span class="p">,</span> <span class="nx">str</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">db</span><span class="p">.</span><span class="nx">view</span><span class="p">(</span><span class="s1">&#39;documents/substrings&#39;</span><span class="p">,</span>
-                   <span class="p">{</span> <span class="nx">startkey</span><span class="o">:</span> <span class="nx">str</span><span class="p">,</span>
-                     <span class="nx">endkey</span><span class="o">:</span> <span class="nx">str</span> <span class="o">+</span> <span class="s2">&quot;\u9999&quot;</span> <span class="p">}</span>
-                  <span class="p">).</span><span class="nx">rows</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">dot</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">));</span>
-<span class="p">}</span>
-</code></pre></div>
-
-<p>CouchDB does not just sort data when responding to queries. In its internal
-representation indexes are always sorted by key.  So a query with a key range
-targets a contiguous block of data from the database.  Because of that CouchDB
-can serve up a key range very efficiently.</p>
-
-<p>Just as with the keyword search, if you want to search for documents that match
-a list of substrings then get the matches for one of the substrings from
-CouchDB and use client code to select results that contain all of the rest of
-the given substrings.</p>
-
-<div class="highlight"><pre><code class="js"><span class="kd">function</span> <span class="nx">find_all_by_substrings</span><span class="p">(</span><span class="nx">db</span><span class="p">,</span> <span class="nx">strs</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">matches</span><span class="p">;</span>
-    <span class="nx">matches</span> <span class="o">=</span> <span class="nx">db</span><span class="p">.</span><span class="nx">view</span><span class="p">(</span><span class="s1">&#39;documents/substrings&#39;</span><span class="p">,</span>
-                      <span class="p">{</span> <span class="nx">startkey</span><span class="o">:</span> <span class="nx">strs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                        <span class="nx">endkey</span><span class="o">:</span> <span class="nx">strs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;\u9999&quot;</span> <span class="p">});</span>
-    <span class="k">return</span> <span class="nx">matches</span><span class="p">.</span><span class="nx">rows</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">dot</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">)).</span><span class="nx">select</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="nx">strs</span><span class="p">.</span><span class="nx">reduce</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">r</span><span class="p">,</span> <span class="nx">s</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">text</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nx">r</span><span class="p">;</span>
-        <span class="p">});</span>
-    <span class="p">});</span>
-<span class="p">}</span>
-</code></pre></div>
-
-<p>If the text of your documents tends to be very long you can avoid a lot of
-really long keys by limiting the lengths of substring keys in your view. In
-that case make sure to truncate the key parameters in your queries so that they
-are not longer than the index keys.</p>
-
-<p><em>Updated 2009-07-05</em>: Updated examples to demonstrate that CouchDB stores
-indexes sorted by key. Thanks to J. Chris Anderson for pointing that out.<br />
-<em>Updated 2009-08-06</em>: Added link to full text search implementation on
-CouchDB wiki.<br />
-<em>Updated 2009-08-09</em>: Fixed a typo.  </p>
-
-<h2 id="appendix-helper-function-definitions">Appendix: Helper Function Definitions</h2>
-
-<p>Some of the functions that I used in the examples above are not built into
-JavaScript or <a href="http://github.com/halorgium/couchdb/blob/2c5f780d8284be5e2cb39f7f61acc5ef8d6fb50d/share/www/script/couch.js">couch.js</a>. Here are definitions of those functions for
-reference.</p>
-
-<p>Given an attribute name, <code>dot</code> returns a function that when given an object
-returns the value of the specified attribute. This function is used in examples
-above to get the <code>value</code> attributes of rows fetched by CouchDB queries.</p>
-
-<div class="highlight"><pre><code class="js"><span class="kd">function</span> <span class="nx">dot</span><span class="p">(</span><span class="nx">attr</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="kd">function</span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="nx">obj</span><span class="p">[</span><span class="nx">attr</span><span class="p">];</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div>
-
-<p><a href="http://en.wikipedia.org/wiki/Map_%28higher-order_function%29"><code>map</code></a> is an Array method that given a function that takes a single
-argument returns a new array formed by applying the given function to every
-element of the original array in turn.</p>
-
-<div class="highlight"><pre><code class="js"><span class="nb">Array</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">map</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">func</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">r</span> <span class="o">=</span> <span class="p">[],</span>
-    <span class="k">for</span> <span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">r</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">func</span><span class="p">(</span><span class="k">this</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span>
-    <span class="p">}</span>
-    <span class="k">return</span> <span class="nx">r</span><span class="p">;</span>
-<span class="p">};</span>
-</code></pre></div>
-
-<p><a href="http://en.wikipedia.org/wiki/Reduce_%28higher-order_function%29"><code>reduce</code></a> is an Array method that given an initial value and a
-function that takes two arguments returns a single value produced by applying
-the given function to every element of the array in turn with the value from
-the previous function invocation and returning the last result.</p>
-
-<div class="highlight"><pre><code class="js"><span class="nb">Array</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">reduce</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">val</span><span class="p">,</span> <span class="nx">func</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">i</span><span class="p">;</span>
-    <span class="k">for</span> <span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">val</span> <span class="o">=</span> <span class="nx">func</span><span class="p">(</span><span class="nx">val</span><span class="p">,</span> <span class="k">this</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span>
-    <span class="p">}</span>
-    <span class="k">return</span> <span class="nx">val</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div>
-
-<p><code>select</code> is an Array method that given a test function returns a new array made
-up of only elements in the original array that pass the test.</p>
-
-<div class="highlight"><pre><code class="js"><span class="nb">Array</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">select</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">test</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">reduce</span><span class="p">([],</span> <span class="kd">function</span><span class="p">(</span><span class="nx">r</span><span class="p">,</span> <span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nx">test</span><span class="p">(</span><span class="nx">e</span><span class="p">))</span> <span class="p">{</span>
-            <span class="k">return</span> <span class="nx">r</span><span class="p">.</span><span class="nx">concat</span><span class="p">([</span><span class="nx">e</span><span class="p">]);</span>
-        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-            <span class="k">return</span> <span class="nx">r</span><span class="p">;</span>
-        <span class="p">}</span>
-    <span class="p">});</span>
-<span class="p">};</span>
-</code></pre></div>
-
-<p><code>uniq</code> is an Array method that returns a new array with any duplicate values
-from the original array removed.</p>
-
-<div class="highlight"><pre><code class="js"><span class="nb">Array</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">uniq</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">reduce</span><span class="p">([],</span> <span class="kd">function</span><span class="p">(</span><span class="nx">list</span><span class="p">,</span> <span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nx">list</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">return</span> <span class="nx">list</span><span class="p">.</span><span class="nx">concat</span><span class="p">([</span><span class="nx">e</span><span class="p">]);</span>
-        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-            <span class="k">return</span> <span class="nx">list</span><span class="p">;</span>
-        <span class="p">}</span>
-    <span class="p">});</span>
-<span class="p">}</span>
-</code></pre></div>
-
 ]]></content>
   </entry>
   

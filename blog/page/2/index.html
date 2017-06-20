@@ -9,9 +9,9 @@
   <meta name="author" content="Jesse Hallett">
 
   
-  <meta name="description" content="I have a long-standing desire for a JavaScript library that provides
-good implementations of functional data structures. Recently I found
-Mori, and I &hellip;">
+  <meta name="description" content="Idris is a programming language with dependent types.
+It is similar to Agda, but hews more closely to Haskell.
+The goal of Idris is to bring &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -84,6 +84,67 @@ Mori, and I &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2014/05/05/category-theory-proofs-in-idris.html">Category Theory proofs in Idris</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-05-05T00:00:00-04:00" pubdate data-updated="true">2014-05-05</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://www.idris-lang.org/">Idris</a> is a programming language with dependent types.
+It is similar to <a href="http://wiki.portal.chalmers.se/agda/pmwiki.php">Agda</a>, but hews more closely to <a href="http://www.haskell.org/haskellwiki/Haskell">Haskell</a>.
+The goal of Idris is to bring dependent types to general-purpose programming.
+It supports multiple compilation targets, including C and Javascript.</p>
+
+<p>Dependent types provide an unprecedented level of type safety.
+A quick example is a <a href="https://www.youtube.com/watch?v=fVBck2Zngjo">type-safe printf implementation (video)</a>.
+They are also useful for theorem proving.
+According to the <a href="http://en.wikipedia.org/wiki/Curry–Howard_correspondence">Curry-Howard correspondence</a>,
+mathematical propositions can be represented in a program as types.
+An implementation that satisfies a given type
+serves as a proof of the corresponding proposition.
+In other words, inhabited types represent true propositions.</p>
+
+<p>The Curry-Howard correspondence applies to every language with type checking.
+But the type systems in most languages are not expressive enough
+to build very interesting propositions.
+On the other hand,
+dependent types can express quantification
+(i.e., the mathematical concepts of universal quantification (∀) and existential quantification (∃)).
+This makes it possible to translate a lot of interesting math into machine-verified code.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/2014/05/05/category-theory-proofs-in-idris.html">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -751,88 +812,6 @@ sudo apt-get install ghc6 ghc6-prof ghc6-doc haddock
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/2009/06/30/database-queries-the-couchdb-way.html">Database Queries the CouchDB Way</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2009-06-30T00:00:00-04:00" pubdate data-updated="true"></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="http://couchdb.apache.org/">CouchDB</a> is a document-oriented database. It has no rows or tables. Instead
-CouchDB is a collection of JSON documents. It uses a map-reduce pattern to
-index data. Queries in CouchDB pull data from what are essentially stored
-procedures called views. A view is made up of a map function and optionally a
-reduce function.  Ninety percent of the time all you need is the map function,
-so I will focus on map-only views here.</p>
-
-<p>A map function is a JavaScript function that takes a single document as an
-argument and emits any number of key/value pairs. Both the key and the value
-can be any JSON value you choose. The map function is run on every document in
-the database individually and the emitted key/value pairs are used to construct
-an index of your data.</p>
-
-<h2 id="a-simple-example">A Simple Example</h2>
-
-<p>Imagine you have a database with user records and you want a view of those
-records using the last name of each user as keys.</p>
-
-<div class="highlight"><pre><code class="js"><span class="kd">function</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">last_name</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">emit</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">last_name</span><span class="p">,</span> <span class="nx">doc</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div>
-
-<p>The above map function will produce and index something like the one below.
-Because <code>doc</code> is used as a value for each entry the entire content of each JSON
-document will be accessible as the indexed values.</p>
-
-<div class="highlight"><pre><code class="js"><span class="p">[</span>
-  <span class="p">...</span>
-  <span class="p">{</span> <span class="nx">key</span><span class="o">:</span> <span class="s2">&quot;Clarke&quot;</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="p">{</span> <span class="nx">last_name</span><span class="o">:</span> <span class="s2">&quot;Clarke&quot;</span><span class="p">,</span> <span class="p">...</span> <span class="p">}</span> <span class="p">},</span>
-  <span class="p">{</span> <span class="nx">key</span><span class="o">:</span> <span class="s2">&quot;Kelly&quot;</span><span class="p">,</span>  <span class="nx">value</span><span class="o">:</span> <span class="p">{</span> <span class="nx">last_name</span><span class="o">:</span> <span class="s2">&quot;Kelly&quot;</span><span class="p">,</span>  <span class="p">...</span> <span class="p">}</span> <span class="p">},</span>
-  <span class="p">{</span> <span class="nx">key</span><span class="o">:</span> <span class="s2">&quot;Smith&quot;</span><span class="p">,</span>  <span class="nx">value</span><span class="o">:</span> <span class="p">{</span> <span class="nx">last_name</span><span class="o">:</span> <span class="s2">&quot;Smith&quot;</span><span class="p">,</span>  <span class="p">...</span> <span class="p">}</span> <span class="p">},</span>
-  <span class="p">...</span>
-<span class="p">]</span>
-</code></pre></div>
-
-<p>Notice that the map function checks each document for a <code>last_name</code> attribute
-before emitting a key/value pair. There may be documents in the database that
-are not user records. By performing that check the view excludes any
-non-user-record documents from the resulting index.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/2009/06/30/database-queries-the-couchdb-way.html">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/3/">&larr; Older</a>
@@ -850,6 +829,10 @@ non-user-record documents from the resulting index.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/2017/06/20/what-is-poodle.html">What is Poodle</a>
+      </li>
+    
+      <li class="post">
         <a href="/2017/02/21/changes-i-would-make-to-go.html">Changes I would make to Go</a>
       </li>
     
@@ -863,10 +846,6 @@ non-user-record documents from the resulting index.</p>
     
       <li class="post">
         <a href="/2016/12/20/flow-cookbook.html">Flow Cookbook</a>
-      </li>
-    
-      <li class="post">
-        <a href="/2015/05/31/type-checking-react-with-flow.html">Type checking React with Flow v0.11</a>
       </li>
     
   </ul>
