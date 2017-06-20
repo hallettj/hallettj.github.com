@@ -4,7 +4,7 @@
   <title><![CDATA[sitr.us]]></title>
   <link href="http://sitr.us/atom.xml" rel="self"/>
   <link href="http://sitr.us/"/>
-  <updated>2017-06-20T12:53:31-04:00</updated>
+  <updated>2017-06-20T13:28:02-04:00</updated>
   <id>http://sitr.us/</id>
   <author>
     <name><![CDATA[Jesse Hallett]]></name>
@@ -75,7 +75,7 @@ and an HTML view of the same content for traditional clients.</p>
 <p>Poodle supports interaction modes beyond the traditional “email exchanges are
 discussions” point of view.
 Poodle splits out several activity types that can serve as the starting point of an interaction -
-for example there is a “share a document” option”.
+for example there is a “share a document” option.
 The document might be HTML edited directly in the client,
 or an uploaded file such as a spreadsheet, presentation, image, or video.
 Anyone who the document is shared with can edit the document.
@@ -104,7 +104,7 @@ And everything gracefully degrades when interacting with people with regular ema
     <p>An interaction might be presented as a collaborative document instead of as a thread. In this case there are calls-to-action to edit, or link to the document. (In this example the document content is markdown; but this concept could work for any type of file: images, videos, slide decks, whatever.)</p>
   </li>
   <li>
-    <p>Linking to email messages is a much under-used feature in my opinion. There is actually already an RFC that specifies how to construct a globally-unique URI for any email message.</p>
+    <p>Linking to email messages is a much under-used feature in my opinion. There is actually already an <a href="https://tools.ietf.org/html/rfc2392">RFC</a> that specifies how to construct a globally-unique URI for any email message.</p>
   </li>
   <li>
     <p>This slide shows an early iteration of the process of linking to a document from another activity. Combining collaborative documents with linking allows for a decentralized wiki that actually lives in copies in the participants’ email accounts.</p>
