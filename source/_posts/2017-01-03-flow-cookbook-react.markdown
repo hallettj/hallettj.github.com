@@ -6,7 +6,7 @@ date: 2017-01-03
 comments: true
 ---
 
-_Last updated 2017-01-07_
+_Last updated 2017-11-21_
 
 _This recipe is part of the [Flow Cookbook][] series._
 
@@ -32,23 +32,26 @@ and in other component methods.
 
 <!-- more -->
 
+Flow changed the way that it handles React types in [version 0.53.0][0.53.0].
+This recipe assumes that you are using Flow v0.53.0 or later.
+
+[0.53.0]: https://github.com/facebook/flow/blob/master/Changelog.md#0530
 
 ## How it works
 
-The form for type parameters on a component class is:
+With Flow you specify the types of `props` and `state` using type parameters on
+the `React.Component` class.
+The form for type parameters is:
 
 ```js
-class MyComponent extends React.Component<DefaultProps, Props, State> {
-  state: State
-
+class MyComponent extends React.Component<Props, State> {
   /* ... */
 }
 ```
 
-Where `DefaultProps`, `Props`, and `State` can be whatever object types you
-want.
-For example, if your component has the props `title`, `createdAt`, and
-`authorId` then a definition for `Props` could look like this:
+Where `Props`, and `State` can be whatever object types you want.
+If your component has the props `title`, `createdAt`, and `authorId`
+then a definition for `Props` could look like this:
 
 ```js
 type Props = {
@@ -58,42 +61,53 @@ type Props = {
 }
 ```
 
-For any type parameter that you don't want to use,
-give the type `void` instead.
-For example, a component that has no internal state gets `void` for its third
-type parameter.
+If your component is stateless then you can omit the `State` parameter,
+in which case the state type defaults to `void`.
 
-If you use `defaultProps`, the props type should include types for *all* props -
-even those that have default values.
-The type for default props should only provide types for props that have
-default values.
-
-Note that the state type needs to be given twice (unless it is `void`) -
-once as the third type parameter, and again as the type of the `state` instance
-variable.
-
-The form for stateless, functional components is:
+`Props` should list types for *all* props -
+even props that are optional or that have default values.
+If you add a `defaultProps` value to your component then Flow will
+automatically infer that fields from `defaultProps` are not required when your
+component is called.
+So you should not use a `?` in the corresponding field in your `Props` type.
 
 ```js
-function MyComponent(props: Props): React.Element<*> {
+type Props = {
+  updatedAt?: Date,      // optional prop, no default value
+  commentsEnabled: bool, // optional, but has a default value in `defaultProps`
+}
+
+class MyComponent extends React.Component<Props> {
+  static defaultProps = { commentsEnabled: true }
+
+  /* ... */
+}
+```
+
+The form for a stateless, functional components is:
+
+```js
+function MyComponent(props: Props) {
   /* ... */
 }
 ```
 
 Once again, `Props` can be any object type that you want,
 and should include types for all props, even those that have default values.
-Notice the return type, `React.Element<*>`.
-Flow uses a type parameter for `Element` to track internal details,
-such as the class and props that produced an element.
-You will probably never want to specify that parameter by hand;
-so we use `*`
-(Flow's [existential type][])
-to leave it to Flow to infer the type of that parameter.
+The return type for a functional component is `React.Element<*>` -
+but Flow can infer that so don't bother with a return type annotation.
 
-[Type definitions for React][react lib] are built into Flow.
+Type definitions for React are built into Flow;
+the Flow documentation includes a
+[type reference for React types][type reference].
 It is useful to look at those definitions to see exactly what Flow expects.
-A lot of what I know about using Flow came from examining that file,
-and others in the same directory.
+You can also go straight to the source:
+a lot of what I know about using Flow came from examining
+[Flow's type definition file for React][react lib]
+and other files in the same directory.
+
+The Flow documentation also includes its own guide on
+[using Flow with React][official guide].
 
 
 ## A Hacker News client
@@ -104,12 +118,12 @@ The client will fetch lists of stories from the Hacker News API to display.
 When the user selects a story,
 the client will fetch and display comments.
 
-One of the simplest components displays a story as a single line,
+Let's start with a component that displays a Hacker News story as a single line,
 and accepts a callback to do something if the user selects that story.
-Let's start be defining a type for the props that this component will accept.
+First we define a type for the props that this component will accept.
 
 ```js
-import type { Story } from 'flow-cookbook-hacker-news'
+import { type Story } from 'flow-cookbook-hacker-news'
 
 type StoryListItemProps = {
   story: Story,
@@ -122,7 +136,7 @@ which is the example code from the [Unpacking JSON API data][] recipe.
 That `Story` type is a ready-made type that describes everything we will want
 to display in the new client.
 Take a look at the [source file][Story] to see what `Story` looks like.
-(The `import type` syntax is [Flow syntax][import syntax] -
+(The `import { type T }` syntax is [Flow syntax][import syntax] -
 it is not part of Javascript.)
 
 The `StoryListItemProps` type lists the props that will be given to our
@@ -134,13 +148,16 @@ and that returns `undefined` (a.k.a. `void`).
 It is not necessary to require that the return type be `undefined` -
 you could use `mixed` instead if you do not want to put any constraint on the
 callback's return type.
+
 My opinion is that using `void` is a clear indication to the caller that the
 component will not do anything with a return value.
+On the other hand you might get an irritating type error if you provide
+a single-expression arrow function that implicitly returns a value.
 
 And here is the `StoryListItem` component itself:
 
 ```js
-function StoryListItem(props: StoryListItemProps): React.Element<*> {
+function StoryListItem(props: StoryListItemProps) {
   const { by, title } = props.story
   return <p>
     <a href="#" onClick={event => selectStory(props, event)}>
@@ -165,7 +182,7 @@ Checking props from both directions ensures that a component is in alignment
 with its callers.
 
 In general if a component does not have internal state,
-and does not use lifecycle callbacks such as `componentDidMount`,
+and does not use life cycle callbacks such as `componentDidMount`,
 then I prefer to use a functional component, like `StoryListItem`.
 A functional component cannot have methods that refer to `this.props`;
 so I made the `selectStory` event handler a top-level function that accepts
@@ -177,8 +194,8 @@ both functions.
 `selectStory` also takes an `event` argument.
 The `Event` type is built into Flow,
 and Flow knows about the `preventDefault` method.
-Flow's take on the `Event` type is defined in Flow's
-[DOM type-definitions file][].
+Flow's version of the `Event` type is defined in Flow's
+[DOM type definitions file][].
 
 To populate instances of the `StoryListItem` component,
 we will need to make API requests and update some state.
@@ -196,10 +213,7 @@ type AppState = {
   error?: Error,
 }
 
-class App extends Component<void, AppProps, AppState> {
-  // Must declare `state` type in two places
-  state: AppState
-
+class App extends React.Component<AppProps, AppState> {
   constructor(props: AppProps) {
     super(props)
     this.state = {}
@@ -224,11 +238,16 @@ not be set.)
 so there are two question marks on that line.
 That is because `selectedStory` is initially not set,
 and after a user views a story and then backs out to the story list
-`selectedStory` is set to `null`.
+`selectedStory` will be set to `null`.
 
 Since `App` has a `constructor`,
 we specify the props type both in the second class type parameter,
 and again in the type of the `props` argument to `constructor`.
+That is because a subclass can define a constructor with a signature that
+differs from the parent class' constructor.
+It would not make much sense to do that in a React Component;
+but Flow must be able to check all sorts of classes,
+so it does not make assumptions about types of constructor arguments.
 
 `App` will fetch stories when it is mounted.
 So we extend its definition with a `componentDidMount` callback.
@@ -236,7 +255,7 @@ So we extend its definition with a `componentDidMount` callback.
 ```js
 import { fetchTopStories } from 'flow-cookbook-hacker-news'
 
-class App extends Component<void, AppProps, AppState> {
+class App extends React.Component<AppProps, AppState> {
   /* ... same as before */
 
   componentDidMount() {
@@ -260,12 +279,12 @@ fetch,
 and it returns a promise.
 
 Once stories are loaded, we can display them via a `render` method.
-But the component will display before those requests are complete -
+But the component will initially display while the API request is loading;
 so we will have to check whether stories have loaded,
 and display a loading indicator if they are not ready.
 
 ```js
-class App extends Component<void, AppProps, AppState> {
+class App extends React.Component<AppProps, AppState> {
   /* ... */
 
   render() {
@@ -324,20 +343,21 @@ then it means that stories are still loading.
 When displaying a list of stories, `content` is populated by a list of
 instances of `StoryListItem`,
 which we defined earlier.
-Note that there is nothing special about rendering a type-checked component -
+There is nothing special about rendering a type-checked component -
 you pass props the same way as with any component.
 
 Flow can track changes to the type of a variable over a series of statements.
 Flow infers that when `content` is first defined its type is `void`;
 and it infers that no matter which code path gets executed,
 by the time we get to the `return` statement the type has changed to either
-`React.Element<*>` or `React.Element<*>[]`.
+`React.Element<*>` or `React.Element<*>[]` -
+either of which is compatible with Flow's expectations for JSX content.
 
 The event handling methods `selectStory` and `deselectStory` just make simple
 state updates:
 
 ```js
-class App extends Component<void, AppProps, AppState> {
+class App extends React.Component<AppProps, AppState> {
   /* ... */
 
   selectStory(story: Story) {
@@ -383,15 +403,17 @@ take a look at the next recipe, [Flow & Redux][].
 ## Changes
 
 - *2017-01-07:* The hacker news client library is now on npm - updated references accordingly
+- *2017-11-21:* Updates for Flow v0.53.0
 
 
 [functional and class components]: https://facebook.github.io/react/docs/components-and-props.html#functional-and-class-components
 [Unpacking JSON API data]: /2016/12/20/flow-cookbook-unpacking-json.html
+[type reference]: https://flow.org/en/docs/react/types/
 [react lib]: https://github.com/facebook/flow/blob/master/lib/react.js
-[existential type]: /2015/05/31/advanced-features-in-flow.html#existential-types
+[official guide]: https://flow.org/en/docs/react/
 [Story]: https://github.com/hallettj/flow-cookbook-hacker-news/blob/master/index.js.flow#L9
 [import syntax]: https://flowtype.org/docs/syntax.html#importing-and-exporting-types
-[DOM type-definitions file]: https://github.com/facebook/flow/blob/master/lib/dom.js#L182
+[DOM type definitions file]: https://github.com/facebook/flow/blob/master/lib/dom.js#L210
 [StoryView]: https://github.com/hallettj/flow-cookbook-react/blob/master/src/StoryView.js
 [Redux]: http://redux.js.org/
 [react-redux]: http://redux.js.org/docs/basics/UsageWithReact.html
