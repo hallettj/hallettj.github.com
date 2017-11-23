@@ -4,7 +4,7 @@
   <title><![CDATA[sitr.us]]></title>
   <link href="http://sitr.us/atom.xml" rel="self"/>
   <link href="http://sitr.us/"/>
-  <updated>2017-11-22T20:30:39-04:00</updated>
+  <updated>2017-11-22T22:42:02-04:00</updated>
   <id>http://sitr.us/</id>
   <author>
     <name><![CDATA[Jesse Hallett]]></name>
@@ -1869,9 +1869,7 @@ I think you will be glad that you did.</p>
     <link href="http://sitr.us/2017/01/03/flow-cookbook-react.html"/>
     <updated>2017-01-03T00:00:00-04:00</updated>
     <id>http://sitr.us/2017/01/03/flow-cookbook-react</id>
-    <content type="html"><![CDATA[<p><em>Last updated 2017-11-22</em></p>
-
-<p><em>This recipe is part of the <a href="http://sitr.us/2016/12/20/flow-cookbook.html">Flow Cookbook</a> series.</em></p>
+    <content type="html"><![CDATA[<p><em>This recipe is part of the <a href="http://sitr.us/2016/12/20/flow-cookbook.html">Flow Cookbook</a> series.</em></p>
 
 <p>Flow and React are both Facebook projects -
 so as you might imagine, they work quite well together.
@@ -2387,13 +2385,6 @@ But in my opinion the best practice is to keep state in a third-party
 state-management framework such as <a href="http://redux.js.org/">Redux</a>.
 For details on using Flow with Redux and <a href="http://redux.js.org/docs/basics/UsageWithReact.html">react-redux</a>
 take a look at the next recipe, <a href="http://sitr.us/todo.html">Flow &amp; Redux</a>.</p>
-
-<h2 id="changes">Changes</h2>
-
-<ul>
-  <li><em>2017-01-07:</em> The hacker news client library is now on npm - updated references accordingly</li>
-  <li><em>2017-11-22:</em> Updates for Flow v0.53.0</li>
-</ul>
 
 ]]></content>
   </entry>
@@ -2915,9 +2906,7 @@ and see how type-checking affects the way you write code.</p>
     <link href="http://sitr.us/2016/12/20/flow-cookbook.html"/>
     <updated>2016-12-20T00:00:00-04:00</updated>
     <id>http://sitr.us/2016/12/20/flow-cookbook</id>
-    <content type="html"><![CDATA[<p><em>Last updated 2017-01-07</em></p>
-
-<p>Type-checking can be a useful asset in a Javascript project.
+    <content type="html"><![CDATA[<p>Type-checking can be a useful asset in a Javascript project.
 A type checker can catch problems that are introduced when adding features or
 refactoring, which can reduce the amount of time spent debugging and testing.
 Type annotations provide a form of always-up-to-date documentation that makes
@@ -3023,12 +3012,6 @@ included,
 so that anyone who uses the library can benefit from those annotations if they
 choose to use Flow as well.</p>
 
-<h2 id="changes">Changes</h2>
-
-<ul>
-  <li><em>2017-01-03:</em> Added recipe, <a href="http://sitr.us/2017/01/03/flow-cookbook-react.html">Flow &amp; React</a></li>
-  <li><em>2017-01-07:</em> Added “More resources” section</li>
-</ul>
 ]]></content>
   </entry>
   

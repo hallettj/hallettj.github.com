@@ -101,9 +101,11 @@ The goal of Idris is to &hellip;">
 
 
   
+  
 
 
-<time datetime="2014-05-04T00:00:00-04:00" pubdate data-updated="true">2014-05-04</time>
+
+<time datetime="2014-05-04" pubdate data-updated="true">2014-05-04</time>
         
       </p>
     
@@ -775,6 +777,8 @@ as I continue to explore Category theory.
 
 
   <footer>
+    
+
     <p class="meta">
       
   
@@ -791,9 +795,11 @@ as I continue to explore Category theory.
 
 
   
+  
 
 
-<time datetime="2014-05-04T00:00:00-04:00" pubdate data-updated="true">2014-05-04</time>
+
+<time datetime="2014-05-04" pubdate data-updated="true">2014-05-04</time>
       
 
 
