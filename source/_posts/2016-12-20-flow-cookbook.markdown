@@ -2,11 +2,15 @@
 layout: post
 title: Flow Cookbook
 author: Jesse Hallett
-date: 2016-12-20
 comments: true
+date: 2016-12-20
+updated: 2017-01-07
+revisions:
+  - date: 2017-01-03
+    message: Added recipe, Flow & React
+  - date: 2017-01-07
+    message: Added "More resources" section
 ---
-
-_Last updated 2017-01-07_
 
 Type-checking can be a useful asset in a Javascript project.
 A type checker can catch problems that are introduced when adding features or
@@ -133,9 +137,3 @@ so that anyone who uses the library can benefit from those annotations if they
 choose to use Flow as well.
 
 [Authoring and publishing JavaScript modules with Flow]: http://javascriptplayground.com/blog/2017/01/npm-flowjs-javascript/
-
-
-## Changes
-
-- *2017-01-03:* Added recipe, [Flow & React][]
-- *2017-01-07:* Added "More resources" section

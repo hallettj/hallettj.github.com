@@ -2,12 +2,15 @@
 layout: post
 title: "Flow Cookbook: Flow & React"
 author: Jesse Hallett
+comments: true
 date: 2017-01-03
 updated: 2017-11-22
-comments: true
+revisions:
+  - date: 2017-01-07
+    message: The hacker news client library is now on npm - updated references accordingly
+  - date: 2017-11-22
+    message: Updates for Flow v0.53.0
 ---
-
-_Last updated 2017-11-22_
 
 _This recipe is part of the [Flow Cookbook][] series._
 
@@ -404,12 +407,6 @@ But in my opinion the best practice is to keep state in a third-party
 state-management framework such as [Redux][].
 For details on using Flow with Redux and [react-redux][]
 take a look at the next recipe, [Flow & Redux][].
-
-
-## Changes
-
-- *2017-01-07:* The hacker news client library is now on npm - updated references accordingly
-- *2017-11-22:* Updates for Flow v0.53.0
 
 
 [functional and class components]: https://facebook.github.io/react/docs/components-and-props.html#functional-and-class-components

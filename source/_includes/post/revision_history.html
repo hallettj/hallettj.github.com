@@ -1,0 +1,10 @@
+{% if page.revisions %}
+  <div class="revisions">
+    <h2>Revision history</h2>
+    <ul>
+      {% for revision in page.revisions %}
+      <li><em>{{revision.date | datetime | date: "%Y-%m-%d" }}:</em> {{ revision.message }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}
