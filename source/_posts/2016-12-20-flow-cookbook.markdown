@@ -2,6 +2,7 @@
 layout: post
 title: Flow Cookbook
 author: Jesse Hallett
+category: Flow Cookbook
 comments: true
 date: 2016-12-20
 updated: 2017-01-07

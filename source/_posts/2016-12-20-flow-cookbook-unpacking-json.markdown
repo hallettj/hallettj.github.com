@@ -2,8 +2,9 @@
 layout: post
 title: "Flow Cookbook: Unpacking JSON API data"
 author: Jesse Hallett
-date: 2016-12-20
+category: Flow Cookbook
 comments: true
+date: 2016-12-20
 ---
 
 _This recipe is part of the [Flow Cookbook][] series._

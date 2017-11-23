@@ -2,6 +2,7 @@
 layout: post
 title: "Flow Cookbook: Flow & React"
 author: Jesse Hallett
+category: Flow Cookbook
 comments: true
 date: 2017-01-03
 updated: 2017-11-22
