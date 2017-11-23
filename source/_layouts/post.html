@@ -7,12 +7,12 @@ single: true
 <article class="hentry" role="article">
   {% include article.html %}
   <footer>
+    {% include post/revision_history.html %}
     <p class="meta">
       {% include post/author.html %}
       {% include post/date.html %}{% if updated %}{{ updated }} {{ created }}{% else %}{{ time }}{% endif %}
       {% include post/categories.html %}
     </p>
-    {% include post/revision_history.html %}
     {% unless page.sharing == false %}
       {% include post/sharing.html %}
     {% endunless %}

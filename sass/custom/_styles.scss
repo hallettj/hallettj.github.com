@@ -64,3 +64,16 @@ p code, li code { font-size: 85%; }
 
 // Hack to remove line numbers from code blocks
 .code .gutter { display: none; }
+
+article > footer .meta {
+  font-size: 0.85em;
+  margin-bottom: 0.8em;
+}
+.revisions dt {
+  float: left;
+  clear: left;
+  font-style: italic;
+}
+.revisions dt:after {
+  content: ":\0000a0";
+}
