@@ -4,7 +4,7 @@
   <title><![CDATA[sitr.us]]></title>
   <link href="http://sitr.us/atom.xml" rel="self"/>
   <link href="http://sitr.us/"/>
-  <updated>2017-06-20T13:28:02-04:00</updated>
+  <updated>2017-11-22T20:30:39-04:00</updated>
   <id>http://sitr.us/</id>
   <author>
     <name><![CDATA[Jesse Hallett]]></name>
@@ -1869,14 +1869,13 @@ I think you will be glad that you did.</p>
     <link href="http://sitr.us/2017/01/03/flow-cookbook-react.html"/>
     <updated>2017-01-03T00:00:00-04:00</updated>
     <id>http://sitr.us/2017/01/03/flow-cookbook-react</id>
-    <content type="html"><![CDATA[<p><em>Last updated 2017-01-07</em></p>
+    <content type="html"><![CDATA[<p><em>Last updated 2017-11-22</em></p>
 
 <p><em>This recipe is part of the <a href="http://sitr.us/2016/12/20/flow-cookbook.html">Flow Cookbook</a> series.</em></p>
 
 <p>Flow and React are both Facebook projects -
 so as you might imagine, they work quite well together.
-React components can take type parameters to specify types for props, default
-props, and state.
+React components can take type parameters to specify types for props and state.
 Type-checking works well with both <a href="https://facebook.github.io/react/docs/components-and-props.html#functional-and-class-components">functional and class components</a>.</p>
 
 <p>Flow type annotations provide an alternative to <code>propTypes</code> runtime checks.
@@ -1895,26 +1894,26 @@ and in other component methods.</li>
 
 <!-- more -->
 
+<p>Flow changed the way that it handles React types in <a href="https://github.com/facebook/flow/blob/master/Changelog.md#0530">version 0.53.0</a>.
+This recipe assumes that you are using Flow v0.53.0 or later.</p>
+
 <h2 id="how-it-works">How it works</h2>
 
-<p>The form for type parameters on a component class is:</p>
+<p>With Flow you specify the types of <code>props</code> and <code>state</code> using type parameters on
+the <code>React.Component</code> class.
+The form for type parameters is:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
 <span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="kr">class</span> <span class="nx">MyComponent</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span><span class="o">&lt;</span><span class="nx">DefaultProps</span><span class="p">,</span> <span class="nx">Props</span><span class="p">,</span> <span class="nx">State</span><span class="o">&gt;</span> <span class="p">{</span>
-</span><span class="line">  <span class="nx">state</span><span class="o">:</span> <span class="nx">State</span>
-</span><span class="line">
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="kr">class</span> <span class="nx">MyComponent</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span><span class="o">&lt;</span><span class="nx">Props</span><span class="p">,</span> <span class="nx">State</span><span class="o">&gt;</span> <span class="p">{</span>
 </span><span class="line">  <span class="cm">/* ... */</span>
 </span><span class="line"><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>Where <code>DefaultProps</code>, <code>Props</code>, and <code>State</code> can be whatever object types you
-want.
-For example, if your component has the props <code>title</code>, <code>createdAt</code>, and
-<code>authorId</code> then a definition for <code>Props</code> could look like this:</p>
+<p>Where <code>Props</code>, and <code>State</code> can be whatever object types you want.
+If your component has the props <code>title</code>, <code>createdAt</code>, and <code>authorId</code>
+then a definition for <code>Props</code> could look like this:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
@@ -1928,44 +1927,67 @@ For example, if your component has the props <code>title</code>, <code>createdAt
 </span><span class="line"><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>For any type parameter that you don’t want to use,
-give the type <code>void</code> instead.
-For example, a component that has no internal state gets <code>void</code> for its third
-type parameter.</p>
+<p>If your component is stateless then you can omit the <code>State</code> parameter,
+in which case the state type defaults to <code>void</code>.</p>
 
-<p>If you use <code>defaultProps</code>, the props type should include types for <em>all</em> props -
-even those that have default values.
-The type for default props should only provide types for props that have
-default values.</p>
-
-<p>Note that the state type needs to be given twice (unless it is <code>void</code>) -
-once as the third type parameter, and again as the type of the <code>state</code> instance
-variable.</p>
-
-<p>The form for stateless, functional components is:</p>
+<p><code>Props</code> should list types for <em>all</em> props -
+even props that are optional or that have default values.
+If you add a <code>defaultProps</code> value to your component then Flow will
+automatically infer that fields from <code>defaultProps</code> are not required when your
+component is called.
+So you should not use a <code>?</code> in the corresponding field in your <code>Props</code> type.
+Leaving out the <code>?</code> lets you avoid unnecessary <code>undefined</code> checks in your
+component’s methods.</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
 <span class="line-number">3</span>
-</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="kd">function</span> <span class="nx">MyComponent</span><span class="p">(</span><span class="nx">props</span><span class="o">:</span> <span class="nx">Props</span><span class="p">)</span><span class="o">:</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Element</span><span class="o">&lt;*&gt;</span> <span class="p">{</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="nx">type</span> <span class="nx">Props</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class="line">  <span class="nx">updatedAt</span><span class="o">?:</span> <span class="nb">Date</span><span class="p">,</span>      <span class="c1">// optional prop, no default value</span>
+</span><span class="line">  <span class="nx">commentsEnabled</span><span class="o">:</span> <span class="nx">bool</span><span class="p">,</span> <span class="c1">// optional, but has a default value in `defaultProps`</span>
+</span><span class="line"><span class="p">}</span>
+</span><span class="line">
+</span><span class="line"><span class="kr">class</span> <span class="nx">MyComponent</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span><span class="o">&lt;</span><span class="nx">Props</span><span class="o">&gt;</span> <span class="p">{</span>
+</span><span class="line">  <span class="kr">static</span> <span class="nx">defaultProps</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">commentsEnabled</span><span class="o">:</span> <span class="kc">true</span> <span class="p">}</span>
+</span><span class="line">
+</span><span class="line">  <span class="cm">/* ... */</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>To declare a type for <code>props</code> in a stateless functional component use
+a type annotation like this:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="kd">function</span> <span class="nx">MyComponent</span><span class="p">(</span><span class="nx">props</span><span class="o">:</span> <span class="nx">Props</span><span class="p">)</span> <span class="p">{</span>
 </span><span class="line">  <span class="cm">/* ... */</span>
 </span><span class="line"><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>Once again, <code>Props</code> can be any object type that you want,
 and should include types for all props, even those that have default values.
-Notice the return type, <code>React.Element&lt;*&gt;</code>.
-Flow uses a type parameter for <code>Element</code> to track internal details,
-such as the class and props that produced an element.
-You will probably never want to specify that parameter by hand;
-so we use <code>*</code>
-(Flow’s <a href="http://sitr.us/2015/05/31/advanced-features-in-flow.html#existential-types">existential type</a>)
-to leave it to Flow to infer the type of that parameter.</p>
+The return type for a functional component is <code>React.Element&lt;*&gt;</code> -
+but Flow can infer that so don’t bother with a return type annotation.</p>
 
-<p><a href="https://github.com/facebook/flow/blob/master/lib/react.js">Type definitions for React</a> are built into Flow.
+<p>Type definitions for React are built into Flow.
+The Flow documentation includes a
+<a href="https://flow.org/en/docs/react/types/">type reference for React types</a>.
 It is useful to look at those definitions to see exactly what Flow expects.
-A lot of what I know about using Flow came from examining that file,
-and others in the same directory.</p>
+You can also go straight to the source:
+a lot of what I know about using Flow came from examining
+<a href="https://github.com/facebook/flow/blob/master/lib/react.js">Flow’s type definition file for React</a>
+and other files in the same directory.</p>
+
+<p>The Flow documentation also includes its own guide on
+<a href="https://flow.org/en/docs/react/">using Flow with React</a>.</p>
 
 <h2 id="a-hacker-news-client">A Hacker News client</h2>
 
@@ -1975,9 +1997,9 @@ The client will fetch lists of stories from the Hacker News API to display.
 When the user selects a story,
 the client will fetch and display comments.</p>
 
-<p>One of the simplest components displays a story as a single line,
+<p>Let’s start with a component that displays a Hacker News story as a single line,
 and accepts a callback to do something if the user selects that story.
-Let’s start be defining a type for the props that this component will accept.</p>
+First we define a type for the props that this component will accept.</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
@@ -1985,7 +2007,7 @@ Let’s start be defining a type for the props that this component will accept.<
 <span class="line-number">4</span>
 <span class="line-number">5</span>
 <span class="line-number">6</span>
-</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="kr">import</span> <span class="nx">type</span> <span class="p">{</span> <span class="nx">Story</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;flow-cookbook-hacker-news&#39;</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="kr">import</span> <span class="p">{</span> <span class="nx">type</span> <span class="nx">Story</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;flow-cookbook-hacker-news&#39;</span>
 </span><span class="line">
 </span><span class="line"><span class="nx">type</span> <span class="nx">StoryListItemProps</span> <span class="o">=</span> <span class="p">{</span>
 </span><span class="line">  <span class="nx">story</span><span class="o">:</span> <span class="nx">Story</span><span class="p">,</span>
@@ -1998,7 +2020,7 @@ which is the example code from the <a href="http://sitr.us/2016/12/20/flow-cookb
 That <code>Story</code> type is a ready-made type that describes everything we will want
 to display in the new client.
 Take a look at the <a href="https://github.com/hallettj/flow-cookbook-hacker-news/blob/master/index.js.flow#L9">source file</a> to see what <code>Story</code> looks like.
-(The <code>import type</code> syntax is <a href="https://flowtype.org/docs/syntax.html#importing-and-exporting-types">Flow syntax</a> -
+(The <code>import { type T }</code> bit is <a href="https://flowtype.org/docs/syntax.html#importing-and-exporting-types">Flow syntax</a> -
 it is not part of Javascript.)</p>
 
 <p>The <code>StoryListItemProps</code> type lists the props that will be given to our
@@ -2009,9 +2031,12 @@ The type indicates that <code>onSelect</code> must be a function that takes zero
 and that returns <code>undefined</code> (a.k.a. <code>void</code>).
 It is not necessary to require that the return type be <code>undefined</code> -
 you could use <code>mixed</code> instead if you do not want to put any constraint on the
-callback’s return type.
-My opinion is that using <code>void</code> is a clear indication to the caller that the
-component will not do anything with a return value.</p>
+callback’s return type.</p>
+
+<p>My opinion is that using <code>void</code> is a clear indication to the caller that the
+component will not do anything with a return value.
+On the other hand you might get an irritating type error if you provide
+a single-expression arrow function that implicitly returns a value.</p>
 
 <p>And here is the <code>StoryListItem</code> component itself:</p>
 
@@ -2028,7 +2053,7 @@ component will not do anything with a return value.</p>
 <span class="line-number">11</span>
 <span class="line-number">12</span>
 <span class="line-number">13</span>
-</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="kd">function</span> <span class="nx">StoryListItem</span><span class="p">(</span><span class="nx">props</span><span class="o">:</span> <span class="nx">StoryListItemProps</span><span class="p">)</span><span class="o">:</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Element</span><span class="o">&lt;*&gt;</span> <span class="p">{</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="kd">function</span> <span class="nx">StoryListItem</span><span class="p">(</span><span class="nx">props</span><span class="o">:</span> <span class="nx">StoryListItemProps</span><span class="p">)</span> <span class="p">{</span>
 </span><span class="line">  <span class="kr">const</span> <span class="p">{</span> <span class="nx">by</span><span class="p">,</span> <span class="nx">title</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">props</span><span class="p">.</span><span class="nx">story</span>
 </span><span class="line">  <span class="k">return</span> <span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span>
 </span><span class="line">    <span class="o">&lt;</span><span class="nx">a</span> <span class="nx">href</span><span class="o">=</span><span class="s2">&quot;#&quot;</span> <span class="nx">onClick</span><span class="o">=</span><span class="p">{</span><span class="nx">event</span> <span class="o">=&gt;</span> <span class="nx">selectStory</span><span class="p">(</span><span class="nx">props</span><span class="p">,</span> <span class="nx">event</span><span class="p">)}</span><span class="o">&gt;</span>
@@ -2053,7 +2078,7 @@ Checking props from both directions ensures that a component is in alignment
 with its callers.</p>
 
 <p>In general if a component does not have internal state,
-and does not use lifecycle callbacks such as <code>componentDidMount</code>,
+and does not use life cycle callbacks such as <code>componentDidMount</code>,
 then I prefer to use a functional component, like <code>StoryListItem</code>.
 A functional component cannot have methods that refer to <code>this.props</code>;
 so I made the <code>selectStory</code> event handler a top-level function that accepts
@@ -2065,8 +2090,8 @@ both functions.</p>
 <p><code>selectStory</code> also takes an <code>event</code> argument.
 The <code>Event</code> type is built into Flow,
 and Flow knows about the <code>preventDefault</code> method.
-Flow’s take on the <code>Event</code> type is defined in Flow’s
-<a href="https://github.com/facebook/flow/blob/master/lib/dom.js#L182">DOM type-definitions file</a>.</p>
+Flow’s version of the <code>Event</code> type is defined in Flow’s
+<a href="https://github.com/facebook/flow/blob/master/lib/dom.js#L210">DOM type definitions file</a>.</p>
 
 <p>To populate instances of the <code>StoryListItem</code> component,
 we will need to make API requests and update some state.
@@ -2091,9 +2116,6 @@ and the parameters for the top-level component, which will manage that state:</p
 <span class="line-number">16</span>
 <span class="line-number">17</span>
 <span class="line-number">18</span>
-<span class="line-number">19</span>
-<span class="line-number">20</span>
-<span class="line-number">21</span>
 </pre></td><td class="code"><pre><code class="js"><span class="line"><span class="nx">type</span> <span class="nx">AppProps</span> <span class="o">=</span> <span class="p">{</span>
 </span><span class="line">  <span class="nx">numStories</span><span class="o">:</span> <span class="nx">number</span><span class="p">,</span>
 </span><span class="line"><span class="p">}</span>
@@ -2104,10 +2126,7 @@ and the parameters for the top-level component, which will manage that state:</p
 </span><span class="line">  <span class="nx">error</span><span class="o">?:</span> <span class="nb">Error</span><span class="p">,</span>
 </span><span class="line"><span class="p">}</span>
 </span><span class="line">
-</span><span class="line"><span class="kr">class</span> <span class="nx">App</span> <span class="kr">extends</span> <span class="nx">Component</span><span class="o">&lt;</span><span class="k">void</span><span class="p">,</span> <span class="nx">AppProps</span><span class="p">,</span> <span class="nx">AppState</span><span class="o">&gt;</span> <span class="p">{</span>
-</span><span class="line">  <span class="c1">// Must declare `state` type in two places</span>
-</span><span class="line">  <span class="nx">state</span><span class="o">:</span> <span class="nx">AppState</span>
-</span><span class="line">
+</span><span class="line"><span class="kr">class</span> <span class="nx">App</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span><span class="o">&lt;</span><span class="nx">AppProps</span><span class="p">,</span> <span class="nx">AppState</span><span class="o">&gt;</span> <span class="p">{</span>
 </span><span class="line">  <span class="nx">constructor</span><span class="p">(</span><span class="nx">props</span><span class="o">:</span> <span class="nx">AppProps</span><span class="p">)</span> <span class="p">{</span>
 </span><span class="line">    <span class="kr">super</span><span class="p">(</span><span class="nx">props</span><span class="p">)</span>
 </span><span class="line">    <span class="k">this</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="p">{}</span>
@@ -2132,11 +2151,16 @@ not be set.)
 so there are two question marks on that line.
 That is because <code>selectedStory</code> is initially not set,
 and after a user views a story and then backs out to the story list
-<code>selectedStory</code> is set to <code>null</code>.</p>
+<code>selectedStory</code> will be set to <code>null</code>.</p>
 
 <p>Since <code>App</code> has a <code>constructor</code>,
 we specify the props type both in the second class type parameter,
-and again in the type of the <code>props</code> argument to <code>constructor</code>.</p>
+and again in the type of the <code>props</code> argument to <code>constructor</code>.
+That is because a subclass can define a constructor with a signature that
+differs from the parent class’ constructor.
+It would not make much sense to do that in a React Component;
+but Flow must be able to check all sorts of classes,
+so it does not make assumptions about types of constructor arguments.</p>
 
 <p><code>App</code> will fetch stories when it is mounted.
 So we extend its definition with a <code>componentDidMount</code> callback.</p>
@@ -2162,7 +2186,7 @@ So we extend its definition with a <code>componentDidMount</code> callback.</p>
 <span class="line-number">19</span>
 </pre></td><td class="code"><pre><code class="js"><span class="line"><span class="kr">import</span> <span class="p">{</span> <span class="nx">fetchTopStories</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;flow-cookbook-hacker-news&#39;</span>
 </span><span class="line">
-</span><span class="line"><span class="kr">class</span> <span class="nx">App</span> <span class="kr">extends</span> <span class="nx">Component</span><span class="o">&lt;</span><span class="k">void</span><span class="p">,</span> <span class="nx">AppProps</span><span class="p">,</span> <span class="nx">AppState</span><span class="o">&gt;</span> <span class="p">{</span>
+</span><span class="line"><span class="kr">class</span> <span class="nx">App</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span><span class="o">&lt;</span><span class="nx">AppProps</span><span class="p">,</span> <span class="nx">AppState</span><span class="o">&gt;</span> <span class="p">{</span>
 </span><span class="line">  <span class="cm">/* ... same as before */</span>
 </span><span class="line">
 </span><span class="line">  <span class="nx">componentDidMount</span><span class="p">()</span> <span class="p">{</span>
@@ -2185,8 +2209,8 @@ So we extend its definition with a <code>componentDidMount</code> callback.</p>
 fetch,
 and it returns a promise.</p>
 
-<p>Once stories are loaded, we can display them via a <code>render</code> method.
-But the component will display before those requests are complete -
+<p>Once stories are loaded we can display them via a <code>render</code> method.
+But the component will initially display while the API request is loading;
 so we will have to check whether stories have loaded,
 and display a loading indicator if they are not ready.</p>
 
@@ -2236,7 +2260,7 @@ and display a loading indicator if they are not ready.</p>
 <span class="line-number">44</span>
 <span class="line-number">45</span>
 <span class="line-number">46</span>
-</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="kr">class</span> <span class="nx">App</span> <span class="kr">extends</span> <span class="nx">Component</span><span class="o">&lt;</span><span class="k">void</span><span class="p">,</span> <span class="nx">AppProps</span><span class="p">,</span> <span class="nx">AppState</span><span class="o">&gt;</span> <span class="p">{</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="kr">class</span> <span class="nx">App</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span><span class="o">&lt;</span><span class="nx">AppProps</span><span class="p">,</span> <span class="nx">AppState</span><span class="o">&gt;</span> <span class="p">{</span>
 </span><span class="line">  <span class="cm">/* ... */</span>
 </span><span class="line">
 </span><span class="line">  <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
@@ -2295,17 +2319,18 @@ then it means that stories are still loading.</p>
 <p>When displaying a list of stories, <code>content</code> is populated by a list of
 instances of <code>StoryListItem</code>,
 which we defined earlier.
-Note that there is nothing special about rendering a type-checked component -
+There is nothing special about rendering a type-checked component -
 you pass props the same way as with any component.</p>
 
 <p>Flow can track changes to the type of a variable over a series of statements.
 Flow infers that when <code>content</code> is first defined its type is <code>void</code>;
 and it infers that no matter which code path gets executed,
 by the time we get to the <code>return</code> statement the type has changed to either
-<code>React.Element&lt;*&gt;</code> or <code>React.Element&lt;*&gt;[]</code>.</p>
+<code>React.Element&lt;*&gt;</code> or <code>React.Element&lt;*&gt;[]</code> -
+either of which is compatible with Flow’s expectations for JSX content.</p>
 
-<p>The event handling methods <code>selectStory</code> and <code>deselectStory</code> just make simple
-state updates:</p>
+<p>The event handling methods <code>selectStory</code> and <code>deselectStory</code> make state changes
+to track whether the user is looking at a specific story:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
@@ -2318,7 +2343,7 @@ state updates:</p>
 <span class="line-number">9</span>
 <span class="line-number">10</span>
 <span class="line-number">11</span>
-</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="kr">class</span> <span class="nx">App</span> <span class="kr">extends</span> <span class="nx">Component</span><span class="o">&lt;</span><span class="k">void</span><span class="p">,</span> <span class="nx">AppProps</span><span class="p">,</span> <span class="nx">AppState</span><span class="o">&gt;</span> <span class="p">{</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="kr">class</span> <span class="nx">App</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span><span class="o">&lt;</span><span class="nx">AppProps</span><span class="p">,</span> <span class="nx">AppState</span><span class="o">&gt;</span> <span class="p">{</span>
 </span><span class="line">  <span class="cm">/* ... */</span>
 </span><span class="line">
 </span><span class="line">  <span class="nx">selectStory</span><span class="p">(</span><span class="nx">story</span><span class="o">:</span> <span class="nx">Story</span><span class="p">)</span> <span class="p">{</span>
@@ -2331,13 +2356,16 @@ state updates:</p>
 </span><span class="line"><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
+<p>Those state changes affect the output from <code>render</code> to switch between displaying
+a list of story titles, or a detail view for a single story.</p>
+
 <p>At this point
 we have made references to <code>App</code>’s state in <code>componentDidMount</code>, <code>render</code>,
 <code>selectStory</code>, and <code>deselectStory</code>.
 Flow checks all of those uses against the definition of <code>AppState</code>.
 For example, if we made a mistaken assumption that <code>selectedStory</code> holds an ID,
 as opposed to a value of type <code>Story</code>,
-and tried to write something like <code>this.setState({ selectedStory: story.id })</code>,
+and tried to write something like <code>this.setState({ selectedStory: story.id })</code>
 Flow would report an error, and point out the mismatch.</p>
 
 <p>I have not given the implementation of <code>StoryView</code>,
@@ -2350,20 +2378,21 @@ The interested reader can see the full details of <code>StoryView</code> in the
 <p>Complete working code is available at
 <a href="https://github.com/hallettj/flow-cookbook-react">https://github.com/hallettj/flow-cookbook-react</a>.
 Your next assignment is to clone that code and to add some features.
-Some ideas to try are to add links to original stories,
+Some ideas to try are to add links to the original article for each story,
 or to display profile pages for posters and commenters.</p>
 
 <p>The example code here uses React’s own state features to manage app state.
 That helps to keep this recipe self-contained.
 But in my opinion the best practice is to keep state in a third-party
-state-management framework, such as <a href="http://redux.js.org/">Redux</a>.
-For details on using Flow with Redux and <a href="http://redux.js.org/docs/basics/UsageWithReact.html">react-redux</a>,
+state-management framework such as <a href="http://redux.js.org/">Redux</a>.
+For details on using Flow with Redux and <a href="http://redux.js.org/docs/basics/UsageWithReact.html">react-redux</a>
 take a look at the next recipe, <a href="http://sitr.us/todo.html">Flow &amp; Redux</a>.</p>
 
 <h2 id="changes">Changes</h2>
 
 <ul>
   <li><em>2017-01-07:</em> The hacker news client library is now on npm - updated references accordingly</li>
+  <li><em>2017-11-22:</em> Updates for Flow v0.53.0</li>
 </ul>
 
 ]]></content>
