@@ -6,7 +6,7 @@ date: 2017-01-03
 comments: true
 ---
 
-_Last updated 2017-11-21_
+_Last updated 2017-11-22_
 
 _This recipe is part of the [Flow Cookbook][] series._
 
@@ -14,8 +14,7 @@ _This recipe is part of the [Flow Cookbook][] series._
 
 Flow and React are both Facebook projects -
 so as you might imagine, they work quite well together.
-React components can take type parameters to specify types for props, default
-props, and state.
+React components can take type parameters to specify types for props and state.
 Type-checking works well with both [functional and class components][].
 
 Flow type annotations provide an alternative to `propTypes` runtime checks.
@@ -70,6 +69,8 @@ If you add a `defaultProps` value to your component then Flow will
 automatically infer that fields from `defaultProps` are not required when your
 component is called.
 So you should not use a `?` in the corresponding field in your `Props` type.
+Leaving out the `?` lets you avoid unnecessary `undefined` checks in your
+component's methods.
 
 ```js
 type Props = {
@@ -84,7 +85,8 @@ class MyComponent extends React.Component<Props> {
 }
 ```
 
-The form for a stateless, functional components is:
+To declare a type for `props` in a stateless functional component use
+a type annotation like this:
 
 ```js
 function MyComponent(props: Props) {
@@ -97,8 +99,8 @@ and should include types for all props, even those that have default values.
 The return type for a functional component is `React.Element<*>` -
 but Flow can infer that so don't bother with a return type annotation.
 
-Type definitions for React are built into Flow;
-the Flow documentation includes a
+Type definitions for React are built into Flow.
+The Flow documentation includes a
 [type reference for React types][type reference].
 It is useful to look at those definitions to see exactly what Flow expects.
 You can also go straight to the source:
@@ -136,7 +138,7 @@ which is the example code from the [Unpacking JSON API data][] recipe.
 That `Story` type is a ready-made type that describes everything we will want
 to display in the new client.
 Take a look at the [source file][Story] to see what `Story` looks like.
-(The `import { type T }` syntax is [Flow syntax][import syntax] -
+(The `import { type T }` bit is [Flow syntax][import syntax] -
 it is not part of Javascript.)
 
 The `StoryListItemProps` type lists the props that will be given to our
@@ -278,7 +280,7 @@ class App extends React.Component<AppProps, AppState> {
 fetch,
 and it returns a promise.
 
-Once stories are loaded, we can display them via a `render` method.
+Once stories are loaded we can display them via a `render` method.
 But the component will initially display while the API request is loading;
 so we will have to check whether stories have loaded,
 and display a loading indicator if they are not ready.
@@ -353,8 +355,8 @@ by the time we get to the `return` statement the type has changed to either
 `React.Element<*>` or `React.Element<*>[]` -
 either of which is compatible with Flow's expectations for JSX content.
 
-The event handling methods `selectStory` and `deselectStory` just make simple
-state updates:
+The event handling methods `selectStory` and `deselectStory` make state changes
+to track whether the user is looking at a specific story:
 
 ```js
 class App extends React.Component<AppProps, AppState> {
@@ -370,13 +372,16 @@ class App extends React.Component<AppProps, AppState> {
 }
 ```
 
+Those state changes affect the output from `render` to switch between displaying
+a list of story titles, or a detail view for a single story.
+
 At this point
 we have made references to `App`'s state in `componentDidMount`, `render`,
 `selectStory`, and `deselectStory`.
 Flow checks all of those uses against the definition of `AppState`.
 For example, if we made a mistaken assumption that `selectedStory` holds an ID,
 as opposed to a value of type `Story`,
-and tried to write something like `this.setState({ selectedStory: story.id })`,
+and tried to write something like `this.setState({ selectedStory: story.id })`
 Flow would report an error, and point out the mismatch.
 
 I have not given the implementation of `StoryView`,
@@ -389,21 +394,21 @@ The interested reader can see the full details of `StoryView` in the
 Complete working code is available at
 [https://github.com/hallettj/flow-cookbook-react](https://github.com/hallettj/flow-cookbook-react).
 Your next assignment is to clone that code and to add some features.
-Some ideas to try are to add links to original stories,
+Some ideas to try are to add links to the original article for each story,
 or to display profile pages for posters and commenters.
 
 The example code here uses React's own state features to manage app state.
 That helps to keep this recipe self-contained.
 But in my opinion the best practice is to keep state in a third-party
-state-management framework, such as [Redux][].
-For details on using Flow with Redux and [react-redux][],
+state-management framework such as [Redux][].
+For details on using Flow with Redux and [react-redux][]
 take a look at the next recipe, [Flow & Redux][].
 
 
 ## Changes
 
 - *2017-01-07:* The hacker news client library is now on npm - updated references accordingly
-- *2017-11-21:* Updates for Flow v0.53.0
+- *2017-11-22:* Updates for Flow v0.53.0
 
 
 [functional and class components]: https://facebook.github.io/react/docs/components-and-props.html#functional-and-class-components
