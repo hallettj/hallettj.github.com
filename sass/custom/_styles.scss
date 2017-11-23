@@ -61,3 +61,6 @@ code {font-size: 120%; }
 pre { tab-size: 4; }
 .highlight code { line-height: 1.2em; }
 p code, li code { font-size: 85%; }
+
+// Hack to remove line numbers from code blocks
+.code .gutter { display: none; }
