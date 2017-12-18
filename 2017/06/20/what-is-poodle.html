@@ -31,9 +31,10 @@
   <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
-<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-<link href="http://fonts.googleapis.com/css?family=Ubuntu+Mono:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="https://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="https://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="https://fonts.googleapis.com/css?family=Ubuntu+Mono:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
 
   
   <script type="text/javascript">
@@ -103,7 +104,9 @@
 
 
 
-<time datetime="2017-06-20" pubdate data-updated="true">2017-06-20</time>
+  
+
+<time datetime="2017-12-18" class="updated" data-updated="true" pubdate>Updated 2017-12-18</time>
         
       </p>
     
@@ -122,7 +125,7 @@ service X just to have a conversation.</p>
 there is no central server, and no one company that controls everything.
 This has been attempted before by Identi.ca, Diaspora, Google Wave, and others.
 I thought that a decentralized protocol could have more success if it takes a different approach: reinvent as little as possible, and build on top of an existing protocol with a large user base.
-I’m working on a reference client (called <a href="https://github.com/PoodleApp/poodle-electron">Poodle</a>) that implements a new protocol that builds on email.</p>
+I’m working on a reference client (called <a href="https://github.com/PoodleApp/poodle">Poodle</a>) that implements a new protocol that builds on email.</p>
 
 <p>Email is one of the few decentralized social protocols that has broad adoption
 (<a href="http://www.radicati.com/wp/wp-content/uploads/2015/02/Email-Statistics-Report-2015-2019-Executive-Summary.pdf">2.6 billion users</a>);
@@ -188,29 +191,19 @@ And everything gracefully degrades when interacting with people with regular ema
 
 <p>Going slide-by-slide:</p>
 
-<ol>
-  <li>
-    <p>Participants can edit their own post after-the-fact; each activity has +1 counts.</p>
-  </li>
-  <li>
-    <p>An interaction might be presented as a collaborative document instead of as a thread. In this case there are calls-to-action to edit, or link to the document. (In this example the document content is markdown; but this concept could work for any type of file: images, videos, slide decks, whatever.)</p>
-  </li>
-  <li>
-    <p>Linking to email messages is a much under-used feature in my opinion. There is actually already an <a href="https://tools.ietf.org/html/rfc2392">RFC</a> that specifies how to construct a globally-unique URI for any email message.</p>
-  </li>
-  <li>
-    <p>This slide shows an early iteration of the process of linking to a document from another activity. Combining collaborative documents with linking allows for a decentralized wiki that actually lives in copies in the participants’ email accounts.</p>
-  </li>
-  <li>
-    <p>I was experimenting with features to make email more usable generally. I tried to design Poodle to make it really obvious who sees what in any exchange. Poodle uses a reply-to-all form as the default reply option, and the user must go through extra steps to reply to just one person, or to a subset of the people already participating in a discussion.</p>
-  </li>
-  <li>
-    <p>If someone does reply without including everyone, you get this “private aside” feature. (This works just by examining To:, From:, and Cc: fields in email messages in the discussion.) The private aside acts like a self-contained sub-discussion, interleaved with the original discussion. My hope is that this kind of feature can help to avoid embarrassing information leaks.</p>
-  </li>
-  <li>
-    <p>Private aside messages are interleaved time-wise with the top-level discussion. And each private aside has its own private reply form after the last message in the aside.</p>
-  </li>
-</ol>
+<p><span class="caption-wrapper"><img class="caption" src="/talks/poodle/message-wide.png" width="" height="" title="Participants can edit their own post after-the-fact; each activity has +1 counts." /><span class="caption-text">Participants can edit their own post after-the-fact; each activity has +1 counts.</span></span></p>
+
+<p><span class="caption-wrapper"><img class="caption" src="/talks/poodle/document-wide.png" width="" height="" title="An interaction might be presented as a collaborative document instead of as a thread. In this case there are calls-to-action to edit, or link to the document. (In this example the document content is markdown; but this concept could work for any type of file: images, videos, slide decks, whatever.)" /><span class="caption-text">An interaction might be presented as a collaborative document instead of as a thread. In this case there are calls-to-action to edit, or link to the document. (In this example the document content is markdown; but this concept could work for any type of file: images, videos, slide decks, whatever.)</span></span></p>
+
+<p><span class="caption-wrapper"><img class="caption" src="/talks/poodle/link-to-document.png" width="" height="" title="Linking to email messages is a much under-used feature in my opinion. There is actually already an [RFC](https://tools.ietf.org/html/rfc2392) that specifies how to construct a globally-unique URI for any email message." /><span class="caption-text">Linking to email messages is a much under-used feature in my opinion. There is actually already an <a href="https://tools.ietf.org/html/rfc2392">RFC</a> that specifies how to construct a globally-unique URI for any email message.</span></span></p>
+
+<p><span class="caption-wrapper"><img class="caption" src="/talks/poodle/permalink.png" width="" height="" title="This is an early iteration of the process of linking to a document from another activity. Combining collaborative documents with linking allows for a decentralized wiki that actually lives in copies in the participant&rsquo;s email accounts." /><span class="caption-text">This is an early iteration of the process of linking to a document from another activity. Combining collaborative documents with linking allows for a decentralized wiki that actually lives in copies in the participant’s email accounts.</span></span></p>
+
+<p><span class="caption-wrapper"><img class="caption" src="/talks/poodle/who-can-see-this-discussion.png" width="" height="" title="I was experimenting with features to make email more usable generally. I tried to design Poodle to make it really obvious who sees what in any exchange. Poodle uses a reply-to-all form as the default reply option, and the user must go through extra steps to reply to just one person, or to a subset of the people already participating in a discussion." /><span class="caption-text">I was experimenting with features to make email more usable generally. I tried to design Poodle to make it really obvious who sees what in any exchange. Poodle uses a reply-to-all form as the default reply option, and the user must go through extra steps to reply to just one person, or to a subset of the people already participating in a discussion.</span></span></p>
+
+<p><span class="caption-wrapper"><img class="caption" src="/talks/poodle/private-aside-1.png" width="" height="" title="If someone does reply without including everyone, you get this &quot;private aside&quot; feature. (This works just by examining To:, From:, and Cc: fields in email messages in the discussion.) The private aside acts like a self-contained sub-discussion, interleaved with the original discussion. My hope is that this kind of feature can help to avoid embarrassing information leaks." /><span class="caption-text">If someone does reply without including everyone, you get this “private aside” feature. (This works just by examining To:, From:, and Cc: fields in email messages in the discussion.) The private aside acts like a self-contained sub-discussion, interleaved with the original discussion. My hope is that this kind of feature can help to avoid embarrassing information leaks.</span></span></p>
+
+<p><span class="caption-wrapper"><img class="caption" src="/talks/poodle/private-aside-2.png" width="" height="" title="Private aside messages are interleaved time-wise with the top-level discussion. And each private aside has its own private reply form after the last message in the aside." /><span class="caption-text">Private aside messages are interleaved time-wise with the top-level discussion. And each private aside has its own private reply form after the last message in the aside.</span></span></p>
 
 <p>Somehow I missed including a slide showing another feature that I think is useful:
 when someone includes a new person in the recipient list in a reply,
@@ -236,6 +229,18 @@ and so on.</p>
 
   <footer>
     
+  <section class="revisions meta">
+    <heading>
+      <h2>Revision history</h2>
+    </heading>
+    <dl>
+      
+      <dt>2017-12-18</dt>
+      <dd>Update link to Poodle; show slides inline with post</dd>
+      
+    </dl>
+  </section>
+
 
     <p class="meta">
       
@@ -257,7 +262,9 @@ and so on.</p>
 
 
 
-<time datetime="2017-06-20" pubdate data-updated="true">2017-06-20</time>
+  
+
+<time datetime="2017-12-18" class="updated" data-updated="true" pubdate>Updated 2017-12-18</time> <time datetime="2017-06-20">Originally posted 2017-06-20</time>
       
 
 
@@ -274,6 +281,8 @@ and so on.</p>
       
         <a class="basic-alignment left" href="/2017/02/21/changes-i-would-make-to-go.html" title="Previous Post: Changes I would make to Go">&laquo; Changes I would make to Go</a>
       
+      
+        <a class="basic-alignment right" href="/2017/12/04/energy-efficient-blockchain.html" title="Next Post: Energy-efficient blockchain via serendipitous difficulty adjustment">Energy-efficient blockchain via serendipitous difficulty adjustment &raquo;</a>
       
     </p>
   </footer>
@@ -294,6 +303,10 @@ and so on.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/2017/12/04/energy-efficient-blockchain.html">Energy-efficient blockchain via serendipitous difficulty adjustment</a>
+      </li>
+    
+      <li class="post">
         <a href="/2017/06/20/what-is-poodle.html">What is Poodle</a>
       </li>
     
@@ -307,10 +320,6 @@ and so on.</p>
     
       <li class="post">
         <a href="/2016/12/20/flow-cookbook-unpacking-json.html">Flow Cookbook: Unpacking JSON API data</a>
-      </li>
-    
-      <li class="post">
-        <a href="/2016/12/20/flow-cookbook.html">Flow Cookbook</a>
       </li>
     
   </ul>

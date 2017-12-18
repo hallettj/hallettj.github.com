@@ -9,8 +9,8 @@
   <meta name="author" content="Jesse Hallett">
 
   
-  <meta name="description" content="CouchDB is a document-oriented database. It has no rows or tables. Instead
-CouchDB is a collection of JSON documents. It uses a map-reduce pattern to &hellip;">
+  <meta name="description" content="Just for kicks I thought I would take another shot at some Haskell programming.
+To get all of the common libraries and the automated package &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -32,9 +32,10 @@ CouchDB is a collection of JSON documents. It uses a map-reduce pattern to &hell
   <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
-<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-<link href="http://fonts.googleapis.com/css?family=Ubuntu+Mono:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="https://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="https://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="https://fonts.googleapis.com/css?family=Ubuntu+Mono:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
 
   
   <script type="text/javascript">
@@ -83,6 +84,75 @@ CouchDB is a collection of JSON documents. It uses a map-reduce pattern to &hell
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2009/07/02/how-to-install-haskell-platform-on-ubuntu-jaunty.html">How to install Haskell &#8220;Batteries Included&#8221; Platform on Ubuntu Jaunty</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+  
+
+
+
+<time datetime="2009-07-02" pubdate data-updated="true"></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Just for kicks I thought I would take another shot at some Haskell programming.
+To get all of the common libraries and the automated package installer, cabal,
+I set up the <a href="http://hackage.haskell.org/platform/">Haskell Platform</a>. Here is how I did it.</p>
+
+<p>Ubuntu Jaunty includes a package for the Haskell compiler, ghc, at version 6.8.
+The Haskell Platform installer will roll its eyes at you if you try to proceed
+with this version of ghc. So the first step is to install ghc 6.10.</p>
+
+<p>Paste these lines into <code>/etc/apt/sources.list.d/haskell.list</code>:</p>
+
+<pre><code>deb http://ppa.launchpad.net/someone561/ppa/ubuntu jaunty main
+deb-src http://ppa.launchpad.net/someone561/ppa/ubuntu jaunty main
+</code></pre>
+
+<p>To get the key to verify packages from that PPA, run this optional command:</p>
+
+<pre><code>sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E51D9310
+</code></pre>
+
+<p>Then update your package list and install Haskell:</p>
+
+<pre><code>sudo apt-get update
+sudo apt-get install ghc6 ghc6-prof ghc6-doc haddock
+</code></pre>
+
+<p>The Haskell Platform website does not list a package for Ubuntu yet. So
+<a href="http://hackage.haskell.org/platform/">download the source installer</a>.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/2009/07/02/how-to-install-haskell-platform-on-ubuntu-jaunty.html">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -454,6 +524,10 @@ discourse to change too.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/2017/12/04/energy-efficient-blockchain.html">Energy-efficient blockchain via serendipitous difficulty adjustment</a>
+      </li>
+    
+      <li class="post">
         <a href="/2017/06/20/what-is-poodle.html">What is Poodle</a>
       </li>
     
@@ -467,10 +541,6 @@ discourse to change too.</p>
     
       <li class="post">
         <a href="/2016/12/20/flow-cookbook-unpacking-json.html">Flow Cookbook: Unpacking JSON API data</a>
-      </li>
-    
-      <li class="post">
-        <a href="/2016/12/20/flow-cookbook.html">Flow Cookbook</a>
       </li>
     
   </ul>
