@@ -105,9 +105,7 @@ One of the endpoints of that API accepts an ID and responds with &hellip;">
 
 
 
-  
-
-<time datetime="2017-11-24" class="updated" data-updated="true" pubdate>Updated 2017-11-24</time>
+<time datetime="2016-12-20" pubdate data-updated="true">2016-12-20</time>
         
       </p>
     
@@ -434,7 +432,7 @@ necessary requests:</p>
 </pre></td><td class="code"><pre><code class="js"><span class="line"><span class="c1">// Fetches the largest ID, which should be the ID of the most recently-created</span>
 </span><span class="line"><span class="c1">// item.</span>
 </span><span class="line"><span class="kd">function</span> <span class="nx">fetchMaxItemId</span><span class="p">()</span><span class="o">:</span> <span class="nx">Promise</span><span class="o">&lt;</span><span class="nx">ID</span><span class="o">&gt;</span> <span class="p">{</span>
-</span><span class="line">  <span class="k">return</span> <span class="nx">fetch</span><span class="p">(</span><span class="err">`</span><span class="nx">https</span><span class="o">:</span><span class="c1">//hacker-news.firebaseio.com/v0/maxitem.json`)</span>
+</span><span class="line">  <span class="k">return</span> <span class="nx">nodeFetch</span><span class="p">(</span><span class="err">`</span><span class="nx">https</span><span class="o">:</span><span class="c1">//hacker-news.firebaseio.com/v0/maxitem.json`)</span>
 </span><span class="line">    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">res</span> <span class="o">=&gt;</span> <span class="nx">res</span><span class="p">.</span><span class="nx">json</span><span class="p">())</span>
 </span><span class="line"><span class="p">}</span>
 </span><span class="line">
@@ -623,18 +621,6 @@ and see how type-checking affects the way you write code.</p>
 
   <footer>
     
-  <section class="revisions meta">
-    <heading>
-      <h2>Revision history</h2>
-    </heading>
-    <dl>
-      
-      <dt>2017-11-24</dt>
-      <dd>Use io-ts to validate incoming JSON</dd>
-      
-    </dl>
-  </section>
-
 
     <p class="meta">
       
@@ -656,9 +642,7 @@ and see how type-checking affects the way you write code.</p>
 
 
 
-  
-
-<time datetime="2017-11-24" class="updated" data-updated="true" pubdate>Updated 2017-11-24</time> <time datetime="2016-12-20">Originally posted 2016-12-20</time>
+<time datetime="2016-12-20" pubdate data-updated="true">2016-12-20</time>
       
 
 <span class="categories">
@@ -703,10 +687,6 @@ and see how type-checking affects the way you write code.</p>
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/2017/12/04/energy-efficient-blockchain.html">Energy-efficient blockchain via serendipitous difficulty adjustment</a>
-      </li>
-    
-      <li class="post">
         <a href="/2017/06/20/what-is-poodle.html">What is Poodle</a>
       </li>
     
@@ -720,6 +700,10 @@ and see how type-checking affects the way you write code.</p>
     
       <li class="post">
         <a href="/2016/12/20/flow-cookbook-unpacking-json.html">Flow Cookbook: Unpacking JSON API data</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2016/12/20/flow-cookbook.html">Flow Cookbook</a>
       </li>
     
   </ul>

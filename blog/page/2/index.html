@@ -9,9 +9,9 @@
   <meta name="author" content="Jesse Hallett">
 
   
-  <meta name="description" content="I now have a Kinesis Advantage keyboard for use at work.
-I have been feeling some wrist strain recently;
-and some of my coworkers were encouraging &hellip;">
+  <meta name="description" content="Idris is a programming language with dependent types.
+It is similar to Agda, but hews more closely to Haskell.
+The goal of Idris is to bring &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -85,65 +85,6 @@ and some of my coworkers were encouraging &hellip;">
     <div id="content">
       <div class="blog-index">
   
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/2014/05/19/kinesis-advantage-with-dsa-keycaps.html">Kinesis Advantage with DSA keycaps</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-  
-
-
-
-<time datetime="2014-05-19" pubdate data-updated="true">2014-05-19</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img src="https://lh4.googleusercontent.com/MPfjOyaNmMKZRL36XEekqRiaeoHcUFLQLN-Kx62XKbgN=w1024-h576-no" /></p>
-
-<p>I now have a Kinesis Advantage keyboard for use at work.
-I have been feeling some wrist strain recently;
-and some of my coworkers were encouraging me to try one.
-So I borrowed a Kinesis for a week, and found that I really liked it.
-The contoured shape makes reaching for keys comfortable;
-I find the column layout to be nicer than the usual staggered key arrangement;
-and between the thumb-key clusters and the arrow keys,
-there are a lot of options for mapping modifier keys that are in easy reach.</p>
-
-<p><span class="caption-wrapper"><img class="caption" src="/images/kinesis-dsa/IMG_20140515_175553491_HDR.jpg" width="" height="" title="Kinesis Advantage, before modification" /><span class="caption-text">Kinesis Advantage, before modification</span></span></p>
-
-<p>But I really like the PBT keycaps on my <a href="http://imgur.com/a/XZ2hG">Leopold</a>.
-I would not enjoy going back to plain, old ABS.
-I also don’t want my keyboard to be just like every other Kinesis.
-So I decided to get replacement keycaps.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/2014/05/19/kinesis-advantage-with-dsa-keycaps.html">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
   
   
     <article>
@@ -823,6 +764,75 @@ technical overview</a>.</p>
 
     </article>
   
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2009/07/02/how-to-install-haskell-platform-on-ubuntu-jaunty.html">How to install Haskell &#8220;Batteries Included&#8221; Platform on Ubuntu Jaunty</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+  
+
+
+
+<time datetime="2009-07-02" pubdate data-updated="true"></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Just for kicks I thought I would take another shot at some Haskell programming.
+To get all of the common libraries and the automated package installer, cabal,
+I set up the <a href="http://hackage.haskell.org/platform/">Haskell Platform</a>. Here is how I did it.</p>
+
+<p>Ubuntu Jaunty includes a package for the Haskell compiler, ghc, at version 6.8.
+The Haskell Platform installer will roll its eyes at you if you try to proceed
+with this version of ghc. So the first step is to install ghc 6.10.</p>
+
+<p>Paste these lines into <code>/etc/apt/sources.list.d/haskell.list</code>:</p>
+
+<pre><code>deb http://ppa.launchpad.net/someone561/ppa/ubuntu jaunty main
+deb-src http://ppa.launchpad.net/someone561/ppa/ubuntu jaunty main
+</code></pre>
+
+<p>To get the key to verify packages from that PPA, run this optional command:</p>
+
+<pre><code>sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E51D9310
+</code></pre>
+
+<p>Then update your package list and install Haskell:</p>
+
+<pre><code>sudo apt-get update
+sudo apt-get install ghc6 ghc6-prof ghc6-doc haddock
+</code></pre>
+
+<p>The Haskell Platform website does not list a package for Ubuntu yet. So
+<a href="http://hackage.haskell.org/platform/">download the source installer</a>.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/2009/07/02/how-to-install-haskell-platform-on-ubuntu-jaunty.html">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/3/">&larr; Older</a>
@@ -840,10 +850,6 @@ technical overview</a>.</p>
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/2017/12/04/energy-efficient-blockchain.html">Energy-efficient blockchain via serendipitous difficulty adjustment</a>
-      </li>
-    
-      <li class="post">
         <a href="/2017/06/20/what-is-poodle.html">What is Poodle</a>
       </li>
     
@@ -857,6 +863,10 @@ technical overview</a>.</p>
     
       <li class="post">
         <a href="/2016/12/20/flow-cookbook-unpacking-json.html">Flow Cookbook: Unpacking JSON API data</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2016/12/20/flow-cookbook.html">Flow Cookbook</a>
       </li>
     
   </ul>
