@@ -2,8 +2,12 @@
 layout: post
 title: "What is Poodle"
 author: Jesse Hallett
-date: 2017-06-20
 comments: true
+date: 2017-06-20
+updated: 2017-12-18
+revisions:
+  - date: 2017-12-18
+    message: Update link to Poodle; show slides inline with post
 ---
 
 This is a description of my passion project. I plan to publish more detail and motivation when I get to a minimum viable product.
@@ -20,7 +24,7 @@ This has been attempted before by Identi.ca, Diaspora, Google Wave, and others.
 I thought that a decentralized protocol could have more success if it takes a different approach: reinvent as little as possible, and build on top of an existing protocol with a large user base.
 I'm working on a reference client (called [Poodle][]) that implements a new protocol that builds on email.
 
-[Poodle]: https://github.com/PoodleApp/poodle-electron
+[Poodle]: https://github.com/PoodleApp/poodle
 
 Email is one of the few decentralized social protocols that has broad adoption
 ([2.6 billion users][email statistics]);
@@ -90,19 +94,19 @@ And everything gracefully degrades when interacting with people with regular ema
 
 Going slide-by-slide:
 
-2. Participants can edit their own post after-the-fact; each activity has +1 counts.
+{% imgcap /talks/poodle/message-wide.png Participants can edit their own post after-the-fact; each activity has +1 counts. %}
 
-3. An interaction might be presented as a collaborative document instead of as a thread. In this case there are calls-to-action to edit, or link to the document. (In this example the document content is markdown; but this concept could work for any type of file: images, videos, slide decks, whatever.)
+{% imgcap /talks/poodle/document-wide.png An interaction might be presented as a collaborative document instead of as a thread. In this case there are calls-to-action to edit, or link to the document. (In this example the document content is markdown; but this concept could work for any type of file: images, videos, slide decks, whatever.) %}
 
-4. Linking to email messages is a much under-used feature in my opinion. There is actually already an [RFC](https://tools.ietf.org/html/rfc2392) that specifies how to construct a globally-unique URI for any email message.
+{% imgcap /talks/poodle/link-to-document.png Linking to email messages is a much under-used feature in my opinion. There is actually already an [RFC](https://tools.ietf.org/html/rfc2392) that specifies how to construct a globally-unique URI for any email message. %}
 
-5. This slide shows an early iteration of the process of linking to a document from another activity. Combining collaborative documents with linking allows for a decentralized wiki that actually lives in copies in the participants' email accounts.
+{% imgcap /talks/poodle/permalink.png This is an early iteration of the process of linking to a document from another activity. Combining collaborative documents with linking allows for a decentralized wiki that actually lives in copies in the participant&rsquo;s email accounts. %}
 
-6. I was experimenting with features to make email more usable generally. I tried to design Poodle to make it really obvious who sees what in any exchange. Poodle uses a reply-to-all form as the default reply option, and the user must go through extra steps to reply to just one person, or to a subset of the people already participating in a discussion.
+{% imgcap /talks/poodle/who-can-see-this-discussion.png I was experimenting with features to make email more usable generally. I tried to design Poodle to make it really obvious who sees what in any exchange. Poodle uses a reply-to-all form as the default reply option, and the user must go through extra steps to reply to just one person, or to a subset of the people already participating in a discussion. %}
 
-7. If someone does reply without including everyone, you get this "private aside" feature. (This works just by examining To:, From:, and Cc: fields in email messages in the discussion.) The private aside acts like a self-contained sub-discussion, interleaved with the original discussion. My hope is that this kind of feature can help to avoid embarrassing information leaks.
+{% imgcap /talks/poodle/private-aside-1.png If someone does reply without including everyone, you get this "private aside" feature. (This works just by examining To:, From:, and Cc: fields in email messages in the discussion.) The private aside acts like a self-contained sub-discussion, interleaved with the original discussion. My hope is that this kind of feature can help to avoid embarrassing information leaks. %}
 
-8. Private aside messages are interleaved time-wise with the top-level discussion. And each private aside has its own private reply form after the last message in the aside.
+{% imgcap /talks/poodle/private-aside-2.png Private aside messages are interleaved time-wise with the top-level discussion. And each private aside has its own private reply form after the last message in the aside. %}
 
 Somehow I missed including a slide showing another feature that I think is useful:
 when someone includes a new person in the recipient list in a reply,
