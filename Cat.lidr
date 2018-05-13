@@ -835,6 +835,10 @@ as I continue to explore Category theory.
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/2018/05/13/build-xmonad-with-stack.html">I finally set up XMonad to build with Stack!</a>
+      </li>
+    
+      <li class="post">
         <a href="/2017/06/20/what-is-poodle.html">What is Poodle</a>
       </li>
     
@@ -848,10 +852,6 @@ as I continue to explore Category theory.
     
       <li class="post">
         <a href="/2016/12/20/flow-cookbook-unpacking-json.html">Flow Cookbook: Unpacking JSON API data</a>
-      </li>
-    
-      <li class="post">
-        <a href="/2016/12/20/flow-cookbook.html">Flow Cookbook</a>
       </li>
     
   </ul>
@@ -896,7 +896,7 @@ as I continue to explore Category theory.
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2017 - Jesse Hallett -
+  Copyright &copy; 2018 - Jesse Hallett -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 

@@ -1,0 +1,385 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>I finally set up XMonad to build with Stack! - sitr.us</title>
+  <meta name="author" content="Jesse Hallett">
+
+  
+  <meta name="description" content="The XMonad window manager is configured in Haskell.
+That means that when you want to apply a new configuration you actually build
+xmonad itself &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- OpenID delegation -->
+  <link rel="openid.delegate" href="http://sitr.us/" />
+  <link rel="openid.server" href="https://indieauth.com/openid" />
+
+  
+  <link rel="canonical" href="http://sitr.us/2018/05/13/build-xmonad-with-stack.html">
+  <link href="/favicon.ico" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="http://feeds.feedburner.com/hallettj" rel="alternate" title="sitr.us" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="https://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="https://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="https://fonts.googleapis.com/css?family=Ubuntu+Mono:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-327628-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">sitr.us</a></h1>
+  
+    <h2>posts by Jesse Hallett</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="http://feeds.feedburner.com/hallettj" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:sitr.us" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">I finally set up XMonad to build with Stack!</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+  
+
+
+
+<time datetime="2018-05-13" pubdate data-updated="true">2018-05-13</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>The <a href="http://xmonad.org/">XMonad</a> window manager is configured in Haskell.
+That means that when you want to apply a new configuration you actually build
+xmonad itself incorporating code from your configuration file.
+It sounds more painful than it is -
+when you install xmonad you get an executable called <code>xmonad</code> that handles the
+details of bootstrapping your custom build.
+The command <code>xmonad --recompile</code> builds <code>~/.xmonad/xmonad.hs</code>,
+and subsequent invocations of <code>xmonad</code> run the executable that is produced.</p>
+
+<p>When you configure xmonad you are actually writing your own version of the
+program.
+Because you can write arbitrary code the possibilities for customization are
+endless!
+As with any software project,
+you get maximum expressive power when you bring in third-party libraries.
+<code>xmonad-contrib</code> is a popular choice -
+but you can import any Haskell library that you want.
+With libraries come the problem of managing library packages.
+In the past I used the <code>cabal</code> command to globally install library packages.
+From time to time I would clear out my installed packages,
+or change something while working on another Haskell project,
+and then my window manager would stop working.
+I wanted a better option.</p>
+
+<!-- more -->
+
+<p><a href="https://docs.haskellstack.org/en/stable/README/">Stack</a> is my preferred dependency management and build tool for Haskell
+projects.
+Stack automatically fetches project dependencies,
+and maintains isolated sets of installed packages for each project.
+With stack I declare dependencies in a <a href="https://github.com/hallettj/dot-xmonad/blob/master/home/.xmonad/my-xmonad.cabal">.cabal file</a>,
+and stack ensures that I have up-to-date copies of all libraries whenever
+xmonad builds itself.</p>
+
+<p>To use stack I needed to hook into xmonad’s build process.
+I used this <a href="http://brianbuccola.com/how-to-install-xmonad-and-xmobar-via-stack/">blog post</a> as a starting point.
+That post provides instructions for using the <code>stack ghc</code> command to invoke ghc
+in an environment prepared by stack.
+But I have some custom code modules in <code>~/.xmonad/lib/</code>,
+and I had problems getting ghc to find those when running <code>stack ghc</code>.
+So I opted to set up a fully-fledged stack project which is built with the
+usual <code>stack build</code> command.
+You can take a look at my <a href="https://github.com/hallettj/dot-xmonad/tree/master/home/.xmonad">~/.xmonad/</a> directory to get the high-level view.</p>
+
+<p>The key is the <a href="https://github.com/hallettj/dot-xmonad/blob/master/home/.xmonad/build">build</a> script.
+Starting in xmonad v0.13 if there is an executable called <code>build</code> in your
+<code>~/.xmonad/</code> directory then xmonad will defer to that script.
+<code>build</code> gets a path as an argument which is where the compiled xmonad executable
+should be placed.
+My script looks like this:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+</pre></td><td class="code"><pre><code class="sh"><span class="line"><span class="c">#!/bin/sh</span>
+</span><span class="line">
+</span><span class="line"><span class="nb">set</span> -e
+</span><span class="line">
+</span><span class="line">stack build :my-xmonad --verbosity error
+</span><span class="line">stack install :my-xmonad --local-bin-path bin/ --verbosity error
+</span><span class="line">mv bin/my-xmonad <span class="s2">&quot;$1&quot;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>My <code>my-xmonad.cabal</code> file declares an executable named <code>my-xmonad</code>
+(which is actually my customized version of xmonad).
+This script builds that executable,
+installs the it to <code>~/.xmonad/bin/my-xmonad</code>
+(thanks to the <code>--local-bin-path</code> argument to <code>stack install</code>),
+and finally moves the executable to the location given by the first argument to
+the <code>build</code> script.</p>
+
+<p>You can detailed on working with stack from stack’s <a href="https://docs.haskellstack.org/en/stable/GUIDE/">user guide</a>.
+If you want to get going quickly I created a stack <a href="https://raw.githubusercontent.com/hallettj/dot-xmonad/master/home/.xmonad/xmonad.hsfiles">project template</a> to set
+up xmonad with stack.
+Here is what you do:</p>
+
+<ul>
+  <li>Install xmonad and stack using your preferred package manager - you need xmonad v0.13 or later.</li>
+  <li>Run <code>stack new my-xmonad https://raw.githubusercontent.com/hallettj/dot-xmonad/master/home/.xmonad/xmonad.hsfiles</code></li>
+  <li>If you are setting up a new xmonad configuration then <code>mv my-xmonad ~/.xmonad</code>. Otherwise copy files from <code>my-xmonad/</code> to <code>~/.xmonad/</code> and then delete <code>my-xmonad/</code>. The relevant files are:
+    <ul>
+      <li><code>my-xmonad.cabal</code>, your project manifest</li>
+      <li><code>build</code></li>
+      <li><code>lib/</code> - this directory must exist or the project will not build!</li>
+      <li><code>xmonad.hs</code>, in case you do not have your own</li>
+      <li><code>.gitignore</code>, in case you want to version-control your xmonad config</li>
+    </ul>
+  </li>
+  <li><code>chmod a+x ~/.xmonad/build</code> - if the build script is not marked as executable xmonad will not execute it.</li>
+  <li>In <code>~/.xmonad/</code> run <code>stack setup</code> to install the version of ghc that stack wants to use. (Stack installs ghc in a sandbox so that it does not conflict with any other ghc installation on your machine.)</li>
+</ul>
+
+<p>Names of any custom modules that you have in <code>~/.xmonad/lib</code> need to be listed in the <code>other-modules</code> section in <code>~/.xmonad/my-xmonad.cabal</code>.
+If you want to add library dependencies beyond <code>xmonad</code> and <code>xmonad-contrib</code>
+then add them to the <code>build-depends</code> section in the same file.
+Stack pulls dependencies from <a href="https://www.stackage.org/">Stackage</a>,
+which hosts curated sets of packages.
+The <code>resolver</code> setting in <code>stack.yaml</code> determines the version of each
+dependency that you get,
+and the version of ghc that stack will use to compile xmonad.
+If you want to use libraries that are not hosted on Stackage you will need to
+list package names with exact version numbers in the <code>extra-deps</code> section in
+<code>stack.yaml</code> according to <a href="https://docs.haskellstack.org/en/stable/GUIDE/#extra-deps">these instructions</a>.</p>
+
+<p>Test everything by running <code>xmonad --recompile</code> from any directory.
+If that works then you are all set!</p>
+
+</div>
+
+
+  <footer>
+    
+
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Jesse Hallett</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+  
+
+
+
+<time datetime="2018-05-13" pubdate data-updated="true">2018-05-13</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/2017/06/20/what-is-poodle.html" title="Previous Post: What is Poodle">&laquo; What is Poodle</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/2018/05/13/build-xmonad-with-stack.html">I finally set up XMonad to build with Stack!</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2017/06/20/what-is-poodle.html">What is Poodle</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2017/02/21/changes-i-would-make-to-go.html">Changes I would make to Go</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2017/01/03/flow-cookbook-react.html">Flow Cookbook: Flow & React</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2016/12/20/flow-cookbook-unpacking-json.html">Flow Cookbook: Unpacking JSON API data</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Talks</h1>
+  <ul id="talks">
+    <li><a href="http://opensourcebridge.org/sessions/1067">Mod your Android</a></li>
+    <li><a href="talks/intro-to-javascript/">Introduction to JavaScript</a></li>
+    <li><a href="http://lanyrd.com/2012/nodepdx/smyqm/">Object-oriented patterns in JavaScript</a></li>
+    <li><a href="talks/cookies/">Cookies are bad for you</a></li>
+    <li><a href="talks/professional-javascript/">Professional JavaScript</a></li>
+    <li><a href="http://opensourcebridge.org/2009/wiki/Clustering_Data_--_How_to_Have_Fun_in_n-Dimensions">Cluster Analysis: How to Have Fun in n Dimensions</a></li>
+    <li><a href="https://docs.google.com/presentation/d/1hx9Pzo07aAnZ2skMH4JPjH7a6IXx64uC0zRliS3qpkk/edit?usp=sharing">How to build blazing fast web apps with Ruby on Rails</a></li>
+  </ul>
+</section>
+<section>
+  <h1>Open Source Projects</h1>
+  <ul id="projects">
+    <li><a href="http://github.com/jivesoftware/tAMD">tAMD:</a> Tiny, extensible implementation of the Asynchronous Module Definition (AMD) specification from CommonJS</li>
+  </ul>
+</section>
+<section>
+  <div class="contact" style="float:left; margin:0.5em;">
+    <p>
+      Jesse Hallett<br/>
+      <a href="mailto:jesse@sitr.us">jesse@sitr.us</a>
+    </p>
+  </div>
+  <div class="contact" style="float:left; margin:0.5em;">
+    <p>
+      <a rel="me" href="https://github.com/hallettj/">github.com/hallettj</a><br />
+      <a rel="me" href="https://twitter.com/hallettj/">twitter.com/hallettj</a>
+    </p>
+  </div>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2018 - Jesse Hallett -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'hallettj';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://sitr.us/2018/05/13/build-xmonad-with-stack.html';
+        var disqus_url = 'http://sitr.us/2018/05/13/build-xmonad-with-stack.html';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

@@ -9,7 +9,9 @@
   <meta name="author" content="Jesse Hallett">
 
   
-  <meta name="description" content="This is a description of my passion project. I plan to publish more detail and motivation when I get to a minimum viable product. I want to make &hellip;">
+  <meta name="description" content="The XMonad window manager is configured in Haskell.
+That means that when you want to apply a new configuration you actually build
+xmonad itself &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -83,6 +85,71 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2018/05/13/build-xmonad-with-stack.html">I finally set up XMonad to build with Stack!</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+  
+
+
+
+<time datetime="2018-05-13" pubdate data-updated="true">2018-05-13</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>The <a href="http://xmonad.org/">XMonad</a> window manager is configured in Haskell.
+That means that when you want to apply a new configuration you actually build
+xmonad itself incorporating code from your configuration file.
+It sounds more painful than it is -
+when you install xmonad you get an executable called <code>xmonad</code> that handles the
+details of bootstrapping your custom build.
+The command <code>xmonad --recompile</code> builds <code>~/.xmonad/xmonad.hs</code>,
+and subsequent invocations of <code>xmonad</code> run the executable that is produced.</p>
+
+<p>When you configure xmonad you are actually writing your own version of the
+program.
+Because you can write arbitrary code the possibilities for customization are
+endless!
+As with any software project,
+you get maximum expressive power when you bring in third-party libraries.
+<code>xmonad-contrib</code> is a popular choice -
+but you can import any Haskell library that you want.
+With libraries come the problem of managing library packages.
+In the past I used the <code>cabal</code> command to globally install library packages.
+From time to time I would clear out my installed packages,
+or change something while working on another Haskell project,
+and then my window manager would stop working.
+I wanted a better option.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/2018/05/13/build-xmonad-with-stack.html">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -661,65 +728,6 @@ generators into code that can be run in any ES5-compatible web browser.</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/2014/05/19/kinesis-advantage-with-dsa-keycaps.html">Kinesis Advantage with DSA keycaps</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-  
-
-
-
-<time datetime="2014-05-19" pubdate data-updated="true">2014-05-19</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img src="https://lh4.googleusercontent.com/MPfjOyaNmMKZRL36XEekqRiaeoHcUFLQLN-Kx62XKbgN=w1024-h576-no" /></p>
-
-<p>I now have a Kinesis Advantage keyboard for use at work.
-I have been feeling some wrist strain recently;
-and some of my coworkers were encouraging me to try one.
-So I borrowed a Kinesis for a week, and found that I really liked it.
-The contoured shape makes reaching for keys comfortable;
-I find the column layout to be nicer than the usual staggered key arrangement;
-and between the thumb-key clusters and the arrow keys,
-there are a lot of options for mapping modifier keys that are in easy reach.</p>
-
-<p><span class="caption-wrapper"><img class="caption" src="/images/kinesis-dsa/IMG_20140515_175553491_HDR.jpg" width="" height="" title="Kinesis Advantage, before modification" /><span class="caption-text">Kinesis Advantage, before modification</span></span></p>
-
-<p>But I really like the PBT keycaps on my <a href="http://imgur.com/a/XZ2hG">Leopold</a>.
-I would not enjoy going back to plain, old ABS.
-I also don’t want my keyboard to be just like every other Kinesis.
-So I decided to get replacement keycaps.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/2014/05/19/kinesis-advantage-with-dsa-keycaps.html">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -735,6 +743,10 @@ So I decided to get replacement keycaps.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/2018/05/13/build-xmonad-with-stack.html">I finally set up XMonad to build with Stack!</a>
+      </li>
+    
+      <li class="post">
         <a href="/2017/06/20/what-is-poodle.html">What is Poodle</a>
       </li>
     
@@ -748,10 +760,6 @@ So I decided to get replacement keycaps.</p>
     
       <li class="post">
         <a href="/2016/12/20/flow-cookbook-unpacking-json.html">Flow Cookbook: Unpacking JSON API data</a>
-      </li>
-    
-      <li class="post">
-        <a href="/2016/12/20/flow-cookbook.html">Flow Cookbook</a>
       </li>
     
   </ul>
@@ -795,7 +803,7 @@ So I decided to get replacement keycaps.</p>
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2017 - Jesse Hallett -
+  Copyright &copy; 2018 - Jesse Hallett -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 
